@@ -1,0 +1,32 @@
+[
+    {
+        "department_id": "CSE",
+        "department_name": "Computer Science and Engineering",
+        "head_of_department": "Dr. Manoj Kumar",
+        "contact_email": "hod.cse@dtu.ac.in",
+        "contact_phone": "011-27871018",
+        "location": "CSE Block",
+        "recognitions": [],
+        "metadata": {
+            "created_at": "2024-01-01T00:00:00.000Z",
+            "updated_at": "2024-01-01T00:00:00.000Z",
+            "created_by": null,
+            "change_log": []
+        }
+    },
+    {
+        "department_id": "ECE",
+        "department_name": "Electronics and Communication Engineering",
+        "head_of_department": "Dr. HOD ECE",
+        "contact_email": "hod.ece@dtu.ac.in",
+        "contact_phone": "011-27871020",
+        "location": "ECE Block",
+        "recognitions": [],
+        "metadata": {
+            "created_at": "2024-01-01T00:00:00.000Z",
+            "updated_at": "2024-01-01T00:00:00.000Z",
+            "created_by": null,
+            "change_log": []
+        }
+    }
+]

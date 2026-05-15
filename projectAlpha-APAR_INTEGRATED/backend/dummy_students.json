@@ -1,0 +1,40 @@
+[
+    {
+        "student_id": "2K20/CSE/01",
+        "department_id": "CSE",
+        "programme_id": "B.Tech",
+        "enrollment_no": "2K20/CSE/01",
+        "name": "Rahul Sharma",
+        "gender": "Male",
+        "date_of_birth": "2002-01-01T00:00:00.000Z",
+        "email": "rahul.cse@dtu.ac.in",
+        "phone": "9999999999",
+        "year_of_admission": 2020,
+        "current_semester": 8,
+        "metadata": {
+            "created_at": "2024-01-01T00:00:00.000Z",
+            "updated_at": "2024-01-01T00:00:00.000Z",
+            "created_by": null,
+            "change_log": []
+        }
+    },
+    {
+        "student_id": "2K20/ECE/02",
+        "department_id": "ECE",
+        "programme_id": "B.Tech",
+        "enrollment_no": "2K20/ECE/02",
+        "name": "Priya Verma",
+        "gender": "Female",
+        "date_of_birth": "2002-02-02T00:00:00.000Z",
+        "email": "priya.ece@dtu.ac.in",
+        "phone": "8888888888",
+        "year_of_admission": 2020,
+        "current_semester": 8,
+        "metadata": {
+            "created_at": "2024-01-01T00:00:00.000Z",
+            "updated_at": "2024-01-01T00:00:00.000Z",
+            "created_by": null,
+            "change_log": []
+        }
+    }
+]

@@ -1,0 +1,447 @@
+{
+  "summary": {
+    "base_url": "http://localhost:8000",
+    "total": 17,
+    "ok": 1,
+    "client_error": 13,
+    "server_error": 3,
+    "generated_at": "2026-01-18T19:05:39.971Z",
+    "duration_ms": 191
+  },
+  "results": [
+    {
+      "method": "POST",
+      "path": "/api/v1/auth/login",
+      "url": "http://localhost:8000/api/v1/auth/login",
+      "status": 400,
+      "ok": true,
+      "classification": "client-error",
+      "duration_ms": 16,
+      "request_payload": {},
+      "response_json": {
+        "message": "Email, password and role are required",
+        "statusCode": 400,
+        "errors": [],
+        "stack": "Error: Email, password and role are required\n    at file:///C:/Users/tanej/OneDrive/Desktop/WEBD/IQAC/project/backend/src/controllers/auth.controller.js:145:11\n    at file:///C:/Users/tanej/OneDrive/Desktop/WEBD/IQAC/project/backend/src/utils/async-handler.js:3:21\n    at Layer.handleRequest (C:\\Users\\tanej\\OneDrive\\Desktop\\WEBD\\IQAC\\project\\backend\\node_modules\\router\\lib\\layer.js:152:17)\n    at next (C:\\Users\\tanej\\OneDrive\\Desktop\\WEBD\\IQAC\\project\\backend\\node_modules\\router\\lib\\route.js:157:13)\n    at Route.dispatch (C:\\Users\\tanej\\OneDrive\\Desktop\\WEBD\\IQAC\\project\\backend\\node_modules\\router\\lib\\route.js:117:3)\n    at handle (C:\\Users\\tanej\\OneDrive\\Desktop\\WEBD\\IQAC\\project\\backend\\node_modules\\router\\index.js:435:11)\n    at Layer.handleRequest (C:\\Users\\tanej\\OneDrive\\Desktop\\WEBD\\IQAC\\project\\backend\\node_modules\\router\\lib\\layer.js:152:17)\n    at C:\\Users\\tanej\\OneDrive\\Desktop\\WEBD\\IQAC\\project\\backend\\node_modules\\router\\index.js:295:15\n    at processParams (C:\\Users\\tanej\\OneDrive\\Desktop\\WEBD\\IQAC\\project\\backend\\node_modules\\router\\index.js:582:12)\n    at next (C:\\Users\\tanej\\OneDrive\\Desktop\\WEBD\\IQAC\\project\\backend\\node_modules\\router\\index.js:291:5)",
+        "success": false
+      },
+      "analysis": {
+        "response_message": "Email, password and role are required",
+        "requires_files": false,
+        "validation_error": false
+      },
+      "routeFile": "src\\routes\\auth.routes.js",
+      "used_multipart": false,
+      "file_attached": false
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/auth/register",
+      "url": "http://localhost:8000/api/v1/auth/register",
+      "status": 403,
+      "ok": true,
+      "classification": "client-error",
+      "duration_ms": 10,
+      "request_payload": {},
+      "response_json": {
+        "message": "User provisioning is not allowed",
+        "statusCode": 403,
+        "errors": [],
+        "stack": "Error: User provisioning is not allowed\n    at file:///C:/Users/tanej/OneDrive/Desktop/WEBD/IQAC/project/backend/src/controllers/auth.controller.js:89:11\n    at file:///C:/Users/tanej/OneDrive/Desktop/WEBD/IQAC/project/backend/src/utils/async-handler.js:3:21\n    at Layer.handleRequest (C:\\Users\\tanej\\OneDrive\\Desktop\\WEBD\\IQAC\\project\\backend\\node_modules\\router\\lib\\layer.js:152:17)\n    at next (C:\\Users\\tanej\\OneDrive\\Desktop\\WEBD\\IQAC\\project\\backend\\node_modules\\router\\lib\\route.js:157:13)\n    at Route.dispatch (C:\\Users\\tanej\\OneDrive\\Desktop\\WEBD\\IQAC\\project\\backend\\node_modules\\router\\lib\\route.js:117:3)\n    at handle (C:\\Users\\tanej\\OneDrive\\Desktop\\WEBD\\IQAC\\project\\backend\\node_modules\\router\\index.js:435:11)\n    at Layer.handleRequest (C:\\Users\\tanej\\OneDrive\\Desktop\\WEBD\\IQAC\\project\\backend\\node_modules\\router\\lib\\layer.js:152:17)\n    at C:\\Users\\tanej\\OneDrive\\Desktop\\WEBD\\IQAC\\project\\backend\\node_modules\\router\\index.js:295:15\n    at processParams (C:\\Users\\tanej\\OneDrive\\Desktop\\WEBD\\IQAC\\project\\backend\\node_modules\\router\\index.js:582:12)\n    at next (C:\\Users\\tanej\\OneDrive\\Desktop\\WEBD\\IQAC\\project\\backend\\node_modules\\router\\index.js:291:5)",
+        "success": false
+      },
+      "analysis": {
+        "response_message": "User provisioning is not allowed",
+        "requires_files": false,
+        "validation_error": false
+      },
+      "routeFile": "src\\routes\\auth.routes.js",
+      "used_multipart": false,
+      "file_attached": false
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/auth/forgot-password",
+      "url": "http://localhost:8000/api/v1/auth/forgot-password",
+      "status": 400,
+      "ok": true,
+      "classification": "client-error",
+      "duration_ms": 6,
+      "request_payload": {},
+      "response_json": {
+        "message": "Teacher ID is required",
+        "statusCode": 400,
+        "errors": [],
+        "stack": "Error: Teacher ID is required\n    at file:///C:/Users/tanej/OneDrive/Desktop/WEBD/IQAC/project/backend/src/controllers/auth.controller.js:319:11\n    at file:///C:/Users/tanej/OneDrive/Desktop/WEBD/IQAC/project/backend/src/utils/async-handler.js:3:21\n    at Layer.handleRequest (C:\\Users\\tanej\\OneDrive\\Desktop\\WEBD\\IQAC\\project\\backend\\node_modules\\router\\lib\\layer.js:152:17)\n    at next (C:\\Users\\tanej\\OneDrive\\Desktop\\WEBD\\IQAC\\project\\backend\\node_modules\\router\\lib\\route.js:157:13)\n    at Route.dispatch (C:\\Users\\tanej\\OneDrive\\Desktop\\WEBD\\IQAC\\project\\backend\\node_modules\\router\\lib\\route.js:117:3)\n    at handle (C:\\Users\\tanej\\OneDrive\\Desktop\\WEBD\\IQAC\\project\\backend\\node_modules\\router\\index.js:435:11)\n    at Layer.handleRequest (C:\\Users\\tanej\\OneDrive\\Desktop\\WEBD\\IQAC\\project\\backend\\node_modules\\router\\lib\\layer.js:152:17)\n    at C:\\Users\\tanej\\OneDrive\\Desktop\\WEBD\\IQAC\\project\\backend\\node_modules\\router\\index.js:295:15\n    at processParams (C:\\Users\\tanej\\OneDrive\\Desktop\\WEBD\\IQAC\\project\\backend\\node_modules\\router\\index.js:582:12)\n    at next (C:\\Users\\tanej\\OneDrive\\Desktop\\WEBD\\IQAC\\project\\backend\\node_modules\\router\\index.js:291:5)",
+        "success": false
+      },
+      "analysis": {
+        "response_message": "Teacher ID is required",
+        "requires_files": false,
+        "validation_error": false
+      },
+      "routeFile": "src\\routes\\auth.routes.js",
+      "used_multipart": false,
+      "file_attached": false
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/auth/logout",
+      "url": "http://localhost:8000/api/v1/auth/logout",
+      "status": 401,
+      "ok": true,
+      "classification": "client-error",
+      "duration_ms": 9,
+      "request_payload": {},
+      "response_json": {
+        "message": "Invalid or expired session",
+        "statusCode": 401,
+        "errors": [],
+        "stack": "Error: Invalid or expired session\n    at verifyAccessToken (file:///C:/Users/tanej/OneDrive/Desktop/WEBD/IQAC/project/backend/src/utils/jwt.js:29:11)\n    at authenticate (file:///C:/Users/tanej/OneDrive/Desktop/WEBD/IQAC/project/backend/src/middlewares/auth.middleware.js:44:21)\n    at Layer.handleRequest (C:\\Users\\tanej\\OneDrive\\Desktop\\WEBD\\IQAC\\project\\backend\\node_modules\\router\\lib\\layer.js:152:17)\n    at next (C:\\Users\\tanej\\OneDrive\\Desktop\\WEBD\\IQAC\\project\\backend\\node_modules\\router\\lib\\route.js:157:13)\n    at Route.dispatch (C:\\Users\\tanej\\OneDrive\\Desktop\\WEBD\\IQAC\\project\\backend\\node_modules\\router\\lib\\route.js:117:3)\n    at handle (C:\\Users\\tanej\\OneDrive\\Desktop\\WEBD\\IQAC\\project\\backend\\node_modules\\router\\index.js:435:11)\n    at Layer.handleRequest (C:\\Users\\tanej\\OneDrive\\Desktop\\WEBD\\IQAC\\project\\backend\\node_modules\\router\\lib\\layer.js:152:17)\n    at C:\\Users\\tanej\\OneDrive\\Desktop\\WEBD\\IQAC\\project\\backend\\node_modules\\router\\index.js:295:15\n    at processParams (C:\\Users\\tanej\\OneDrive\\Desktop\\WEBD\\IQAC\\project\\backend\\node_modules\\router\\index.js:582:12)\n    at next (C:\\Users\\tanej\\OneDrive\\Desktop\\WEBD\\IQAC\\project\\backend\\node_modules\\router\\index.js:291:5)",
+        "success": false
+      },
+      "analysis": {
+        "response_message": "Invalid or expired session",
+        "requires_files": false,
+        "validation_error": false
+      },
+      "routeFile": "src\\routes\\auth.routes.js",
+      "used_multipart": false,
+      "file_attached": false
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/auth/profile",
+      "url": "http://localhost:8000/api/v1/auth/profile",
+      "status": 401,
+      "ok": true,
+      "classification": "client-error",
+      "duration_ms": 6,
+      "response_json": {
+        "message": "Invalid or expired session",
+        "statusCode": 401,
+        "errors": [],
+        "stack": "Error: Invalid or expired session\n    at verifyAccessToken (file:///C:/Users/tanej/OneDrive/Desktop/WEBD/IQAC/project/backend/src/utils/jwt.js:29:11)\n    at authenticate (file:///C:/Users/tanej/OneDrive/Desktop/WEBD/IQAC/project/backend/src/middlewares/auth.middleware.js:44:21)\n    at Layer.handleRequest (C:\\Users\\tanej\\OneDrive\\Desktop\\WEBD\\IQAC\\project\\backend\\node_modules\\router\\lib\\layer.js:152:17)\n    at next (C:\\Users\\tanej\\OneDrive\\Desktop\\WEBD\\IQAC\\project\\backend\\node_modules\\router\\lib\\route.js:157:13)\n    at Route.dispatch (C:\\Users\\tanej\\OneDrive\\Desktop\\WEBD\\IQAC\\project\\backend\\node_modules\\router\\lib\\route.js:117:3)\n    at handle (C:\\Users\\tanej\\OneDrive\\Desktop\\WEBD\\IQAC\\project\\backend\\node_modules\\router\\index.js:435:11)\n    at Layer.handleRequest (C:\\Users\\tanej\\OneDrive\\Desktop\\WEBD\\IQAC\\project\\backend\\node_modules\\router\\lib\\layer.js:152:17)\n    at C:\\Users\\tanej\\OneDrive\\Desktop\\WEBD\\IQAC\\project\\backend\\node_modules\\router\\index.js:295:15\n    at processParams (C:\\Users\\tanej\\OneDrive\\Desktop\\WEBD\\IQAC\\project\\backend\\node_modules\\router\\index.js:582:12)\n    at next (C:\\Users\\tanej\\OneDrive\\Desktop\\WEBD\\IQAC\\project\\backend\\node_modules\\router\\index.js:291:5)",
+        "success": false
+      },
+      "analysis": {
+        "response_message": "Invalid or expired session",
+        "requires_files": false,
+        "validation_error": false
+      },
+      "routeFile": "src\\routes\\auth.routes.js",
+      "used_multipart": false,
+      "file_attached": false
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/auth/verify-role",
+      "url": "http://localhost:8000/api/v1/auth/verify-role",
+      "status": 401,
+      "ok": true,
+      "classification": "client-error",
+      "duration_ms": 6,
+      "request_payload": {},
+      "response_json": {
+        "message": "Invalid or expired session",
+        "statusCode": 401,
+        "errors": [],
+        "stack": "Error: Invalid or expired session\n    at verifyAccessToken (file:///C:/Users/tanej/OneDrive/Desktop/WEBD/IQAC/project/backend/src/utils/jwt.js:29:11)\n    at authenticate (file:///C:/Users/tanej/OneDrive/Desktop/WEBD/IQAC/project/backend/src/middlewares/auth.middleware.js:44:21)\n    at Layer.handleRequest (C:\\Users\\tanej\\OneDrive\\Desktop\\WEBD\\IQAC\\project\\backend\\node_modules\\router\\lib\\layer.js:152:17)\n    at next (C:\\Users\\tanej\\OneDrive\\Desktop\\WEBD\\IQAC\\project\\backend\\node_modules\\router\\lib\\route.js:157:13)\n    at Route.dispatch (C:\\Users\\tanej\\OneDrive\\Desktop\\WEBD\\IQAC\\project\\backend\\node_modules\\router\\lib\\route.js:117:3)\n    at handle (C:\\Users\\tanej\\OneDrive\\Desktop\\WEBD\\IQAC\\project\\backend\\node_modules\\router\\index.js:435:11)\n    at Layer.handleRequest (C:\\Users\\tanej\\OneDrive\\Desktop\\WEBD\\IQAC\\project\\backend\\node_modules\\router\\lib\\layer.js:152:17)\n    at C:\\Users\\tanej\\OneDrive\\Desktop\\WEBD\\IQAC\\project\\backend\\node_modules\\router\\index.js:295:15\n    at processParams (C:\\Users\\tanej\\OneDrive\\Desktop\\WEBD\\IQAC\\project\\backend\\node_modules\\router\\index.js:582:12)\n    at next (C:\\Users\\tanej\\OneDrive\\Desktop\\WEBD\\IQAC\\project\\backend\\node_modules\\router\\index.js:291:5)",
+        "success": false
+      },
+      "analysis": {
+        "response_message": "Invalid or expired session",
+        "requires_files": false,
+        "validation_error": false
+      },
+      "routeFile": "src\\routes\\auth.routes.js",
+      "used_multipart": false,
+      "file_attached": false
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/auth/teacher-ids",
+      "url": "http://localhost:8000/api/v1/auth/teacher-ids",
+      "status": 200,
+      "ok": true,
+      "classification": "success",
+      "duration_ms": 46,
+      "response_json": {
+        "statusCode": 200,
+        "data": {
+          "teacherIds": [
+            "DTU-CSE-PMEHRA",
+            "FC_CSE_001",
+            "HOD_CSE_001",
+            "IQAC_001",
+            "Test_Hctufu",
+            "Test_Lbxzae",
+            "Test_Ohyydc",
+            "Test_Umwhyq",
+            "Test_Vjcjxz",
+            "Test_Wfybcg"
+          ]
+        },
+        "message": "Teacher IDs fetched",
+        "success": true
+      },
+      "analysis": {
+        "response_message": "Teacher IDs fetched",
+        "requires_files": false,
+        "validation_error": false
+      },
+      "routeFile": "src\\routes\\auth.routes.js",
+      "used_multipart": false,
+      "file_attached": false
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/feedback/analyze/faculty",
+      "url": "http://localhost:8000/api/v1/feedback/analyze/faculty",
+      "status": 500,
+      "ok": false,
+      "classification": "server-error",
+      "duration_ms": 16,
+      "request_payload": {},
+      "response_json": {
+        "message": "Unexpected field",
+        "statusCode": 500,
+        "errors": [],
+        "stack": "MulterError: Unexpected field\n    at wrappedFileFilter (C:\\Users\\tanej\\OneDrive\\Desktop\\WEBD\\IQAC\\project\\backend\\node_modules\\multer\\index.js:40:19)\n    at Multipart.<anonymous> (C:\\Users\\tanej\\OneDrive\\Desktop\\WEBD\\IQAC\\project\\backend\\node_modules\\multer\\lib\\make-middleware.js:132:7)\n    at Multipart.emit (node:events:519:28)\n    at HeaderParser.cb (C:\\Users\\tanej\\OneDrive\\Desktop\\WEBD\\IQAC\\project\\backend\\node_modules\\busboy\\lib\\types\\multipart.js:358:14)\n    at HeaderParser.push (C:\\Users\\tanej\\OneDrive\\Desktop\\WEBD\\IQAC\\project\\backend\\node_modules\\busboy\\lib\\types\\multipart.js:162:20)\n    at SBMH.ssCb [as _cb] (C:\\Users\\tanej\\OneDrive\\Desktop\\WEBD\\IQAC\\project\\backend\\node_modules\\busboy\\lib\\types\\multipart.js:394:37)\n    at feed (C:\\Users\\tanej\\OneDrive\\Desktop\\WEBD\\IQAC\\project\\backend\\node_modules\\streamsearch\\lib\\sbmh.js:200:10)\n    at SBMH.push (C:\\Users\\tanej\\OneDrive\\Desktop\\WEBD\\IQAC\\project\\backend\\node_modules\\streamsearch\\lib\\sbmh.js:104:16)\n    at Multipart._write (C:\\Users\\tanej\\OneDrive\\Desktop\\WEBD\\IQAC\\project\\backend\\node_modules\\busboy\\lib\\types\\multipart.js:567:19)\n    at writeOrBuffer (node:internal/streams/writable:564:12)",
+        "success": false
+      },
+      "analysis": {
+        "response_message": "Unexpected field",
+        "requires_files": false,
+        "validation_error": false
+      },
+      "routeFile": "src\\routes\\feedback.routes.js",
+      "used_multipart": true,
+      "file_attached": true
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/feedback/analyze/course",
+      "url": "http://localhost:8000/api/v1/feedback/analyze/course",
+      "status": 500,
+      "ok": false,
+      "classification": "server-error",
+      "duration_ms": 8,
+      "request_payload": {},
+      "response_json": {
+        "message": "Unexpected field",
+        "statusCode": 500,
+        "errors": [],
+        "stack": "MulterError: Unexpected field\n    at wrappedFileFilter (C:\\Users\\tanej\\OneDrive\\Desktop\\WEBD\\IQAC\\project\\backend\\node_modules\\multer\\index.js:40:19)\n    at Multipart.<anonymous> (C:\\Users\\tanej\\OneDrive\\Desktop\\WEBD\\IQAC\\project\\backend\\node_modules\\multer\\lib\\make-middleware.js:132:7)\n    at Multipart.emit (node:events:519:28)\n    at HeaderParser.cb (C:\\Users\\tanej\\OneDrive\\Desktop\\WEBD\\IQAC\\project\\backend\\node_modules\\busboy\\lib\\types\\multipart.js:358:14)\n    at HeaderParser.push (C:\\Users\\tanej\\OneDrive\\Desktop\\WEBD\\IQAC\\project\\backend\\node_modules\\busboy\\lib\\types\\multipart.js:162:20)\n    at SBMH.ssCb [as _cb] (C:\\Users\\tanej\\OneDrive\\Desktop\\WEBD\\IQAC\\project\\backend\\node_modules\\busboy\\lib\\types\\multipart.js:394:37)\n    at feed (C:\\Users\\tanej\\OneDrive\\Desktop\\WEBD\\IQAC\\project\\backend\\node_modules\\streamsearch\\lib\\sbmh.js:200:10)\n    at SBMH.push (C:\\Users\\tanej\\OneDrive\\Desktop\\WEBD\\IQAC\\project\\backend\\node_modules\\streamsearch\\lib\\sbmh.js:104:16)\n    at Multipart._write (C:\\Users\\tanej\\OneDrive\\Desktop\\WEBD\\IQAC\\project\\backend\\node_modules\\busboy\\lib\\types\\multipart.js:567:19)\n    at writeOrBuffer (node:internal/streams/writable:564:12)",
+        "success": false
+      },
+      "analysis": {
+        "response_message": "Unexpected field",
+        "requires_files": false,
+        "validation_error": false
+      },
+      "routeFile": "src\\routes\\feedback.routes.js",
+      "used_multipart": true,
+      "file_attached": true
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/feedback/analyze/program",
+      "url": "http://localhost:8000/api/v1/feedback/analyze/program",
+      "status": 500,
+      "ok": false,
+      "classification": "server-error",
+      "duration_ms": 6,
+      "request_payload": {},
+      "response_json": {
+        "message": "Unexpected field",
+        "statusCode": 500,
+        "errors": [],
+        "stack": "MulterError: Unexpected field\n    at wrappedFileFilter (C:\\Users\\tanej\\OneDrive\\Desktop\\WEBD\\IQAC\\project\\backend\\node_modules\\multer\\index.js:40:19)\n    at Multipart.<anonymous> (C:\\Users\\tanej\\OneDrive\\Desktop\\WEBD\\IQAC\\project\\backend\\node_modules\\multer\\lib\\make-middleware.js:132:7)\n    at Multipart.emit (node:events:519:28)\n    at HeaderParser.cb (C:\\Users\\tanej\\OneDrive\\Desktop\\WEBD\\IQAC\\project\\backend\\node_modules\\busboy\\lib\\types\\multipart.js:358:14)\n    at HeaderParser.push (C:\\Users\\tanej\\OneDrive\\Desktop\\WEBD\\IQAC\\project\\backend\\node_modules\\busboy\\lib\\types\\multipart.js:162:20)\n    at SBMH.ssCb [as _cb] (C:\\Users\\tanej\\OneDrive\\Desktop\\WEBD\\IQAC\\project\\backend\\node_modules\\busboy\\lib\\types\\multipart.js:394:37)\n    at feed (C:\\Users\\tanej\\OneDrive\\Desktop\\WEBD\\IQAC\\project\\backend\\node_modules\\streamsearch\\lib\\sbmh.js:200:10)\n    at SBMH.push (C:\\Users\\tanej\\OneDrive\\Desktop\\WEBD\\IQAC\\project\\backend\\node_modules\\streamsearch\\lib\\sbmh.js:104:16)\n    at Multipart._write (C:\\Users\\tanej\\OneDrive\\Desktop\\WEBD\\IQAC\\project\\backend\\node_modules\\busboy\\lib\\types\\multipart.js:567:19)\n    at writeOrBuffer (node:internal/streams/writable:564:12)",
+        "success": false
+      },
+      "analysis": {
+        "response_message": "Unexpected field",
+        "requires_files": false,
+        "validation_error": false
+      },
+      "routeFile": "src\\routes\\feedback.routes.js",
+      "used_multipart": true,
+      "file_attached": true
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/apar/auth/login",
+      "url": "http://localhost:8000/api/v1/apar/auth/login",
+      "status": 400,
+      "ok": true,
+      "classification": "client-error",
+      "duration_ms": 8,
+      "request_payload": {},
+      "response_json": {
+        "message": "Email, password and role are required",
+        "statusCode": 400,
+        "errors": [],
+        "stack": "Error: Email, password and role are required\n    at file:///C:/Users/tanej/OneDrive/Desktop/WEBD/IQAC/project/backend/src/controllers/aparAuth.controller.js:94:11\n    at file:///C:/Users/tanej/OneDrive/Desktop/WEBD/IQAC/project/backend/src/utils/async-handler.js:3:21\n    at Layer.handleRequest (C:\\Users\\tanej\\OneDrive\\Desktop\\WEBD\\IQAC\\project\\backend\\node_modules\\router\\lib\\layer.js:152:17)\n    at next (C:\\Users\\tanej\\OneDrive\\Desktop\\WEBD\\IQAC\\project\\backend\\node_modules\\router\\lib\\route.js:157:13)\n    at Route.dispatch (C:\\Users\\tanej\\OneDrive\\Desktop\\WEBD\\IQAC\\project\\backend\\node_modules\\router\\lib\\route.js:117:3)\n    at handle (C:\\Users\\tanej\\OneDrive\\Desktop\\WEBD\\IQAC\\project\\backend\\node_modules\\router\\index.js:435:11)\n    at Layer.handleRequest (C:\\Users\\tanej\\OneDrive\\Desktop\\WEBD\\IQAC\\project\\backend\\node_modules\\router\\lib\\layer.js:152:17)\n    at C:\\Users\\tanej\\OneDrive\\Desktop\\WEBD\\IQAC\\project\\backend\\node_modules\\router\\index.js:295:15\n    at processParams (C:\\Users\\tanej\\OneDrive\\Desktop\\WEBD\\IQAC\\project\\backend\\node_modules\\router\\index.js:582:12)\n    at next (C:\\Users\\tanej\\OneDrive\\Desktop\\WEBD\\IQAC\\project\\backend\\node_modules\\router\\index.js:291:5)",
+        "success": false
+      },
+      "analysis": {
+        "response_message": "Email, password and role are required",
+        "requires_files": false,
+        "validation_error": false
+      },
+      "routeFile": "src\\routes\\apar.auth.routes.js",
+      "used_multipart": false,
+      "file_attached": false
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/apar/auth/forgot-password",
+      "url": "http://localhost:8000/api/v1/apar/auth/forgot-password",
+      "status": 400,
+      "ok": true,
+      "classification": "client-error",
+      "duration_ms": 6,
+      "request_payload": {},
+      "response_json": {
+        "message": "Teacher ID is required",
+        "statusCode": 400,
+        "errors": [],
+        "stack": "Error: Teacher ID is required\n    at file:///C:/Users/tanej/OneDrive/Desktop/WEBD/IQAC/project/backend/src/controllers/aparAuth.controller.js:283:11\n    at file:///C:/Users/tanej/OneDrive/Desktop/WEBD/IQAC/project/backend/src/utils/async-handler.js:3:21\n    at Layer.handleRequest (C:\\Users\\tanej\\OneDrive\\Desktop\\WEBD\\IQAC\\project\\backend\\node_modules\\router\\lib\\layer.js:152:17)\n    at next (C:\\Users\\tanej\\OneDrive\\Desktop\\WEBD\\IQAC\\project\\backend\\node_modules\\router\\lib\\route.js:157:13)\n    at Route.dispatch (C:\\Users\\tanej\\OneDrive\\Desktop\\WEBD\\IQAC\\project\\backend\\node_modules\\router\\lib\\route.js:117:3)\n    at handle (C:\\Users\\tanej\\OneDrive\\Desktop\\WEBD\\IQAC\\project\\backend\\node_modules\\router\\index.js:435:11)\n    at Layer.handleRequest (C:\\Users\\tanej\\OneDrive\\Desktop\\WEBD\\IQAC\\project\\backend\\node_modules\\router\\lib\\layer.js:152:17)\n    at C:\\Users\\tanej\\OneDrive\\Desktop\\WEBD\\IQAC\\project\\backend\\node_modules\\router\\index.js:295:15\n    at processParams (C:\\Users\\tanej\\OneDrive\\Desktop\\WEBD\\IQAC\\project\\backend\\node_modules\\router\\index.js:582:12)\n    at next (C:\\Users\\tanej\\OneDrive\\Desktop\\WEBD\\IQAC\\project\\backend\\node_modules\\router\\index.js:291:5)",
+        "success": false
+      },
+      "analysis": {
+        "response_message": "Teacher ID is required",
+        "requires_files": false,
+        "validation_error": false
+      },
+      "routeFile": "src\\routes\\apar.auth.routes.js",
+      "used_multipart": false,
+      "file_attached": false
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/apar/auth/logout",
+      "url": "http://localhost:8000/api/v1/apar/auth/logout",
+      "status": 401,
+      "ok": true,
+      "classification": "client-error",
+      "duration_ms": 7,
+      "request_payload": {},
+      "response_json": {
+        "message": "Invalid or expired session",
+        "statusCode": 401,
+        "errors": [],
+        "stack": "Error: Invalid or expired session\n    at verifyAccessToken (file:///C:/Users/tanej/OneDrive/Desktop/WEBD/IQAC/project/backend/src/utils/jwt.js:29:11)\n    at authenticate (file:///C:/Users/tanej/OneDrive/Desktop/WEBD/IQAC/project/backend/src/middlewares/auth.middleware.js:44:21)\n    at Layer.handleRequest (C:\\Users\\tanej\\OneDrive\\Desktop\\WEBD\\IQAC\\project\\backend\\node_modules\\router\\lib\\layer.js:152:17)\n    at next (C:\\Users\\tanej\\OneDrive\\Desktop\\WEBD\\IQAC\\project\\backend\\node_modules\\router\\lib\\route.js:157:13)\n    at Route.dispatch (C:\\Users\\tanej\\OneDrive\\Desktop\\WEBD\\IQAC\\project\\backend\\node_modules\\router\\lib\\route.js:117:3)\n    at handle (C:\\Users\\tanej\\OneDrive\\Desktop\\WEBD\\IQAC\\project\\backend\\node_modules\\router\\index.js:435:11)\n    at Layer.handleRequest (C:\\Users\\tanej\\OneDrive\\Desktop\\WEBD\\IQAC\\project\\backend\\node_modules\\router\\lib\\layer.js:152:17)\n    at C:\\Users\\tanej\\OneDrive\\Desktop\\WEBD\\IQAC\\project\\backend\\node_modules\\router\\index.js:295:15\n    at processParams (C:\\Users\\tanej\\OneDrive\\Desktop\\WEBD\\IQAC\\project\\backend\\node_modules\\router\\index.js:582:12)\n    at next (C:\\Users\\tanej\\OneDrive\\Desktop\\WEBD\\IQAC\\project\\backend\\node_modules\\router\\index.js:291:5)",
+        "success": false
+      },
+      "analysis": {
+        "response_message": "Invalid or expired session",
+        "requires_files": false,
+        "validation_error": false
+      },
+      "routeFile": "src\\routes\\apar.auth.routes.js",
+      "used_multipart": false,
+      "file_attached": false
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/apar/auth/profile",
+      "url": "http://localhost:8000/api/v1/apar/auth/profile",
+      "status": 401,
+      "ok": true,
+      "classification": "client-error",
+      "duration_ms": 6,
+      "response_json": {
+        "message": "Invalid or expired session",
+        "statusCode": 401,
+        "errors": [],
+        "stack": "Error: Invalid or expired session\n    at verifyAccessToken (file:///C:/Users/tanej/OneDrive/Desktop/WEBD/IQAC/project/backend/src/utils/jwt.js:29:11)\n    at authenticate (file:///C:/Users/tanej/OneDrive/Desktop/WEBD/IQAC/project/backend/src/middlewares/auth.middleware.js:44:21)\n    at Layer.handleRequest (C:\\Users\\tanej\\OneDrive\\Desktop\\WEBD\\IQAC\\project\\backend\\node_modules\\router\\lib\\layer.js:152:17)\n    at next (C:\\Users\\tanej\\OneDrive\\Desktop\\WEBD\\IQAC\\project\\backend\\node_modules\\router\\lib\\route.js:157:13)\n    at Route.dispatch (C:\\Users\\tanej\\OneDrive\\Desktop\\WEBD\\IQAC\\project\\backend\\node_modules\\router\\lib\\route.js:117:3)\n    at handle (C:\\Users\\tanej\\OneDrive\\Desktop\\WEBD\\IQAC\\project\\backend\\node_modules\\router\\index.js:435:11)\n    at Layer.handleRequest (C:\\Users\\tanej\\OneDrive\\Desktop\\WEBD\\IQAC\\project\\backend\\node_modules\\router\\lib\\layer.js:152:17)\n    at C:\\Users\\tanej\\OneDrive\\Desktop\\WEBD\\IQAC\\project\\backend\\node_modules\\router\\index.js:295:15\n    at processParams (C:\\Users\\tanej\\OneDrive\\Desktop\\WEBD\\IQAC\\project\\backend\\node_modules\\router\\index.js:582:12)\n    at next (C:\\Users\\tanej\\OneDrive\\Desktop\\WEBD\\IQAC\\project\\backend\\node_modules\\router\\index.js:291:5)",
+        "success": false
+      },
+      "analysis": {
+        "response_message": "Invalid or expired session",
+        "requires_files": false,
+        "validation_error": false
+      },
+      "routeFile": "src\\routes\\apar.auth.routes.js",
+      "used_multipart": false,
+      "file_attached": false
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/apar/auth/verify-role",
+      "url": "http://localhost:8000/api/v1/apar/auth/verify-role",
+      "status": 401,
+      "ok": true,
+      "classification": "client-error",
+      "duration_ms": 9,
+      "request_payload": {},
+      "response_json": {
+        "message": "Invalid or expired session",
+        "statusCode": 401,
+        "errors": [],
+        "stack": "Error: Invalid or expired session\n    at verifyAccessToken (file:///C:/Users/tanej/OneDrive/Desktop/WEBD/IQAC/project/backend/src/utils/jwt.js:29:11)\n    at authenticate (file:///C:/Users/tanej/OneDrive/Desktop/WEBD/IQAC/project/backend/src/middlewares/auth.middleware.js:44:21)\n    at Layer.handleRequest (C:\\Users\\tanej\\OneDrive\\Desktop\\WEBD\\IQAC\\project\\backend\\node_modules\\router\\lib\\layer.js:152:17)\n    at next (C:\\Users\\tanej\\OneDrive\\Desktop\\WEBD\\IQAC\\project\\backend\\node_modules\\router\\lib\\route.js:157:13)\n    at Route.dispatch (C:\\Users\\tanej\\OneDrive\\Desktop\\WEBD\\IQAC\\project\\backend\\node_modules\\router\\lib\\route.js:117:3)\n    at handle (C:\\Users\\tanej\\OneDrive\\Desktop\\WEBD\\IQAC\\project\\backend\\node_modules\\router\\index.js:435:11)\n    at Layer.handleRequest (C:\\Users\\tanej\\OneDrive\\Desktop\\WEBD\\IQAC\\project\\backend\\node_modules\\router\\lib\\layer.js:152:17)\n    at C:\\Users\\tanej\\OneDrive\\Desktop\\WEBD\\IQAC\\project\\backend\\node_modules\\router\\index.js:295:15\n    at processParams (C:\\Users\\tanej\\OneDrive\\Desktop\\WEBD\\IQAC\\project\\backend\\node_modules\\router\\index.js:582:12)\n    at next (C:\\Users\\tanej\\OneDrive\\Desktop\\WEBD\\IQAC\\project\\backend\\node_modules\\router\\index.js:291:5)",
+        "success": false
+      },
+      "analysis": {
+        "response_message": "Invalid or expired session",
+        "requires_files": false,
+        "validation_error": false
+      },
+      "routeFile": "src\\routes\\apar.auth.routes.js",
+      "used_multipart": false,
+      "file_attached": false
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/apar/auth/change-password",
+      "url": "http://localhost:8000/api/v1/apar/auth/change-password",
+      "status": 401,
+      "ok": true,
+      "classification": "client-error",
+      "duration_ms": 8,
+      "request_payload": {},
+      "response_json": {
+        "message": "Invalid or expired session",
+        "statusCode": 401,
+        "errors": [],
+        "stack": "Error: Invalid or expired session\n    at verifyAccessToken (file:///C:/Users/tanej/OneDrive/Desktop/WEBD/IQAC/project/backend/src/utils/jwt.js:29:11)\n    at authenticate (file:///C:/Users/tanej/OneDrive/Desktop/WEBD/IQAC/project/backend/src/middlewares/auth.middleware.js:44:21)\n    at Layer.handleRequest (C:\\Users\\tanej\\OneDrive\\Desktop\\WEBD\\IQAC\\project\\backend\\node_modules\\router\\lib\\layer.js:152:17)\n    at next (C:\\Users\\tanej\\OneDrive\\Desktop\\WEBD\\IQAC\\project\\backend\\node_modules\\router\\lib\\route.js:157:13)\n    at Route.dispatch (C:\\Users\\tanej\\OneDrive\\Desktop\\WEBD\\IQAC\\project\\backend\\node_modules\\router\\lib\\route.js:117:3)\n    at handle (C:\\Users\\tanej\\OneDrive\\Desktop\\WEBD\\IQAC\\project\\backend\\node_modules\\router\\index.js:435:11)\n    at Layer.handleRequest (C:\\Users\\tanej\\OneDrive\\Desktop\\WEBD\\IQAC\\project\\backend\\node_modules\\router\\lib\\layer.js:152:17)\n    at C:\\Users\\tanej\\OneDrive\\Desktop\\WEBD\\IQAC\\project\\backend\\node_modules\\router\\index.js:295:15\n    at processParams (C:\\Users\\tanej\\OneDrive\\Desktop\\WEBD\\IQAC\\project\\backend\\node_modules\\router\\index.js:582:12)\n    at next (C:\\Users\\tanej\\OneDrive\\Desktop\\WEBD\\IQAC\\project\\backend\\node_modules\\router\\index.js:291:5)",
+        "success": false
+      },
+      "analysis": {
+        "response_message": "Invalid or expired session",
+        "requires_files": false,
+        "validation_error": false
+      },
+      "routeFile": "src\\routes\\apar.auth.routes.js",
+      "used_multipart": false,
+      "file_attached": false
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/upload",
+      "url": "http://localhost:8000/api/v1/upload",
+      "status": 401,
+      "ok": true,
+      "classification": "client-error",
+      "duration_ms": 6,
+      "request_payload": {},
+      "response_json": {
+        "message": "Invalid or expired session",
+        "statusCode": 401,
+        "errors": [],
+        "stack": "Error: Invalid or expired session\n    at verifyAccessToken (file:///C:/Users/tanej/OneDrive/Desktop/WEBD/IQAC/project/backend/src/utils/jwt.js:29:11)\n    at authenticate (file:///C:/Users/tanej/OneDrive/Desktop/WEBD/IQAC/project/backend/src/middlewares/auth.middleware.js:44:21)\n    at Layer.handleRequest (C:\\Users\\tanej\\OneDrive\\Desktop\\WEBD\\IQAC\\project\\backend\\node_modules\\router\\lib\\layer.js:152:17)\n    at next (C:\\Users\\tanej\\OneDrive\\Desktop\\WEBD\\IQAC\\project\\backend\\node_modules\\router\\lib\\route.js:157:13)\n    at Route.dispatch (C:\\Users\\tanej\\OneDrive\\Desktop\\WEBD\\IQAC\\project\\backend\\node_modules\\router\\lib\\route.js:117:3)\n    at handle (C:\\Users\\tanej\\OneDrive\\Desktop\\WEBD\\IQAC\\project\\backend\\node_modules\\router\\index.js:435:11)\n    at Layer.handleRequest (C:\\Users\\tanej\\OneDrive\\Desktop\\WEBD\\IQAC\\project\\backend\\node_modules\\router\\lib\\layer.js:152:17)\n    at C:\\Users\\tanej\\OneDrive\\Desktop\\WEBD\\IQAC\\project\\backend\\node_modules\\router\\index.js:295:15\n    at processParams (C:\\Users\\tanej\\OneDrive\\Desktop\\WEBD\\IQAC\\project\\backend\\node_modules\\router\\index.js:582:12)\n    at next (C:\\Users\\tanej\\OneDrive\\Desktop\\WEBD\\IQAC\\project\\backend\\node_modules\\router\\index.js:291:5)",
+        "success": false
+      },
+      "analysis": {
+        "response_message": "Invalid or expired session",
+        "requires_files": false,
+        "validation_error": false
+      },
+      "routeFile": "src\\routes\\upload.routes.js",
+      "used_multipart": true,
+      "file_attached": true
+    }
+  ]
+}

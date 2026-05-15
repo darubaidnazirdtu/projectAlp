@@ -1,0 +1,65 @@
+[
+    {
+        "faculty_id": "FAC_PAWAN",
+        "email": "pawansingh@dtu.ac.in",
+        "name": "Dr. Pawan Singh Mehra",
+        "gender": "Male",
+        "date_of_birth": "1985-07-15T00:00:00.000Z",
+        "designation": "Assistant Professor",
+        "department_id": "CSE",
+        "qualification": "Ph.D.",
+        "specialization": "Computer Networks",
+        "joining_date": "2015-08-01T00:00:00.000Z",
+        "employment_type": "Regular",
+        "phone": "9876543210",
+        "metadata": {
+            "created_at": "2024-01-01T00:00:00.000Z",
+            "updated_at": "2024-01-01T00:00:00.000Z",
+            "migrated_from_sql_at": null,
+            "created_by": null,
+            "change_log": []
+        }
+    },
+    {
+        "faculty_id": "FAC_ANURAG",
+        "email": "anurag@dtu.ac.in",
+        "name": "Dr. Anurag Goel",
+        "gender": "Male",
+        "date_of_birth": "1982-05-20T00:00:00.000Z",
+        "designation": "Assistant Professor",
+        "department_id": "CSE",
+        "qualification": "Ph.D.",
+        "specialization": "Software Engineering",
+        "joining_date": "2012-09-10T00:00:00.000Z",
+        "employment_type": "Regular",
+        "phone": "9876543211",
+        "metadata": {
+            "created_at": "2024-01-01T00:00:00.000Z",
+            "updated_at": "2024-01-01T00:00:00.000Z",
+            "migrated_from_sql_at": null,
+            "created_by": null,
+            "change_log": []
+        }
+    },
+    {
+        "faculty_id": "FAC_GUNJAN",
+        "email": "gunjanchugh@dtu.ac.in",
+        "name": "Dr. Gunjan Chugh",
+        "gender": "Female",
+        "date_of_birth": "1988-12-10T00:00:00.000Z",
+        "designation": "Assistant Professor",
+        "department_id": "CSE",
+        "qualification": "Ph.D.",
+        "specialization": "Data Science",
+        "joining_date": "2018-01-15T00:00:00.000Z",
+        "employment_type": "Regular",
+        "phone": "9876543212",
+        "metadata": {
+            "created_at": "2024-01-01T00:00:00.000Z",
+            "updated_at": "2024-01-01T00:00:00.000Z",
+            "migrated_from_sql_at": null,
+            "created_by": null,
+            "change_log": []
+        }
+    }
+]

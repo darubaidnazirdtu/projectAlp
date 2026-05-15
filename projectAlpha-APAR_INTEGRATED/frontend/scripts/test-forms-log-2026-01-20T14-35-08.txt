@@ -1,0 +1,384 @@
+
+[LOG] Output is being saved to: C:\Users\tanej\OneDrive\Desktop\WEBD\IQAC\project\frontend\scripts\test-forms-log-2026-01-20T14-35-08.txt
+
+======================================================================
+COMPREHENSIVE FORM TESTING SCRIPT
+Testing: ADD, EDIT, and DELETE functionality
+======================================================================
+Base URL: http://localhost:5173
+Headless: true
+
+[LOGIN] Navigating to login page...
+[LOGIN] Login successful!
+
+[INFO] Testing 9 resources with ADD, EDIT, and DELETE operations...
+
+============================================================
+[ADD TEST] Testing resource: collaborative_research_exchanges
+============================================================
+  [NAV] Going to add page: http://localhost:5173/app/add/collaborative_research_exchanges
+  [FORM] Found 15 form fields
+  [FORM] Added object list item
+  [FORM] Added object list item
+  [FORM] Added object list item
+  [FORM] Found 3 react-select dropdowns
+    [FILL] Department ID: CSE
+    [FILL] Faculty ID: FAC_PAWAN
+    [FILL] Student ID: 2K20/ECE/02
+    [FILL] type_of_activity: Faculty Exchange
+    [FILL] name_of_institution: Test Abivunaz Dldjeo
+    [FILL] level: International
+    [FILL] start_date: 2022-03-20
+    [FILL] end_date: 2026-05-28
+    [FILL] number_of_participants: 10
+    [FILL] funding_agency: Test_Xacwuc
+    [FILL] funding_amount: 165843
+    [FILL] academic_year: 2026-27
+    [FILL] year: 2024
+    [FILL] nature_of_collaboration: Test_Hningf
+    [FILL] outcome: Test_Dzyayv
+    [FILL] remarks: Test_Yfarkw
+    [FILL] link: dummy.pdf
+    [FILL] external_contributors_0_name: Test Ypjbmmap Sjkexk
+    [FILL] external_contributors_0_email: grxbntdq@test.edu
+    [FILL] external_contributors_0_affiliation: Test_Vwrohd
+  [FORM] Form filled with 20 values
+  [SUBMIT] Submitting form...
+  [FAIL] Submission error: Failed to add Collaborative Research Exchange: Network Error
+
+[SKIP] Skipping EDIT test for collaborative_research_exchanges - ADD test failed
+
+[SKIP] Skipping DELETE test for collaborative_research_exchanges - ADD test failed
+
+============================================================
+[ADD TEST] Testing resource: developed_e_contents
+============================================================
+  [NAV] Going to add page: http://localhost:5173/app/add/developed_e_contents
+  [FORM] Found 15 form fields
+  [FORM] Found 3 react-select dropdowns
+    [FILL] Faculty ID: FAC_PAWAN
+    [FILL] Department ID: CSE
+    [FILL] Course ID: 34a444c2-bca6-4054-8ca6-2c6252916256
+    [FILL] name_of_module: Test Ejqswntz Fptwww
+    [FILL] type_of_content: Module
+    [FILL] platform: Test_Yngtsr
+    [FILL] platform_type: Internal
+    [FILL] date_of_launching: 2026-07-03
+    [FILL] academic_year: 2026-27
+    [FILL] semester: Test_Wwrjqo
+    [FILL] target_audience: UG
+    [FILL] duration_hours: 22
+    [FILL] learning_outcome: Test_Nfclbt
+    [FILL] remarks: Test_Sqqtwa
+    [FILL] link: https://example.com/vzahsxmx
+  [FORM] Form filled with 15 values
+  [SUBMIT] Submitting form...
+  [SUCCESS] E Content Developed added successfully!
+  [VERIFY] Navigating to table: http://localhost:5173/app/tables/developed_e_contents
+  [VERIFY] Found 5 rows in table
+  [FOUND] faculty_id: "FAC_PAWAN"
+  [FOUND] course_id: "34a444c2-bca6-4"
+  [FOUND] name_of_module: "Test Ejqswntz F"
+  [FOUND] type_of_content: "Module"
+  [FOUND] platform: "Test_Yngtsr"
+  [FOUND] platform_type: "Internal"
+  [FOUND] date_of_launching: "2026-07-03" (date)
+  [FOUND] academic_year: "2026-27"
+  [FOUND] semester: "Test_Wwrjqo"
+  [FOUND] learning_outcome: "Test_Nfclbt"
+  [VERIFY] 10/10 values found in same row
+  [SUCCESS] All values verified in same row
+
+============================================================
+[EDIT TEST] Testing resource: developed_e_contents
+============================================================
+  [NAV] Going to table page: http://localhost:5173/app/tables/developed_e_contents
+  [TABLE] Found 5 rows in table
+  [CLICK] Clicking edit button...
+  [FORM] Edit form loaded
+  [FORM] Found 10 editable text fields
+    [SKIP] Field react-select-3-input is react-select
+    [SKIP] Field react-select-5-input is react-select
+    [SKIP] Field react-select-7-input is react-select
+  [ERROR] No fields could be modified
+
+============================================================
+[DELETE TEST] Testing resource: developed_e_contents
+============================================================
+  [NAV] Going to table page: http://localhost:5173/app/tables/developed_e_contents
+  [TABLE] Found 5 rows before deletion
+  [ROW] First row content: FAC_PAWAN CSE 34a444c2-bca6-4054-8ca6-2c6252916256...
+  [CLICK] Clicking delete button...
+  [MODAL] Waiting for delete confirmation modal...
+  [MODAL] Modal appeared, clicking confirm...
+  [MODAL] Clicked confirm delete button
+  [TABLE] Found 4 rows after deletion
+  [SUCCESS] Row count decreased from 5 to 4
+
+============================================================
+[ADD TEST] Testing resource: faculty_development_programs
+============================================================
+  [NAV] Going to add page: http://localhost:5173/app/add/faculty_development_programs
+  [FORM] Found 15 form fields
+  [FORM] Added object list item
+  [FORM] Added object list item
+  [FORM] Found 2 react-select dropdowns
+    [FILL] Department ID: CSE
+    [FILL] Faculty ID: FAC_PAWAN
+    [FILL] program_title: Test Myehauto Duumrr
+    [FILL] type_of_program: Training
+    [FILL] level: International
+    [FILL] mode: Hybrid
+    [FILL] start_date: 2022-01-01
+    [FILL] end_date: 2022-07-12
+    [FILL] duration_days: 28
+    [FILL] organising_body: Test_Yntpyd
+    [FILL] funding_agency: Test_Fjhijw
+    [FILL] venue: Kehudi Hall, Vdwhtxsx Universi...
+    [FILL] academic_year: 2026-27
+    [FILL] outcome: Test_Benxpf
+    [FILL] remarks: Test_Itftfk
+    [FILL] certificate_link: dummy.pdf
+    [FILL] external_participants_0_name: QCNOR0698X
+    [FILL] external_participants_0_email: aajvslws@test.edu
+    [FILL] external_participants_0_affiliation: DQZQG4026F
+  [FORM] Form filled with 19 values
+  [SUBMIT] Submitting form...
+  [FAIL] Submission error: Failed to add Faculty Development Programs: Network Error
+
+[SKIP] Skipping EDIT test for faculty_development_programs - ADD test failed
+
+[SKIP] Skipping DELETE test for faculty_development_programs - ADD test failed
+
+============================================================
+[ADD TEST] Testing resource: phd_defences
+============================================================
+  [NAV] Going to add page: http://localhost:5173/app/add/phd_defences
+  [FORM] Found 14 form fields
+  [FORM] Added object list item
+  [FORM] Added object list item
+  [FORM] Added object list item
+  [FORM] Found 4 react-select dropdowns
+    [FILL] Student ID: 2K20/ECE/02
+    [FILL] Department ID: CSE
+    [FILL] Supervisor ID: FAC_PAWAN
+    [FILL] Co-Supervisor ID: FAC_PAWAN
+    [FILL] enrollment_no: Test_Tumqzy
+    [FILL] student_name: Test Dupjzcqz Tunnck
+    [FILL] thesis_title: Test Dkobuast Vciijh
+    [FILL] thesis_type: Other
+    [FILL] supervisor_name: Test Gvcdrkea Mzuwrg
+    [FILL] date_of_defence: 2023-08-06
+    [FILL] date_of_result_notification: 2026-12-26
+    [FILL] result_outcome: Rejected
+    [FILL] academic_year: 2026-27
+    [FILL] remarks: Test_Sgllvu
+    [FILL] link: dummy.pdf
+    [FILL] committee_members_0_member_id: Test_Azwzmc
+    [FILL] external_examiners_0_name: Test Wdldeggs Qkeeei
+    [FILL] external_examiners_0_email: yvlinlfm@test.edu
+    [FILL] external_examiners_0_affiliation: Test_Njeemf
+  [FORM] Form filled with 19 values
+  [SUBMIT] Submitting form...
+  [FAIL] Submission error: Failed to add Phd Defence: Network Error
+
+[SKIP] Skipping EDIT test for phd_defences - ADD test failed
+
+[SKIP] Skipping DELETE test for phd_defences - ADD test failed
+
+============================================================
+[ADD TEST] Testing resource: professional_staff_trainings
+============================================================
+  [NAV] Going to add page: http://localhost:5173/app/add/professional_staff_trainings
+  [FORM] Found 13 form fields
+  [FORM] Added object list item
+  [FORM] Added object list item
+  [FORM] Added object list item
+  [FORM] Found 3 react-select dropdowns
+    [FILL] Department ID: CSE
+    [FILL] Faculty ID: FAC_PAWAN
+    [FILL] Student ID: 2K20/ECE/02
+    [FILL] title_of_event: Test Rqkvtviq Hufxen
+    [FILL] type_of_training: Other
+    [FILL] mode: Online
+    [FILL] year_of_training: 2025
+    [FILL] academic_year: 2026-27
+    [FILL] start_date: 2025-04-01
+    [FILL] end_date: 2025-07-22
+    [FILL] number_of_participants: 81
+    [FILL] sponsoring_agencies: Test_Tlapwd
+    [FILL] outcome: Test_Uizvrz
+    [FILL] remarks: Test_Ibknoq
+    [FILL] link: dummy.pdf
+    [FILL] external_contributors_0_name: Test Zwhmctdl Izpogd
+    [FILL] external_contributors_0_email: oyfnqddz@test.edu
+    [FILL] external_contributors_0_affiliation: Test_Ikrhdx
+  [FORM] Form filled with 18 values
+  [SUBMIT] Submitting form...
+  [FAIL] Submission error: Failed to add Professional Training Staff: Network Error
+
+[SKIP] Skipping EDIT test for professional_staff_trainings - ADD test failed
+
+[SKIP] Skipping DELETE test for professional_staff_trainings - ADD test failed
+
+============================================================
+[ADD TEST] Testing resource: research_funding_grants
+============================================================
+  [NAV] Going to add page: http://localhost:5173/app/add/research_funding_grants
+  [FORM] Found 15 form fields
+  [FORM] Added object list item
+  [FORM] Added object list item
+  [FORM] Added object list item
+  [FORM] Found 3 react-select dropdowns
+    [FILL] Department ID: CSE
+    [FILL] Faculty ID: FAC_PAWAN
+    [FILL] Student ID: 2K20/ECE/02
+    [FILL] title_research: Test Unzarfho Sxebdj
+    [FILL] type_of_project: Innovation
+    [FILL] funding_agency_name: Test Oacjjuxn Nbkbfj
+    [FILL] funding_type: Non-Government
+    [FILL] sanction_number: Test_Uuxhfj
+    [FILL] year_of_sanction: 2025
+    [FILL] academic_year: 2026-27
+    [FILL] start_date: 2022-01-24
+    [FILL] end_date: 2026-08-14
+    [FILL] amount: 325415
+    [FILL] status: Submitted
+    [FILL] outcome: Test_Egkncf
+    [FILL] remarks: Test_Lvhmnl
+    [FILL] link: dummy.pdf
+    [FILL] external_collaborators_0_name: Test Oduhtime Iuwtie
+    [FILL] external_collaborators_0_email: mtbpisnn@test.edu
+    [FILL] external_collaborators_0_affiliation: Test_Qfmdca
+  [FORM] Form filled with 20 values
+  [SUBMIT] Submitting form...
+  [FAIL] Submission error: Failed to add Research Funding: Network Error
+
+[SKIP] Skipping EDIT test for research_funding_grants - ADD test failed
+
+[SKIP] Skipping DELETE test for research_funding_grants - ADD test failed
+
+============================================================
+[ADD TEST] Testing resource: revenue_from_consultancies
+============================================================
+  [NAV] Going to add page: http://localhost:5173/app/add/revenue_from_consultancies
+  [FORM] Found 15 form fields
+  [FORM] Added object list item
+  [FORM] Added object list item
+  [FORM] Added object list item
+  [FORM] Found 3 react-select dropdowns
+    [FILL] Department ID: CSE
+    [FILL] Faculty ID: FAC_PAWAN
+    [FILL] Student ID: 2K20/ECE/02
+    [FILL] name_of_project: Test Iehspqfa Fcfgct
+    [FILL] agency_name: Test Aoetkcfp Drowoc
+    [FILL] type_of_agency: Private
+    [FILL] grant_amount: 259540
+    [FILL] revenue_generated: 59
+    [FILL] duration_start_date: 2024-08-21
+    [FILL] end_date: 2025-04-24
+    [FILL] year_of_consultancy: 2024
+    [FILL] academic_year: 2026-27
+    [FILL] status: Completed
+    [FILL] consultancy_type: Departmental
+    [FILL] outcome: Test_Vvxvfn
+    [FILL] remarks: Test_Exedze
+    [FILL] link: dummy.pdf
+    [FILL] external_consultants_0_name: Test Wzlmmmmu Fbqtja
+    [FILL] external_consultants_0_email: pcmmyfza@test.edu
+    [FILL] external_consultants_0_affiliation: Test_Kxecpo
+  [FORM] Form filled with 20 values
+  [SUBMIT] Submitting form...
+  [FAIL] Submission error: Failed to add Revenue From Consultancy: Network Error
+
+[SKIP] Skipping EDIT test for revenue_from_consultancies - ADD test failed
+
+[SKIP] Skipping DELETE test for revenue_from_consultancies - ADD test failed
+
+============================================================
+[ADD TEST] Testing resource: revenue_from_corporate_trainings
+============================================================
+  [NAV] Going to add page: http://localhost:5173/app/add/revenue_from_corporate_trainings
+  [FORM] Found 13 form fields
+  [FORM] Added object list item
+  [FORM] Added object list item
+  [FORM] Added object list item
+  [FORM] Found 3 react-select dropdowns
+    [FILL] Department ID: CSE
+    [FILL] Faculty ID: FAC_PAWAN
+    [FILL] Student ID: 2K20/ECE/02
+    [FILL] name_of_program: Test Xnnklxgp Pxwabz
+    [FILL] agency_name: Test Ckqcvixu Kraifp
+    [FILL] type_of_agency: Other
+    [FILL] duration_start_date: 2026-07-16
+    [FILL] end_date: 2026-01-07
+    [FILL] year_of_training: 2024
+    [FILL] academic_year: 2026-27
+    [FILL] revenue_generated: 38
+    [FILL] mode_of_training: Hybrid
+    [FILL] outcome: Test_Mxtwac
+    [FILL] remarks: Test_Gdqarz
+    [FILL] link: dummy.pdf
+    [FILL] external_trainers_0_name: Test Bskllwwu Qzmwbk
+    [FILL] external_trainers_0_email: ajldxkue@test.edu
+    [FILL] external_trainers_0_affiliation: Test_Gnqkni
+  [FORM] Form filled with 18 values
+  [SUBMIT] Submitting form...
+  [FAIL] Submission error: Failed to add Revenue From Corporate Training: Network Error
+
+[SKIP] Skipping EDIT test for revenue_from_corporate_trainings - ADD test failed
+
+[SKIP] Skipping DELETE test for revenue_from_corporate_trainings - ADD test failed
+
+============================================================
+[ADD TEST] Testing resource: students
+============================================================
+  [NAV] Going to add page: http://localhost:5173/app/add/students
+  [FORM] Found 3 form fields
+  [FORM] Found 0 react-select dropdowns
+    [FILL] email: majbawdv@test.edu
+    [FILL] role: Department HOD
+    [FILL] password: Test_Bfzuge
+  [FORM] Form filled with 3 values
+  [SUBMIT] Submitting form...
+  [FAIL] Submission error: Network Error
+
+[SKIP] Skipping EDIT test for students - ADD test failed
+
+[SKIP] Skipping DELETE test for students - ADD test failed
+
+======================================================================
+TEST SUMMARY
+======================================================================
+
+Total Tests Run: 11
+  - Add Tests: 9
+  - Edit Tests: 1
+  - Delete Tests: 1
+
+--- ADD TESTS ---
+Submitted Successfully: 1/9
+Verified in Tables: 1/9
+
+Failed Add Tests:
+  - collaborative_research_exchanges: Failed to add Collaborative Research Exchange: Network Error
+  - faculty_development_programs: Failed to add Faculty Development Programs: Network Error
+  - phd_defences: Failed to add Phd Defence: Network Error
+  - professional_staff_trainings: Failed to add Professional Training Staff: Network Error
+  - research_funding_grants: Failed to add Research Funding: Network Error
+  - revenue_from_consultancies: Failed to add Revenue From Consultancy: Network Error
+  - revenue_from_corporate_trainings: Failed to add Revenue From Corporate Training: Network Error
+  - students: Network Error
+
+--- EDIT TESTS ---
+Submitted Successfully: 0/1
+Changes Verified: 0/1
+
+Failed Edit Tests:
+  - developed_e_contents: No fields could be modified
+
+--- DELETE TESTS ---
+Deleted Successfully: 1/1
+Deletion Verified: 1/1
+
+======================================================================
