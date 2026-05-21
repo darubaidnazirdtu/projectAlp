@@ -1,6 +1,4 @@
 import axios from 'axios';
-import { toast } from 'sonner';
-import { clearCsrfToken, fetchCsrfToken } from '../utils/csrf.js';
 
 const trimTrailingSlash = (value) => value.endsWith('/') ? value.slice(0, -1) : value;
 
@@ -44,64 +42,31 @@ export class Api {
             withCredentials: true
         });
 
-        this.client.interceptors.request.use(
-            async (config) => {
-                const role = Api.roleProvider ? Api.roleProvider() : null;
-                if (role) {
-                    config.headers = config.headers || {};
-                    if (!config.headers['X-Client-Role'] && !config.headers['x-client-role']) {
-                        config.headers['X-Client-Role'] = role;
-                    }
+        this.client.interceptors.request.use((config) => {
+            const role = Api.roleProvider ? Api.roleProvider() : null;
+            if (role) {
+                config.headers = config.headers || {};
+                if (!config.headers['X-Client-Role'] && !config.headers['x-client-role']) {
+                    config.headers['X-Client-Role'] = role;
                 }
-
-                const method = config.method?.toUpperCase();
-                if (method && ['POST', 'PUT', 'PATCH', 'DELETE'].includes(method)) {
-                    try {
-                        const csrfToken = await fetchCsrfToken(this.client);
-                        if (csrfToken) {
-                            config.headers['X-CSRF-Token'] = csrfToken;
-                        }
-                    } catch (e) {
-                        console.warn('Failed to fetch CSRF token:', e);
-                    }
-                }
-                return config;
             }
-        );
+            return config;
+        });
 
         this.client.interceptors.response.use(
             (response) => response,
-            async (error) => {
-                const status = error.response?.status;
-                const responseMessage = error.response?.data?.message || error.response?.data?.error || '';
-                const isCsrfError = status === 403 && String(responseMessage).toLowerCase().includes('csrf');
-                const originalRequest = error.config || {};
-                
-
-                if (isCsrfError && !originalRequest._csrfRetry) {
-                    originalRequest._csrfRetry = true;
-                    originalRequest.headers = originalRequest.headers || {};
-                    clearCsrfToken();
-
-                    try {
-                        const csrfToken = await fetchCsrfToken(this.client);
-                        if (csrfToken) {
-                            originalRequest.headers['X-CSRF-Token'] = csrfToken;
-                        }
-                        return this.client(originalRequest);
-                    } catch (retryError) {
-                        return Promise.reject(retryError);
-                    }
+            (error) => {
+                const status = error?.response?.status;
+                const bypass = error?.config?.headers && (error.config.headers['X-Bypass-Auth-Redirect'] || error.config.headers['x-bypass-auth-redirect']);
+                if (bypass) {
+                    return Promise.reject(error);
                 }
-
-                
-
                 if (status && [401, 403, 409].includes(status)) {
                     const pathname = typeof window !== 'undefined' ? window.location.pathname : '';
                     const isLoginPage = pathname.endsWith('/login') || pathname.endsWith('/apar/login');
 
                     // Prevent redirect loop if already on login page or when requesting profile endpoints
-                    const reqUrl = originalRequest.url || '';
+                    const reqUrl = error.config?.url || '';
                     const isProfileReq = reqUrl.endsWith('/auth/profile') || reqUrl.endsWith('/apar/auth/profile');
 
                     if (status === 401 && (isLoginPage || isProfileReq)) {
