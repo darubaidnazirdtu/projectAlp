@@ -21,7 +21,7 @@ const enterData = asyncHandler(async (req, res) => {
 
 
     // Validation based on tableConfig required fields
-    const requiredFields = ['department_id', 'date_of_event', 'name_of_event', 'type_of_support', 'amount_of_support', 'academic_year'];
+    const requiredFields = ['department_id', 'date_of_event', 'name_of_event', 'type_of_support', 'amount_of_support', 'academic_year', 'year_of_sanction'];
     const missingFields = requiredFields.filter(field => !data[field] && data[field] !== 0);
     if (missingFields.length > 0) {
         throw new ApiError(400, `Missing required fields: ${missingFields.join(', ')}`);

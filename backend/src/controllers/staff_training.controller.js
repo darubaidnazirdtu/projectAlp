@@ -8,7 +8,7 @@ const enterData = asyncHandler(async (req, res) => {
     const data = req.body
 
     // Validation based on tableConfig required fields
-    const requiredFields = ['department_id', 'name_of_official', 'program_name', 'organising_agency', 'type_of_training', 'mode', 'start_date', 'end_date', 'academic_year', 'outcome'];
+    const requiredFields = ['department_id', 'name_of_official', 'program_name', 'organising_agency', 'type_of_training', 'mode', 'start_date', 'end_date', 'academic_year', 'year_of_sanction', 'outcome'];
     const missingFields = requiredFields.filter(field => !data[field]);
     if (missingFields.length > 0) {
         throw new ApiError(400, `Missing required fields: ${missingFields.join(', ')}`);
@@ -34,6 +34,7 @@ const enterData = asyncHandler(async (req, res) => {
         start_date: data.start_date,
         end_date: data.end_date,
         academic_year: data.academic_year,
+        year_of_sanction: data.year_of_sanction,
         funding_details: data.funding_details || '',
         outcome: data.outcome || '',
         link: link, // Cloudinary URL
