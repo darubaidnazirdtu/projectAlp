@@ -24,6 +24,7 @@ const set = async (data, loggedInUser = null) => {
       funding_agency,
       venue,
       academic_year,
+      year_of_sanction,
       outcome,
       remarks,
       certificate_link,
@@ -84,6 +85,7 @@ const set = async (data, loggedInUser = null) => {
       funding_agency,
       venue,
       academic_year,
+      year_of_sanction,
       outcome,
       remarks,
       certificate_link,
@@ -148,6 +150,7 @@ const transformFdp = (activity) => ({
   funding_agency: activity.funding_agency,
   venue: activity.venue,
   academic_year: activity.academic_year,
+  year_of_sanction: activity.year_of_sanction,
   outcome: activity.outcome,
   remarks: activity.remarks,
   certificate_link: activity.certificate_link || activity.link,
@@ -211,6 +214,7 @@ const update = async (program_id, data, loggedInUser = null) => {
     if (data.funding_agency) updateFields.funding_agency = data.funding_agency;
     if (data.venue) updateFields.venue = data.venue;
     if (data.academic_year) updateFields.academic_year = data.academic_year;
+    if (data.year_of_sanction) updateFields.year_of_sanction = data.year_of_sanction;
     if (data.outcome) updateFields.outcome = data.outcome;
     if (data.remarks) updateFields.remarks = data.remarks;
     if (data.certificate_link) {

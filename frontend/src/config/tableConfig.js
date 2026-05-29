@@ -838,8 +838,7 @@ const rawResources = [
     columns: [
       // { header: 'E-Content ID', accessor: 'econtent_id' },
       { header: 'Faculty ID', accessor: 'faculty_id', required: true, type: 'entitySelect', entityType: 'faculty' },
-      { header: 'Faculty Name', accessor: 'faculty_name', placeholder: 'Enter faculty name (for display)' },
-      { header: 'Faculty Name', accessor: 'faculty_name', placeholder: 'Enter faculty name (for records / display)' },
+      { header: 'Faculty Name', accessor: 'faculty_name', placeholder: 'Auto-filled from Faculty ID', readOnly: true },
       { header: 'Department ID', accessor: 'department_id', required: true, type: 'entitySelect', entityType: 'department' },
       { header: 'Course ID', accessor: 'course_id', required: true, type: 'entitySelect', entityType: 'course' },
       { header: 'Module Name', accessor: 'name_of_module', required: true, placeholder: 'Enter module name' },
@@ -2988,7 +2987,7 @@ const rawResources = [
       // { header: 'Exam Record ID', accessor: 'exam_record_id' },
       { header: 'Student ID', accessor: 'student_id', required: true, type: 'entitySelect', entityType: 'student' },
       { header: 'Department ID', accessor: 'department_id', required: true, type: 'entitySelect', entityType: 'department' },
-      { header: 'Student Name', accessor: 'student_name', required: true, placeholder: 'Enter student name' },
+      { header: 'Student Name', accessor: 'student_name', required: true, placeholder: 'Auto-filled from Student ID', readOnly: true },
       { header: 'Exam', accessor: 'name_of_exam', required: true, placeholder: 'Enter exam name' },
       {
         header: 'Type',
@@ -3047,7 +3046,7 @@ const rawResources = [
       // { header: 'Record ID', accessor: 'record_id' },
       { header: 'Student ID', accessor: 'student_id', required: true, type: 'entitySelect', entityType: 'student' },
       { header: 'Department ID', accessor: 'department_id', required: true, type: 'entitySelect', entityType: 'department' },
-      { header: 'Student Name', accessor: 'student_name', required: true, placeholder: 'Enter student name' },
+      { header: 'Student Name', accessor: 'student_name', required: true, placeholder: 'Auto-filled from Student ID', readOnly: true },
       { header: 'Institution', accessor: 'institution_joined', required: true, placeholder: 'Enter institution name' },
       { header: 'Country', accessor: 'country', required: true, placeholder: 'Enter country' },
       {

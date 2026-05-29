@@ -210,7 +210,7 @@ const SearchableSelect = ({
   // Handle selection change
   const handleChange = (selectedOpt) => {
     setSelectedOption(selectedOpt);
-    onChange(selectedOpt ? selectedOpt.value : '');
+    onChange(selectedOpt ? selectedOpt.value : '', selectedOpt || null);
     if (onOptionChange) {
       onOptionChange(selectedOpt || null);
     }

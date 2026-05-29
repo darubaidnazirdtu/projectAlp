@@ -31,6 +31,7 @@ const StudentActivitySchema = new mongoose.Schema({
     // -------------------------------------------------------------------------
     student_name: String,
     academic_year: String,
+    year_of_sanction: String,
     remarks: String,
     link: String,
 

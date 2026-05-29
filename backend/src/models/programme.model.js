@@ -31,6 +31,7 @@ const ProgrammeSchema = new mongoose.Schema({
     duration_years: Number, // required for standard, optional for field_research
     intake_capacity: Number,
     academic_year: String,
+    year_of_sanction: String,
 
     // Field research specific (type: 'field_research')
     has_field_research_component: Boolean,

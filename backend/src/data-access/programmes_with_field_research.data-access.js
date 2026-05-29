@@ -21,6 +21,7 @@ const set = async (data, loggedInUser = null) => {
       course_code_of_component,
       number_of_students_undertaking,
       academic_year,
+      year_of_sanction,
       link
     } = data;
 
@@ -41,6 +42,7 @@ const set = async (data, loggedInUser = null) => {
       course_code_of_component,
       number_of_students_undertaking,
       academic_year,
+      year_of_sanction,
       link,
       metadata: {
         created_by: userId,
@@ -74,6 +76,7 @@ const transformFieldResearch = (prog) => ({
   course_code_of_component: prog.course_code_of_component,
   number_of_students_undertaking: prog.number_of_students_undertaking,
   academic_year: prog.academic_year,
+  year_of_sanction: prog.year_of_sanction,
   link: prog.link,
   metadata: prog.metadata || {}
 });
@@ -120,6 +123,7 @@ const update = async (programme_id, data, loggedInUser = null) => {
     if (data.course_code_of_component) updateFields.course_code_of_component = data.course_code_of_component;
     if (data.number_of_students_undertaking !== undefined) updateFields.number_of_students_undertaking = data.number_of_students_undertaking;
     if (data.academic_year) updateFields.academic_year = data.academic_year;
+    if (data.year_of_sanction) updateFields.year_of_sanction = data.year_of_sanction;
     if (data.link) updateFields.link = data.link;
 
     const userId = loggedInUser?.userId || loggedInUser?.id || null;

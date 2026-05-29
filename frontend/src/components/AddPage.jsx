@@ -251,15 +251,15 @@ const ObjectListField = ({ label, name, values = [], subFields = [], onChange })
         onChange({ target: { name, value: newValues } });
     };
 
-    const handleItemChange = (index, subAccessor, subValue) => {
+    const handleItemChange = (index, subAccessor, subValue, selectedOption = null) => {
         const newValues = [...values];
+        const changedField = subFields.find(f => f.accessor === subAccessor);
         const updatedItem = {
             ...newValues[index],
-            [subAccessor]: subValue
+            ...(changedField ? getAutoFillUpdates(changedField, subValue, selectedOption) : { [subAccessor]: subValue })
         };
 
         // Check for duplicate entity on entitySelect field change
-        const changedField = subFields.find(f => f.accessor === subAccessor);
         if (changedField && changedField.type === 'entitySelect' && subValue) {
             if (isDuplicateEntity(updatedItem, newValues, index)) {
                 toast.error(`This ${changedField.header || 'entity'} has already been added. Duplicates are not allowed.`);
@@ -341,7 +341,7 @@ const ObjectListField = ({ label, name, values = [], subFields = [], onChange })
                                             <SearchableSelect
                                                 entityType={field.entityType}
                                                 value={item[field.accessor] || ''}
-                                                onChange={(value) => handleItemChange(index, field.accessor, value)}
+                                                onChange={(value, option) => handleItemChange(index, field.accessor, value, option)}
                                                 label={null}
                                                 required={field.required}
                                                 excludeValues={alreadySelected}
@@ -431,6 +431,28 @@ const getFacultyDisplayName = (faculty) => {
     }
 
     return faculty.name || faculty.faculty_name || faculty.full_name || faculty.teacher_name || '';
+};
+
+const getStudentDisplayName = (student) => {
+    if (!student) {
+        return '';
+    }
+
+    return student.name || student.student_name || student.full_name || '';
+};
+
+const getAutoFillUpdates = (field, value, selectedOption = null) => {
+    const updates = { [field.accessor]: value };
+
+    if (field.entityType === 'faculty' && field.accessor === 'faculty_id') {
+        updates.faculty_name = getFacultyDisplayName(selectedOption?.data);
+    }
+
+    if (field.entityType === 'student' && field.accessor === 'student_id') {
+        updates.student_name = getStudentDisplayName(selectedOption?.data);
+    }
+
+    return updates;
 };
 
 const AddPage = () => {
@@ -585,13 +607,10 @@ const AddPage = () => {
     };
 
     const handleEntitySelectChange = (col, value, selectedOption = null) => {
-        const updates = { [col.accessor]: value };
-
-        if (resourceId === 'faculty_visits' && col.accessor === 'faculty_id') {
-            updates.faculty_name = getFacultyDisplayName(selectedOption?.data);
-        }
-
-        setFormData(prev => applyCalculatedFields(resource, { ...prev, ...updates }));
+        setFormData(prev => applyCalculatedFields(resource, {
+            ...prev,
+            ...getAutoFillUpdates(col, value, selectedOption)
+        }));
     };
 
     const validateFormFields = () => {
@@ -1079,13 +1098,11 @@ const AddPage = () => {
                 );
             case 'entitySelect':
                 {
-                    const shouldUseSelectedOption = resourceId === 'faculty_visits' && col.accessor === 'faculty_id';
                     return (
                     <SearchableSelect
                         entityType={col.entityType}
                         value={fieldValue || ''}
-                        onChange={shouldUseSelectedOption ? () => {} : (value) => handleEntitySelectChange(col, value)}
-                        onOptionChange={shouldUseSelectedOption ? (option) => handleEntitySelectChange(col, option?.value || '', option) : undefined}
+                        onChange={(value, option) => handleEntitySelectChange(col, value, option)}
                         required={col.required}
                         label={col.header}
                         disabled={isDisabled}

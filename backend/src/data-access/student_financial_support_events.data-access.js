@@ -17,6 +17,7 @@ const set = async (data, loggedInUser = null) => {
       amount_of_support,
       date_of_event,
       academic_year,
+      year_of_sanction,
       outcome,
       remarks,
       link,
@@ -50,6 +51,7 @@ const set = async (data, loggedInUser = null) => {
       amount_of_support,
       date_of_event,
       academic_year,
+      year_of_sanction,
       outcome,
       remarks,
       link,
@@ -84,6 +86,7 @@ const transformFinancialSupport = (activity) => ({
   amount_of_support: activity.amount_of_support,
   date_of_event: activity.date_of_event,
   academic_year: activity.academic_year,
+  year_of_sanction: activity.year_of_sanction,
   outcome: activity.outcome,
   remarks: activity.remarks,
   link: activity.link,
@@ -130,6 +133,7 @@ const update = async (support_id, data, loggedInUser = null) => {
     if (data.amount_of_support !== undefined) updateFields.amount_of_support = data.amount_of_support;
     if (data.date_of_event) updateFields.date_of_event = data.date_of_event;
     if (data.academic_year) updateFields.academic_year = data.academic_year;
+    if (data.year_of_sanction) updateFields.year_of_sanction = data.year_of_sanction;
     if (data.outcome) updateFields.outcome = data.outcome;
     if (data.remarks) updateFields.remarks = data.remarks;
     if (data.link) updateFields.link = data.link;

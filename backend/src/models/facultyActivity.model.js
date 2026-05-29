@@ -31,6 +31,7 @@ const FacultyActivitySchema = new mongoose.Schema({
     // Common fields
     // -------------------------------------------------------------------------
     academic_year: String,
+    year_of_sanction: String,
     start_date: Date,
     end_date: Date,
     outcome: String,

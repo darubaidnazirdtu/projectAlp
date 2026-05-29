@@ -15,6 +15,7 @@ const set = async (data, loggedInUser = null) => {
       name_of_scheme,
       type_of_scheme,
       academic_year,
+      year_of_sanction,
       semester,
       start_date,
       end_date,
@@ -59,6 +60,7 @@ const set = async (data, loggedInUser = null) => {
       type_of_scheme,
       type_of_training: type_of_scheme,
       academic_year,
+      year_of_sanction,
       semester,
       start_date,
       end_date,
@@ -113,6 +115,7 @@ const transformCapability = (training) => ({
   name_of_scheme: training.name_of_scheme || training.title,
   type_of_scheme: training.type_of_scheme || training.type_of_training,
   academic_year: training.academic_year,
+  year_of_sanction: training.year_of_sanction,
   semester: training.semester,
   start_date: training.start_date,
   end_date: training.end_date,
@@ -168,6 +171,7 @@ const update = async (scheme_id, data, loggedInUser = null) => {
       updateFields.type_of_training = data.type_of_scheme;
     }
     if (data.academic_year) updateFields.academic_year = data.academic_year;
+    if (data.year_of_sanction) updateFields.year_of_sanction = data.year_of_sanction;
     if (data.semester) updateFields.semester = data.semester;
     if (data.start_date) updateFields.start_date = data.start_date;
     if (data.end_date) updateFields.end_date = data.end_date;

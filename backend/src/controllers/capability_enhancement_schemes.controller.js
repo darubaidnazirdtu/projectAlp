@@ -54,7 +54,7 @@ const enterData = asyncHandler(async (req, res) => {
     console.log("dd")
     const requiredFields = [
         'department_id', 'name_of_scheme', 'type_of_scheme',
-        'academic_year', 'semester', 'start_date', 'end_date',
+        'academic_year', 'year_of_sanction', 'semester', 'start_date', 'end_date',
         'no_of_students_enrolled', 'name_of_agencies_involved',
         'mode', 'outcome', 'remarks'
     ];

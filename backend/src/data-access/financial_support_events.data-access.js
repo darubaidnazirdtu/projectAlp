@@ -23,6 +23,7 @@ const set = async (data, loggedInUser = null) => {
       date_start,
       date_end,
       academic_year,
+      year_of_sanction,
       outcome,
       link,
       faculty_participants = [],
@@ -64,6 +65,7 @@ const set = async (data, loggedInUser = null) => {
       date_end,
       end_date: date_end,
       academic_year,
+      year_of_sanction,
       outcome,
       link,
       faculty_participants,
@@ -127,6 +129,7 @@ const transformFinancialSupport = (activity) => ({
   date_start: activity.date_start || activity.start_date,
   date_end: activity.date_end || activity.end_date,
   academic_year: activity.academic_year,
+  year_of_sanction: activity.year_of_sanction,
   outcome: activity.outcome,
   link: activity.link,
   faculty_participants: activity.faculty_participants || [],
@@ -195,6 +198,7 @@ const update = async (support_id, data, loggedInUser = null) => {
       updateFields.end_date = data.date_end;
     }
     if (data.academic_year) updateFields.academic_year = data.academic_year;
+    if (data.year_of_sanction) updateFields.year_of_sanction = data.year_of_sanction;
     if (data.outcome) updateFields.outcome = data.outcome;
     if (data.link) updateFields.link = data.link;
     if (data.external_contributors) {

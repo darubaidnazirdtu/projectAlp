@@ -18,6 +18,7 @@ const set = async (data, loggedInUser = null) => {
       start_date,
       end_date,
       academic_year,
+      year_of_sanction,
       organising_agency,
       funding_details,
       outcome,
@@ -49,6 +50,7 @@ const set = async (data, loggedInUser = null) => {
       start_date,
       end_date,
       academic_year,
+      year_of_sanction,
       organising_agency,
       funding_details,
       outcome,
@@ -84,6 +86,7 @@ const transformStaffTraining = (training) => ({
   start_date: training.start_date,
   end_date: training.end_date,
   academic_year: training.academic_year,
+  year_of_sanction: training.year_of_sanction,
   organising_agency: training.organising_agency,
   funding_details: training.funding_details,
   outcome: training.outcome,
@@ -134,6 +137,7 @@ const update = async (training_record_id, data, loggedInUser = null) => {
     if (data.start_date) updateFields.start_date = data.start_date;
     if (data.end_date) updateFields.end_date = data.end_date;
     if (data.academic_year) updateFields.academic_year = data.academic_year;
+    if (data.year_of_sanction) updateFields.year_of_sanction = data.year_of_sanction;
     if (data.organising_agency) updateFields.organising_agency = data.organising_agency;
     if (data.funding_details) updateFields.funding_details = data.funding_details;
     if (data.outcome) updateFields.outcome = data.outcome;

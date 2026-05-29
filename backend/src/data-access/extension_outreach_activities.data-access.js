@@ -19,6 +19,7 @@ const set = async (data, loggedInUser = null) => {
       location,
       geo_tag_location_link,
       academic_year,
+      year_of_sanction,
       no_of_participants,
       target_beneficiaries,
       sponsoring_agency,
@@ -63,6 +64,7 @@ const set = async (data, loggedInUser = null) => {
       location,
       geo_tag_location_link,
       academic_year,
+      year_of_sanction,
       no_of_participants,
       number_of_participants: no_of_participants,
       target_beneficiaries,
@@ -119,6 +121,7 @@ const transformOutreach = (collab) => ({
   location: collab.location,
   geo_tag_location_link: collab.geo_tag_location_link,
   academic_year: collab.academic_year,
+  year_of_sanction: collab.year_of_sanction,
   no_of_participants: collab.no_of_participants || collab.number_of_participants,
   target_beneficiaries: collab.target_beneficiaries,
   sponsoring_agency: collab.sponsoring_agency,
@@ -172,6 +175,7 @@ const update = async (activity_id, data, loggedInUser = null) => {
     if (data.location) updateFields.location = data.location;
     if (data.geo_tag_location_link) updateFields.geo_tag_location_link = data.geo_tag_location_link;
     if (data.academic_year) updateFields.academic_year = data.academic_year;
+    if (data.year_of_sanction) updateFields.year_of_sanction = data.year_of_sanction;
     if (data.no_of_participants !== undefined) {
       updateFields.no_of_participants = data.no_of_participants;
       updateFields.number_of_participants = data.no_of_participants;

@@ -33,6 +33,7 @@ const CollaborationSchema = new mongoose.Schema({
     start_date: Date,
     end_date: Date,
     academic_year: String,
+    year_of_sanction: String,
     outcome: String,
     remarks: String,
     link: String,

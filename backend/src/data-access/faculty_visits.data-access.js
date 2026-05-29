@@ -24,6 +24,7 @@ const set = async (data, loggedInUser = null) => {
       start_date,
       end_date,
       academic_year,
+      year_of_sanction,
       outcome,
       remarks,
       link
@@ -61,6 +62,7 @@ const set = async (data, loggedInUser = null) => {
       start_date,
       end_date,
       academic_year,
+      year_of_sanction,
       outcome,
       remarks,
       link,
@@ -113,6 +115,7 @@ const transformVisit = (activity) => ({
   start_date: activity.start_date,
   end_date: activity.end_date,
   academic_year: activity.academic_year,
+  year_of_sanction: activity.year_of_sanction,
   outcome: activity.outcome,
   remarks: activity.remarks,
   link: activity.link,
@@ -171,6 +174,7 @@ const update = async (visit_id, data, loggedInUser = null) => {
     if (data.start_date) updateFields.start_date = data.start_date;
     if (data.end_date) updateFields.end_date = data.end_date;
     if (data.academic_year) updateFields.academic_year = data.academic_year;
+    if (data.year_of_sanction) updateFields.year_of_sanction = data.year_of_sanction;
     if (data.outcome) updateFields.outcome = data.outcome;
     if (data.remarks) updateFields.remarks = data.remarks;
     if (data.link) updateFields.link = data.link;
