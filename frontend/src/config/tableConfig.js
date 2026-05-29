@@ -12,6 +12,16 @@ const ACADEMIC_YEAR_FIELD = {
   placeholder: 'Select academic year',
 };
 
+const AUTO_ACADEMIC_YEAR_FIELD = {
+  header: 'Academic Year',
+  accessor: 'academic_year',
+  type: 'text',
+  autoAcademicYear: true,
+  required: true,
+  disabled: true,
+  placeholder: 'Auto fetched from session',
+};
+
 const APP_BASE_PATH = '/app';
 
 const prefixPath = (path) => {
@@ -62,7 +72,7 @@ const rawResources = [
         required: true,
         placeholder: 'Select publication type'
       },
-      { header: 'Title of Book', accessor: 'title_of_book', requiredIf: (item) => item.publication_type === 'Book', placeholder: 'Enter book title' },
+      { header: 'Title of Book', accessor: 'title_of_book', required: true, placeholder: 'Enter book title' },
       { header: 'Title of Chapter', accessor: 'title_of_chapter', requiredIf: (item) => item.publication_type === 'Chapter', placeholder: 'Enter chapter title (if applicable)' },
       {
         header: 'Role',
@@ -72,8 +82,8 @@ const rawResources = [
         placeholder: 'Select Role',
         required: true
       },
-      { header: 'Year', accessor: 'year', type: 'year', required: true, min: 1900, max: 2099, placeholder: 'e.g., 2024' },
-      ACADEMIC_YEAR_FIELD,
+      { header: 'Month-Year', accessor: 'year', type: 'monthYear', required: true, academicCycleBounded: true, placeholder: 'Select month-year' },
+      AUTO_ACADEMIC_YEAR_FIELD,
       { header: 'ISBN', accessor: 'isbn_number', placeholder: 'e.g., 978-3-16-148410-0' },
       { header: 'Publisher', accessor: 'name_of_publisher', required: true, placeholder: 'Enter publisher name' },
       {
@@ -253,13 +263,13 @@ const rawResources = [
         required: true,
         placeholder: 'Select level'
       },
-      { header: 'Start Date', accessor: 'start_date', type: 'date', required: true },
-      { header: 'End Date', accessor: 'end_date', type: 'date', required: true },
+      { header: 'Start Date', accessor: 'start_date', type: 'date', required: true, academicCycleDateBounded: true },
+      { header: 'End Date', accessor: 'end_date', type: 'date', required: true, academicCycleDateBounded: true, endDateAfterAccessor: 'start_date' },
       { header: 'Participants', accessor: 'number_of_participants', type: 'number', placeholder: 'Number of participants' },
       { header: 'Source of Financial Support', accessor: 'source_of_financial_support', placeholder: 'Enter source' },
       { header: 'Funding Amount', accessor: 'funding_amount', type: 'number', placeholder: 'Amount in INR' },
-      { header: 'Year', accessor: 'year', type: 'number', required: true, placeholder: 'e.g., 2024' },
-      ACADEMIC_YEAR_FIELD,
+      { header: 'Month-Year', accessor: 'year', type: 'monthYear', required: true, academicCycleBounded: true, placeholder: 'Select month-year' },
+      AUTO_ACADEMIC_YEAR_FIELD,
       { header: 'Duration', accessor: 'duration', placeholder: 'e.g., 3 days' },
       { header: 'Nature of Activity', accessor: 'nature_of_activity', placeholder: 'Describe nature' },
       { header: 'Outcome', accessor: 'outcome', placeholder: 'Describe outcome' },
@@ -339,13 +349,13 @@ const rawResources = [
         required: true,
         placeholder: 'Select level'
       },
-      { header: 'Start Date', accessor: 'start_date', type: 'date', required: true },
-      { header: 'End Date', accessor: 'end_date', type: 'date', placeholder: 'Select end date' },
+      { header: 'Start Date', accessor: 'start_date', type: 'date', required: true, academicCycleDateBounded: true },
+      { header: 'End Date', accessor: 'end_date', type: 'date', placeholder: 'Select end date', academicCycleDateBounded: true, endDateAfterAccessor: 'start_date' },
       { header: 'Participants', accessor: 'number_of_participants', type: 'number', placeholder: 'Number of participants' },
       { header: 'Funding Agency', accessor: 'funding_agency', placeholder: 'Enter funding agency' },
       { header: 'Funding Amount', accessor: 'funding_amount', type: 'number', placeholder: 'Amount in INR' },
-      ACADEMIC_YEAR_FIELD,
-      { header: 'Year', accessor: 'year', type: 'number', required: true, placeholder: 'e.g., 2024' },
+      AUTO_ACADEMIC_YEAR_FIELD,
+      { header: 'Month-Year', accessor: 'year', type: 'monthYear', required: true, academicCycleBounded: true, placeholder: 'Select month-year' },
       { header: 'Nature of Collaboration', accessor: 'nature_of_collaboration', required: true, placeholder: 'Describe collaboration nature' },
       { header: 'Outcome', accessor: 'outcome', placeholder: 'Describe outcome' },
       { header: 'Remarks', accessor: 'remarks', placeholder: 'Additional remarks' },
@@ -432,8 +442,8 @@ const rawResources = [
       { header: 'ISBN', accessor: 'isbn', placeholder: 'e.g., 978-3-16-148410-0' },
       { header: 'Volume', accessor: 'volume', placeholder: 'Enter volume number' },
       { header: 'Page Numbers', accessor: 'page_numbers', placeholder: 'e.g., 10-25' },
-      { header: 'Year', accessor: 'year_of_publication', type: 'number', required: true, placeholder: 'e.g., 2024' },
-      ACADEMIC_YEAR_FIELD,
+      { header: 'Month-Year', accessor: 'year_of_publication', type: 'monthYear', required: true, academicCycleBounded: true, placeholder: 'Select month-year' },
+      AUTO_ACADEMIC_YEAR_FIELD,
       { header: 'DOI', accessor: 'doi', placeholder: 'e.g., 10.1000/xyz123' },
       { header: 'Indexing', accessor: 'indexing', placeholder: 'e.g., Scopus, WoS' },
       { header: 'Award Received', accessor: 'award_received', placeholder: 'Enter award details' },
@@ -1208,8 +1218,8 @@ const rawResources = [
       { header: 'Volume', accessor: 'volume', placeholder: 'Enter volume number' },
       { header: 'Issue', accessor: 'issue', placeholder: 'Enter issue number' },
       { header: 'Page Numbers', accessor: 'page_numbers', placeholder: 'e.g., 10-25' },
-      { header: 'Year', accessor: 'year_of_publication', type: 'number', required: true, placeholder: 'e.g., 2024' },
-      ACADEMIC_YEAR_FIELD,
+      { header: 'Month-Year', accessor: 'year_of_publication', type: 'monthYear', required: true, academicCycleBounded: true, placeholder: 'Select month-year' },
+      AUTO_ACADEMIC_YEAR_FIELD,
       { header: 'DOI', accessor: 'doi', placeholder: 'e.g., 10.1000/xyz123' },
       { header: 'Indexing', accessor: 'indexing', placeholder: 'e.g., Scopus, WoS' },
       { header: 'Impact Factor', accessor: 'impact_factor', type: 'number', placeholder: 'e.g., 3.5' },
@@ -1356,7 +1366,7 @@ const rawResources = [
       { header: 'Date of Award', accessor: 'date_of_award', type: 'date' },
       { header: 'Awarding Agency', accessor: 'patent_awarding_agency', placeholder: 'Enter awarding agency' },
       { header: 'Department ID', accessor: 'department_id', required: true, type: 'entitySelect', entityType: 'department' },
-      ACADEMIC_YEAR_FIELD,
+      AUTO_ACADEMIC_YEAR_FIELD,
       { header: 'PDF', accessor: 'link_to_patent', type: 'hyperlink', fileKey: 'doc' , description: 'Upload patent publication or grant certificate (Max 5MB PDF)' },
       {
         header: 'Faculty Members',
@@ -1445,7 +1455,7 @@ const rawResources = [
         required: true,
         placeholder: 'Select outcome'
       },
-      ACADEMIC_YEAR_FIELD,
+      AUTO_ACADEMIC_YEAR_FIELD,
       { header: 'Remarks', accessor: 'remarks', placeholder: 'Additional remarks' },
       { header: 'PDF', accessor: 'link', type: 'hyperlink', fileKey: 'doc' , description: 'Upload final notification or degree certificate (Max 5MB PDF)' },
       {
@@ -1722,10 +1732,10 @@ const rawResources = [
         placeholder: 'Select funding type'
       },
       { header: 'Sanction Number', accessor: 'sanction_number', placeholder: 'Enter sanction number' },
-      { header: 'Year of Sanction', accessor: 'year_of_sanction', type: 'number', required: true, placeholder: 'e.g., 2024' },
-      ACADEMIC_YEAR_FIELD,
-      { header: 'Start Date', accessor: 'start_date', type: 'date', required: true },
-      { header: 'End Date', accessor: 'end_date', type: 'date', required: true },
+      { header: 'Month-Year', accessor: 'year_of_sanction', type: 'monthYear', required: true, academicCycleBounded: true, placeholder: 'Select month-year' },
+      AUTO_ACADEMIC_YEAR_FIELD,
+      { header: 'Start Date', accessor: 'start_date', type: 'date', required: true, academicCycleDateBounded: true },
+      { header: 'End Date', accessor: 'end_date', type: 'date', required: true, academicCycleDateBounded: true, endDateAfterAccessor: 'start_date' },
       { header: 'Amount', accessor: 'amount', type: 'number', required: true, placeholder: 'Amount in INR' },
       {
         header: 'Status',
@@ -1817,9 +1827,9 @@ const rawResources = [
       { header: 'Organisation', accessor: 'name_of_organisation', required: true, placeholder: 'Enter organisation name' },
       { header: 'Awarding Agency', accessor: 'awarding_agency', required: true, placeholder: 'Enter awarding agency' },
       { header: 'Monetary Value', accessor: 'monetary_value', type: 'number', placeholder: 'Amount in INR' },
-      { header: 'Year', accessor: 'year', type: 'number', required: true, placeholder: 'e.g., 2024' },
+      { header: 'Month-Year', accessor: 'year', type: 'monthYear', required: true, academicCycleBounded: true, placeholder: 'Select month-year' },
       { header: 'Date of Award', accessor: 'date_of_award', type: 'date', required: true },
-      ACADEMIC_YEAR_FIELD,
+      AUTO_ACADEMIC_YEAR_FIELD,
       { header: 'Outcome', accessor: 'outcome', placeholder: 'Describe outcome' },
       { header: 'Remarks', accessor: 'remarks', placeholder: 'Additional remarks' },
       { header: 'PDF', accessor: 'evidence_link', type: 'hyperlink', fileKey: 'doc' , description: 'Upload award certificate or notification (Max 5MB PDF)' },
@@ -1892,10 +1902,10 @@ const rawResources = [
       },
       { header: 'Grant Amount', accessor: 'grant_amount', type: 'number', required: true, placeholder: 'Grant amount in INR' },
       { header: 'Revenue', accessor: 'revenue_generated', type: 'number', required: true, placeholder: 'Revenue in INR' },
-      { header: 'Start Date', accessor: 'duration_start_date', type: 'date', required: true },
-      { header: 'End Date', accessor: 'end_date', type: 'date', required: true },
-      { header: 'Year', accessor: 'year_of_consultancy', type: 'number', required: true, placeholder: 'e.g., 2024' },
-      ACADEMIC_YEAR_FIELD,
+      { header: 'Start Date', accessor: 'duration_start_date', type: 'date', required: true, academicCycleDateBounded: true },
+      { header: 'End Date', accessor: 'end_date', type: 'date', required: true, academicCycleDateBounded: true, endDateAfterAccessor: 'duration_start_date' },
+      { header: 'Month-Year', accessor: 'year_of_consultancy', type: 'monthYear', required: true, academicCycleBounded: true, placeholder: 'Select month-year' },
+      AUTO_ACADEMIC_YEAR_FIELD,
       {
         header: 'Status',
         accessor: 'status',
@@ -1985,10 +1995,10 @@ const rawResources = [
         required: true,
         placeholder: 'Select agency type'
       },
-      { header: 'Start Date', accessor: 'duration_start_date', type: 'date', required: true },
-      { header: 'End Date', accessor: 'end_date', type: 'date', required: true },
-      { header: 'Year', accessor: 'year_of_training', type: 'number', required: true, placeholder: 'e.g., 2024' },
-      ACADEMIC_YEAR_FIELD,
+      { header: 'Start Date', accessor: 'duration_start_date', type: 'date', required: true, academicCycleDateBounded: true },
+      { header: 'End Date', accessor: 'end_date', type: 'date', required: true, academicCycleDateBounded: true, endDateAfterAccessor: 'duration_start_date' },
+      { header: 'Month-Year', accessor: 'year_of_training', type: 'monthYear', required: true, academicCycleBounded: true, placeholder: 'Select month-year' },
+      AUTO_ACADEMIC_YEAR_FIELD,
       { header: 'Revenue', accessor: 'revenue_generated', type: 'number', required: true, placeholder: 'Revenue in INR' },
       {
         header: 'Mode',

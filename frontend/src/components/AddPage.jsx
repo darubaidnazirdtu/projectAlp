@@ -19,8 +19,10 @@ import { shouldUseFacultyApproval } from '../utils/iqacApproval.util.js';
 import { iqacApprovalService } from '../services/iqacApproval.service.js';
 import { toast } from 'sonner';
 import FormPageHeader from './FormPageHeader.jsx';
+import { normalizeAcademicYear } from '../utils/academicYear.util.js';
+import { useIqacFilter } from '../context/IqacFilterContext.jsx';
 
-const InputField = ({ label, name, type = 'text', placeholder, value, onChange, required, className = '' }) => (
+const InputField = ({ label, name, type = 'text', placeholder, value, onChange, required, disabled, min, max, className = '' }) => (
     <div>
         {label && (
             <label className="form-field-label-iqac">
@@ -35,6 +37,9 @@ const InputField = ({ label, name, type = 'text', placeholder, value, onChange, 
             value={value}
             onChange={onChange}
             required={required}
+            disabled={disabled}
+            min={min}
+            max={max}
             className={`form-field-input-iqac ${className}`}
         />
     </div>
@@ -102,6 +107,40 @@ const toStoredMonthYear = (value) => {
     }
 
     return text;
+};
+
+const getAcademicCycleMonthBounds = (academicYear) => {
+    const normalized = normalizeAcademicYear(academicYear);
+    const match = normalized.match(/^(\d{4})-(\d{2})$/);
+    if (!match) return {};
+
+    const startYear = Number(match[1]);
+    if (!Number.isFinite(startYear)) return {};
+
+    return {
+        min: `${startYear}-08`,
+        max: `${startYear + 1}-07`
+    };
+};
+
+const getAcademicCycleDateBounds = (academicYear) => {
+    const normalized = normalizeAcademicYear(academicYear);
+    const match = normalized.match(/^(\d{4})-(\d{2})$/);
+    if (!match) return {};
+
+    const startYear = Number(match[1]);
+    if (!Number.isFinite(startYear)) return {};
+
+    return {
+        min: `${startYear}-08-01`,
+        max: `${startYear + 1}-07-31`
+    };
+};
+
+const isValidDateValue = (value) => {
+    if (!value) return false;
+    const date = new Date(value);
+    return !Number.isNaN(date.getTime());
 };
 
 const getStudentNameFromEntity = (studentData) => {
@@ -319,7 +358,7 @@ const ObjectListField = ({ label, name, values = [], subFields = [], onChange })
     );
 };
 
-const getInitialFormData = (resource) => {
+const getInitialFormData = (resource, sessionAcademicYear = '') => {
     return resource.columns
         .filter(col => !col.hideInForm) // Exclude columns hidden from form
         .reduce((acc, col) => {
@@ -328,6 +367,8 @@ const getInitialFormData = (resource) => {
                     acc[col.accessor] = [];
                 } else if (col.type === 'boolean') {
                     acc[col.accessor] = false;
+                } else if (col.autoAcademicYear) {
+                    acc[col.accessor] = sessionAcademicYear;
                 } else {
                     acc[col.accessor] = '';
                 }
@@ -346,6 +387,8 @@ const AddPage = () => {
     // Auth State
     const user = useSelector(selectUser);
     const role = useSelector(selectRole);
+    const { academicYear: selectedIqacSession } = useIqacFilter();
+    const sessionAcademicYear = normalizeAcademicYear(selectedIqacSession);
 
     const [formData, setFormData] = useState({});
     const [files, setFiles] = useState({});
@@ -378,7 +421,7 @@ const AddPage = () => {
                             if (!data) throw new Error("No data returned from service");
 
                             // Merge with initial structure to ensure all fields exist
-                            const initialData = getInitialFormData(resource);
+                            const initialData = getInitialFormData(resource, sessionAcademicYear);
 
                             // Format date fields and Normalize Object values
                             resource.columns.forEach(col => {
@@ -422,7 +465,13 @@ const AddPage = () => {
                                 }
                             });
 
-                            setFormData({ ...initialData, ...data });
+                            const nextData = { ...initialData, ...data };
+                            resource.columns.forEach(col => {
+                                if (col.autoAcademicYear && sessionAcademicYear) {
+                                    nextData[col.accessor] = sessionAcademicYear;
+                                }
+                            });
+                            setFormData(nextData);
                         } else {
                             console.error(`[AddPage] Service or function not found. Service: ${!!service}, Func: ${!!service?.[getByIdFunctionName]}`);
                             throw new Error(`Service function ${getByIdFunctionName} not found in ${serviceName}`);
@@ -435,7 +484,7 @@ const AddPage = () => {
                     }
                 } else {
                     // ADD MODE
-                    const initialData = getInitialFormData(resource);
+                    const initialData = getInitialFormData(resource, sessionAcademicYear);
                     // HOD Logic: Pre-fill department_id
                     if (role === ROLES.DEPARTMENT_HOD && (user?.departmentId || user?.department_id)) {
                         initialData.department_id = user.departmentId || user.department_id;
@@ -446,7 +495,7 @@ const AddPage = () => {
 
             loadData();
         }
-    }, [resource, role, user, editMode, editId]);
+    }, [resource, role, user, editMode, editId, sessionAcademicYear]);
 
     if (!resource) {
         return <NotFound />;
@@ -484,6 +533,47 @@ const AddPage = () => {
             toast.error(`Please fill required fields: ${missing.join(', ')}`);
             return false;
         }
+
+        const invalidAcademicCycleFields = resource.columns
+            .filter((col) => col.academicCycleBounded && formData[col.accessor])
+            .filter((col) => {
+                const bounds = getAcademicCycleMonthBounds(formData.academic_year || sessionAcademicYear);
+                const monthValue = toMonthInputValue(formData[col.accessor]);
+                return !bounds.min || !bounds.max || !monthValue || monthValue < bounds.min || monthValue > bounds.max;
+            })
+            .map((col) => col.header || col.accessor);
+
+        if (invalidAcademicCycleFields.length > 0) {
+            toast.error(`Please select ${invalidAcademicCycleFields.join(', ')} within the IQAC session academic cycle (August to July).`);
+            return false;
+        }
+
+        const invalidDateOrder = resource.columns.some((col) => {
+            if (!col.endDateAfterAccessor) return false;
+            const startDate = formData[col.endDateAfterAccessor];
+            const endDate = formData[col.accessor];
+            return isValidDateValue(startDate) && isValidDateValue(endDate) && endDate < startDate;
+        });
+
+        if (invalidDateOrder) {
+            toast.error('End Date cannot be earlier than Start Date.');
+            return false;
+        }
+
+        const invalidAcademicCycleDates = resource.columns
+            .filter((col) => col.academicCycleDateBounded && formData[col.accessor])
+            .filter((col) => {
+                const bounds = getAcademicCycleDateBounds(formData.academic_year || sessionAcademicYear);
+                const dateValue = formData[col.accessor];
+                return !bounds.min || !bounds.max || !isValidDateValue(dateValue) || dateValue < bounds.min || dateValue > bounds.max;
+            })
+            .map((col) => col.header || col.accessor);
+
+        if (invalidAcademicCycleDates.length > 0) {
+            toast.error(`Please select ${invalidAcademicCycleDates.join(', ')} within the IQAC session academic cycle (August to July).`);
+            return false;
+        }
+
         return true;
     };
 
@@ -560,7 +650,7 @@ const AddPage = () => {
                 setSuccess(`${resource.title} sent to associated faculty for approval. It will be saved permanently after approval.`);
                 toast.success('Approval request sent to faculty');
 
-                const nextInitialData = getInitialFormData(resource);
+                const nextInitialData = getInitialFormData(resource, sessionAcademicYear);
                 if (role === ROLES.DEPARTMENT_HOD && (user?.departmentId || user?.department_id)) {
                     nextInitialData.department_id = user.departmentId || user.department_id;
                 }
@@ -672,7 +762,7 @@ const AddPage = () => {
 
             if (!editMode) {
                 setFiles({});
-                setFormData(getInitialFormData(resource));
+                setFormData(getInitialFormData(resource, sessionAcademicYear));
             } else {
                 // Determine what to do after edit - maybe stay or go back?
                 // For now, let's just show success.
@@ -692,7 +782,13 @@ const AddPage = () => {
     };
 
     const renderField = (col) => {
-        const isDisabled = false; // All fields are always editable (department_id is pre-filled for HODs but editable)
+        const isDisabled = Boolean(col.disabled || col.readOnly);
+        const monthBounds = col.academicCycleBounded
+            ? getAcademicCycleMonthBounds(formData.academic_year || sessionAcademicYear)
+            : {};
+        const dateBounds = col.academicCycleDateBounded
+            ? getAcademicCycleDateBounds(formData.academic_year || sessionAcademicYear)
+            : {};
 
         const commonProps = {
             name: col.accessor,
@@ -865,6 +961,8 @@ const AddPage = () => {
                                 value: toStoredMonthYear(event.target.value)
                             }
                         })}
+                        min={monthBounds.min}
+                        max={monthBounds.max}
                     />
                 );
             default:
@@ -882,6 +980,8 @@ const AddPage = () => {
                                     value: toStoredMonthYear(event.target.value)
                                 }
                             })}
+                            min={monthBounds.min}
+                            max={monthBounds.max}
                         />
                     );
                 }
@@ -893,6 +993,8 @@ const AddPage = () => {
                         value={formData[col.accessor] || ''}
                         required={col.required}
                         {...commonProps}
+                        min={col.type === 'date' ? dateBounds.min : undefined}
+                        max={col.type === 'date' ? dateBounds.max : undefined}
                     />
                 );
         }
@@ -951,7 +1053,7 @@ const AddPage = () => {
                     if (action === 'keep') {
                         setIsDuplicateModalOpen(false);
                         setSuccess('Duplicate found and verified. No new entry created.');
-                        setFormData(getInitialFormData(resource));
+                        setFormData(getInitialFormData(resource, sessionAcademicYear));
                     } else if (action === 'create') {
                         setIsDuplicateModalOpen(false);
                         setIsBypassingDuplicate(true);
