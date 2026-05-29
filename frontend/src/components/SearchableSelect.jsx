@@ -97,6 +97,7 @@ const SearchableSelect = ({
   entityType,
   value,
   onChange,
+  onOptionChange,
   required = false,
   label,
   disabled = false,
@@ -210,6 +211,9 @@ const SearchableSelect = ({
   const handleChange = (selectedOpt) => {
     setSelectedOption(selectedOpt);
     onChange(selectedOpt ? selectedOpt.value : '');
+    if (onOptionChange) {
+      onOptionChange(selectedOpt || null);
+    }
   };
 
   return (

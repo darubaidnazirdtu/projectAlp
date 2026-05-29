@@ -19,8 +19,10 @@ import { shouldUseFacultyApproval } from '../utils/iqacApproval.util.js';
 import { iqacApprovalService } from '../services/iqacApproval.service.js';
 import { toast } from 'sonner';
 import FormPageHeader from './FormPageHeader.jsx';
+import { useIqacFilter } from '../context/IqacFilterContext.jsx';
+import { getCurrentAcademicYear } from '../utils/academicYears.js';
 
-const InputField = ({ label, name, type = 'text', placeholder, value, onChange, required, className = '' }) => (
+const InputField = ({ label, name, type = 'text', placeholder, value, onChange, required, className = '', ...inputProps }) => (
     <div>
         {label && (
             <label className="form-field-label-iqac">
@@ -36,9 +38,87 @@ const InputField = ({ label, name, type = 'text', placeholder, value, onChange, 
             onChange={onChange}
             required={required}
             className={`form-field-input-iqac ${className}`}
+            {...inputProps}
         />
     </div>
 );
+
+const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+const parseAcademicYearRange = (academicYear) => {
+    const match = String(academicYear || '').trim().match(/^(\d{4})-(\d{2}|\d{4})$/);
+    if (!match) {
+        return null;
+    }
+
+    const startYear = Number(match[1]);
+    let endYear = Number(match[2]);
+
+    if (match[2].length === 2) {
+        endYear = Math.floor(startYear / 100) * 100 + endYear;
+        if (endYear < startYear) {
+            endYear += 100;
+        }
+    }
+
+    return Number.isInteger(startYear) && Number.isInteger(endYear) ? { startYear, endYear } : null;
+};
+
+const getEffectiveSessionYear = (academicYear) => {
+    return academicYear && academicYear !== 'All' ? academicYear : getCurrentAcademicYear();
+};
+
+const getSessionBounds = (academicYear) => {
+    const range = parseAcademicYearRange(getEffectiveSessionYear(academicYear));
+    if (!range) {
+        return {};
+    }
+
+    return {
+        startDate: `${range.startYear}-07-01`,
+        endDate: `${range.endYear}-08-31`,
+        startMonth: `${range.startYear}-07`,
+        endMonth: `${range.endYear}-08`,
+    };
+};
+
+const formatMonthOptionLabel = (year, monthIndex) => {
+    const label = new Date(year, monthIndex - 1, 1).toLocaleString('en-US', {
+        month: 'long',
+        year: 'numeric'
+    });
+    return label;
+};
+
+const getSessionMonthYearOptions = (academicYear) => {
+    const range = parseAcademicYearRange(getEffectiveSessionYear(academicYear));
+    if (!range) {
+        return [];
+    }
+
+    const options = [];
+    for (let year = range.startYear; year <= range.endYear; year += 1) {
+        const firstMonth = year === range.startYear ? 7 : 1;
+        const lastMonth = year === range.endYear ? 8 : 12;
+
+        for (let month = firstMonth; month <= lastMonth; month += 1) {
+            const monthText = String(month).padStart(2, '0');
+            options.push({
+                value: `${monthText}-${year}`,
+                label: formatMonthOptionLabel(year, month)
+            });
+        }
+    }
+
+    return options;
+};
+
+const isNonNegativeIntegerValue = (value) => {
+    if (value === '' || value === null || value === undefined) {
+        return true;
+    }
+    return /^\d+$/.test(String(value));
+};
 
 const isMonthYearField = (field) => {
     if (!field) {
@@ -295,6 +375,10 @@ const ObjectListField = ({ label, name, values = [], subFields = [], onChange })
                                         type={field.type || 'text'}
                                         placeholder={field.placeholder || ''}
                                         value={item[field.accessor] || ''}
+                                        min={field.min}
+                                        max={field.max}
+                                        step={field.step}
+                                        pattern={field.pattern}
                                         onChange={(e) => handleItemChange(index, field.accessor, e.target.value)}
                                     />
                                 </div>
@@ -324,12 +408,39 @@ const getInitialFormData = (resource) => {
         }, {});
 };
 
+const applyCalculatedFields = (resource, data) => {
+    if (!resource?.columns) {
+        return data;
+    }
+
+    return resource.columns.reduce((nextData, col) => {
+        if (col.accessor && typeof col.value === 'function') {
+            try {
+                nextData[col.accessor] = col.value(nextData);
+            } catch (error) {
+                console.warn(`Failed to calculate field ${col.accessor}`, error);
+            }
+        }
+        return nextData;
+    }, { ...data });
+};
+
+const getFacultyDisplayName = (faculty) => {
+    if (!faculty) {
+        return '';
+    }
+
+    return faculty.name || faculty.faculty_name || faculty.full_name || faculty.teacher_name || '';
+};
+
 const AddPage = () => {
     const { resourceId } = useParams();
     const [searchParams] = useSearchParams();
     const editMode = searchParams.get('edit') === 'true';
     const editId = searchParams.get('id');
     const resource = resourceMap.get(resourceId);
+    const { academicYear: dashboardAcademicYear } = useIqacFilter();
+    const navigate = useNavigate(); // Hook for navigation
 
     // Auth State
     const user = useSelector(selectUser);
@@ -345,6 +456,8 @@ const AddPage = () => {
     const [isDuplicateModalOpen, setIsDuplicateModalOpen] = useState(false);
     const [duplicateComparison, setDuplicateComparison] = useState(null);
     const [isBypassingDuplicate, setIsBypassingDuplicate] = useState(false);
+
+    const sessionAcademicYear = getEffectiveSessionYear(dashboardAcademicYear);
 
     useEffect(() => {
         if (resource) {
@@ -410,7 +523,13 @@ const AddPage = () => {
                                 }
                             });
 
-                            setFormData({ ...initialData, ...data });
+                            const nextData = { ...initialData, ...data };
+                            resource.columns.forEach(col => {
+                                if (col.readOnlyFromSession && col.accessor === 'academic_year') {
+                                    nextData[col.accessor] = sessionAcademicYear;
+                                }
+                            });
+                            setFormData(applyCalculatedFields(resource, nextData));
                         } else {
                             console.error(`[AddPage] Service or function not found. Service: ${!!service}, Func: ${!!service?.[getByIdFunctionName]}`);
                             throw new Error(`Service function ${getByIdFunctionName} not found in ${serviceName}`);
@@ -428,13 +547,18 @@ const AddPage = () => {
                     if (role === ROLES.DEPARTMENT_HOD && (user?.departmentId || user?.department_id)) {
                         initialData.department_id = user.departmentId || user.department_id;
                     }
-                    setFormData(initialData);
+                    resource.columns.forEach(col => {
+                        if (col.readOnlyFromSession && col.accessor === 'academic_year') {
+                            initialData[col.accessor] = sessionAcademicYear;
+                        }
+                    });
+                    setFormData(applyCalculatedFields(resource, initialData));
                 }
             };
 
             loadData();
         }
-    }, [resource, role, user, editMode, editId]);
+    }, [resource, role, user, editMode, editId, sessionAcademicYear]);
 
     if (!resource) {
         return <NotFound />;
@@ -442,10 +566,16 @@ const AddPage = () => {
 
     const handleChange = (e) => {
         const { name, value, type, checked } = e.target;
+        const column = resource.columns.find(col => col.accessor === name);
+        if (column?.readOnlyFromSession) {
+            setFormData(prev => applyCalculatedFields(resource, { ...prev, [name]: sessionAcademicYear }));
+            return;
+        }
+
         if (Array.isArray(value)) {
-            setFormData(prev => ({ ...prev, [name]: value }));
+            setFormData(prev => applyCalculatedFields(resource, { ...prev, [name]: value }));
         } else {
-            setFormData(prev => ({ ...prev, [name]: type === 'checkbox' ? checked : value }));
+            setFormData(prev => applyCalculatedFields(resource, { ...prev, [name]: type === 'checkbox' ? checked : value }));
         }
     };
 
@@ -454,9 +584,17 @@ const AddPage = () => {
         setFiles(prev => ({ ...prev, [name]: files[0] }));
     };
 
-    const navigate = useNavigate(); // Hook for navigation
+    const handleEntitySelectChange = (col, value, selectedOption = null) => {
+        const updates = { [col.accessor]: value };
 
-    const validateRequiredFields = () => {
+        if (resourceId === 'faculty_visits' && col.accessor === 'faculty_id') {
+            updates.faculty_name = getFacultyDisplayName(selectedOption?.data);
+        }
+
+        setFormData(prev => applyCalculatedFields(resource, { ...prev, ...updates }));
+    };
+
+    const validateFormFields = () => {
         const missing = resource.columns
             .filter((col) => col.required && !col.hideInForm && col.accessor)
             .filter((col) => {
@@ -472,6 +610,79 @@ const AddPage = () => {
             toast.error(`Please fill required fields: ${missing.join(', ')}`);
             return false;
         }
+
+        const validationErrors = [];
+
+        resource.columns
+            .filter((col) => !col.hideInForm && col.accessor)
+            .forEach((col) => {
+                const value = formData[col.accessor];
+
+                if (col.integer && !isNonNegativeIntegerValue(value)) {
+                    validationErrors.push(`${col.header || col.accessor} must be a positive integer or zero.`);
+                }
+
+                if (col.type === 'email' && value && !EMAIL_PATTERN.test(String(value).trim())) {
+                    validationErrors.push(`${col.header || col.accessor} must be a valid email address.`);
+                }
+
+                const resolvedMin = typeof col.min === 'function' ? col.min(formData) : col.min;
+                const resolvedMax = typeof col.max === 'function' ? col.max(formData) : col.max;
+
+                if (col.type === 'date' && value) {
+                    if (resolvedMin && value < resolvedMin) {
+                        validationErrors.push(`${col.header || col.accessor} must be on or after ${resolvedMin}.`);
+                    }
+                    if (resolvedMax && value > resolvedMax) {
+                        validationErrors.push(`${col.header || col.accessor} must be on or before ${resolvedMax}.`);
+                    }
+                } else if (col.type === 'monthYearSelect' && value) {
+                    const monthValue = toMonthInputValue(value);
+                    const { startMonth, endMonth } = getSessionBounds(formData.academic_year || sessionAcademicYear);
+                    if (startMonth && endMonth && (monthValue < startMonth || monthValue > endMonth)) {
+                        validationErrors.push(`${col.header || col.accessor} must be between ${startMonth} and ${endMonth}.`);
+                    }
+                } else if (resolvedMin !== undefined && value !== '' && value !== null && value !== undefined && Number(value) < Number(resolvedMin)) {
+                    validationErrors.push(`${col.header || col.accessor} must be at least ${resolvedMin}.`);
+                }
+
+                if (col.type !== 'date' && col.type !== 'monthYearSelect' && resolvedMax !== undefined && value !== '' && value !== null && value !== undefined && Number(value) > Number(resolvedMax)) {
+                    validationErrors.push(`${col.header || col.accessor} must be at most ${resolvedMax}.`);
+                }
+
+                if (col.validate) {
+                    const message = col.validate(value, formData);
+                    if (message) {
+                        validationErrors.push(message);
+                    }
+                }
+
+                if (col.type === 'objectList' && Array.isArray(value) && col.subFields) {
+                    value.forEach((item, index) => {
+                        col.subFields.forEach((subField) => {
+                            const subValue = item?.[subField.accessor];
+                            if (subField.required && (subValue === null || subValue === undefined || String(subValue).trim() === '')) {
+                                validationErrors.push(`${col.header} row ${index + 1}: ${subField.header || subField.accessor} is required.`);
+                            }
+                            if (subField.type === 'email' && subValue && !EMAIL_PATTERN.test(String(subValue).trim())) {
+                                validationErrors.push(`${col.header} row ${index + 1}: ${subField.header || subField.accessor} must be a valid email address.`);
+                            }
+                            if (subField.validate) {
+                                const message = subField.validate(subValue, item, formData);
+                                if (message) {
+                                    validationErrors.push(`${col.header} row ${index + 1}: ${message}`);
+                                }
+                            }
+                        });
+                    });
+                }
+            });
+
+        if (validationErrors.length > 0) {
+            toast.error(validationErrors[0]);
+            return false;
+        }
+
         return true;
     };
 
@@ -480,7 +691,7 @@ const AddPage = () => {
         setError(null);
         setSuccess(null);
 
-        if (!validateRequiredFields()) {
+        if (!validateFormFields()) {
             return;
         }
 
@@ -552,8 +763,13 @@ const AddPage = () => {
                 if (role === ROLES.DEPARTMENT_HOD && (user?.departmentId || user?.department_id)) {
                     nextInitialData.department_id = user.departmentId || user.department_id;
                 }
+                resource.columns.forEach(col => {
+                    if (col.readOnlyFromSession && col.accessor === 'academic_year') {
+                        nextInitialData[col.accessor] = sessionAcademicYear;
+                    }
+                });
                 setFiles({});
-                setFormData(nextInitialData);
+                setFormData(applyCalculatedFields(resource, nextInitialData));
                 return;
             }
 
@@ -659,8 +875,17 @@ const AddPage = () => {
             setSuccess(`${resource.title} ${editMode ? 'updated' : 'added'} successfully!`);
 
             if (!editMode) {
+                const nextInitialData = getInitialFormData(resource);
+                if (role === ROLES.DEPARTMENT_HOD && (user?.departmentId || user?.department_id)) {
+                    nextInitialData.department_id = user.departmentId || user.department_id;
+                }
+                resource.columns.forEach(col => {
+                    if (col.readOnlyFromSession && col.accessor === 'academic_year') {
+                        nextInitialData[col.accessor] = sessionAcademicYear;
+                    }
+                });
                 setFiles({});
-                setFormData(getInitialFormData(resource));
+                setFormData(applyCalculatedFields(resource, nextInitialData));
             } else {
                 // Determine what to do after edit - maybe stay or go back?
                 // For now, let's just show success.
@@ -680,14 +905,19 @@ const AddPage = () => {
     };
 
     const renderField = (col) => {
-        const isDisabled = false; // All fields are always editable (department_id is pre-filled for HODs but editable)
+        const isDisabled = Boolean(col.readOnlyFromSession || col.readOnly || col.disabled); // session-managed/calculated fields stay read-only
+        const fieldValue = typeof col.value === 'function' ? col.value(formData) : formData[col.accessor];
 
         const commonProps = {
             name: col.accessor,
             onChange: handleChange,
             placeholder: col.placeholder || '',
             required: col.required || false,
-            disabled: isDisabled
+            disabled: isDisabled,
+            min: typeof col.min === 'function' ? col.min(formData) : col.min,
+            max: typeof col.max === 'function' ? col.max(formData) : col.max,
+            step: col.step,
+            pattern: col.pattern,
         };
 
         switch (col.type) {
@@ -715,6 +945,21 @@ const AddPage = () => {
                     </div>
                 );
             case 'select':
+                if (col.readOnlyFromSession) {
+                    return (
+                        <InputField
+                            label={col.header}
+                            type="text"
+                            value={fieldValue || sessionAcademicYear}
+                            required={col.required}
+                            {...commonProps}
+                            readOnly
+                            disabled={false}
+                            onChange={() => {}}
+                            className="bg-gray-100 cursor-not-allowed"
+                        />
+                    );
+                }
                 return (
                     <div>
                         <label className="block text-sm font-semibold mb-2 text-gray-700">
@@ -731,6 +976,25 @@ const AddPage = () => {
                         </select>
                     </div>
                 );
+            case 'monthYearSelect': {
+                const options = getSessionMonthYearOptions(formData.academic_year || sessionAcademicYear);
+                return (
+                    <div>
+                        <label className="block text-sm font-semibold mb-2 text-gray-700">
+                            {col.header}
+                            {col.required && <span className="text-red-500 ml-1">*</span>}
+                        </label>
+                        <select {...commonProps} value={formData[col.accessor] || ''} className="form-field-input-iqac disabled:opacity-50">
+                            <option value="">{col.placeholder || 'Select month and year'}</option>
+                            {options.map(option => (
+                                <option key={option.value} value={option.value}>
+                                    {option.label}
+                                </option>
+                            ))}
+                        </select>
+                    </div>
+                );
+            }
             case 'textarea':
                 return (
                     <div>
@@ -740,7 +1004,7 @@ const AddPage = () => {
                         </label>
                         <textarea
                             {...commonProps}
-                            value={formData[col.accessor] || ''}
+                            value={fieldValue || ''}
                             rows={col.rows || 3}
                             className="form-field-input-iqac disabled:opacity-50"
                         />
@@ -788,7 +1052,7 @@ const AddPage = () => {
                     <InputField
                         label={col.header}
                         type="url"
-                        value={formData[col.accessor] || ''}
+                        value={fieldValue || ''}
                         required={col.required}
                         {...commonProps}
                         className={`form-field-input-iqac ${isDisabled ? 'opacity-50 cursor-not-allowed' : ''}`}
@@ -814,16 +1078,20 @@ const AddPage = () => {
                     />
                 );
             case 'entitySelect':
-                return (
+                {
+                    const shouldUseSelectedOption = resourceId === 'faculty_visits' && col.accessor === 'faculty_id';
+                    return (
                     <SearchableSelect
                         entityType={col.entityType}
-                        value={formData[col.accessor] || ''}
-                        onChange={(value) => handleChange({ target: { name: col.accessor, value } })}
+                        value={fieldValue || ''}
+                        onChange={shouldUseSelectedOption ? () => {} : (value) => handleEntitySelectChange(col, value)}
+                        onOptionChange={shouldUseSelectedOption ? (option) => handleEntitySelectChange(col, option?.value || '', option) : undefined}
                         required={col.required}
                         label={col.header}
                         disabled={isDisabled}
                     />
-                );
+                    );
+                }
             case 'monthYear':
             case 'year':
                 return (
@@ -864,7 +1132,7 @@ const AddPage = () => {
                     <InputField
                         label={col.header}
                         type={col.type || 'text'}
-                        value={formData[col.accessor] || ''}
+                        value={fieldValue || ''}
                         required={col.required}
                         {...commonProps}
                     />

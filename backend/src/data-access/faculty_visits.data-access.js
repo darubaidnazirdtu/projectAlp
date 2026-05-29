@@ -12,6 +12,7 @@ const set = async (data, loggedInUser = null) => {
   try {
     const {
       faculty_id,
+      faculty_name,
       department_id,
       organisation_name,
       title,
@@ -47,6 +48,7 @@ const set = async (data, loggedInUser = null) => {
       activity_id: visit_id,
       visit_id,
       faculty_id,
+      faculty_name,
       department_id,
       type: 'visit',
       organisation_name,
@@ -99,6 +101,7 @@ const set = async (data, loggedInUser = null) => {
 const transformVisit = (activity) => ({
   visit_id: activity.visit_id || activity.activity_id,
   faculty_id: activity.faculty_id,
+  faculty_name: activity.faculty_name,
   department_id: activity.department_id,
   organisation_name: activity.organisation_name,
   title: activity.title,
@@ -157,6 +160,7 @@ const update = async (visit_id, data, loggedInUser = null) => {
     const updateFields = {};
     if (data.department_id) updateFields.department_id = data.department_id;
     if (data.faculty_id) updateFields.faculty_id = data.faculty_id;
+    if (data.faculty_name) updateFields.faculty_name = data.faculty_name;
     if (data.organisation_name) updateFields.organisation_name = data.organisation_name;
     if (data.title) updateFields.title = data.title;
     if (data.visit_type) updateFields.visit_type = data.visit_type;

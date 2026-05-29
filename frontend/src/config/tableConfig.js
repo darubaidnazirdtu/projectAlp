@@ -12,6 +12,74 @@ const ACADEMIC_YEAR_FIELD = {
   placeholder: 'Select academic year',
 };
 
+const parseAcademicYearRange = (academicYear) => {
+  const match = String(academicYear || '').trim().match(/^(\d{4})-(\d{2}|\d{4})$/);
+  if (!match) return null;
+
+  const startYear = Number(match[1]);
+  let endYear = Number(match[2]);
+
+  if (match[2].length === 2) {
+    endYear = Math.floor(startYear / 100) * 100 + endYear;
+    if (endYear < startYear) endYear += 100;
+  }
+
+  return Number.isInteger(startYear) && Number.isInteger(endYear) ? { startYear, endYear } : null;
+};
+
+const getAcademicSessionBounds = (academicYear) => {
+  const range = parseAcademicYearRange(academicYear);
+  if (!range) return {};
+
+  return {
+    startDate: `${range.startYear}-07-01`,
+    endDate: `${range.endYear}-08-31`,
+  };
+};
+
+const parseMonthYear = (monthYear) => {
+  const normalized = String(monthYear || '').trim();
+  const monthYearMatch = normalized.match(/^(\d{2})-(\d{4})$/);
+  if (monthYearMatch) {
+    return {
+      month: Number(monthYearMatch[1]),
+      year: Number(monthYearMatch[2]),
+    };
+  }
+
+  const yearMonthMatch = normalized.match(/^(\d{4})-(\d{2})$/);
+  if (yearMonthMatch) {
+    return {
+      month: Number(yearMonthMatch[2]),
+      year: Number(yearMonthMatch[1]),
+    };
+  }
+
+  return null;
+};
+
+const getSelectedMonthBounds = (monthYear) => {
+  const parsed = parseMonthYear(monthYear);
+  if (!parsed || parsed.month < 1 || parsed.month > 12) return {};
+
+  const month = String(parsed.month).padStart(2, '0');
+  const lastDay = new Date(parsed.year, parsed.month, 0).getDate();
+
+  return {
+    startDate: `${parsed.year}-${month}-01`,
+    endDate: `${parsed.year}-${month}-${String(lastDay).padStart(2, '0')}`,
+  };
+};
+
+const getCapabilityDateBounds = (formValues) => {
+  const selectedMonthBounds = getSelectedMonthBounds(formValues?.year_of_sanction);
+  if (selectedMonthBounds.startDate && selectedMonthBounds.endDate) {
+    return selectedMonthBounds;
+  }
+
+  return getAcademicSessionBounds(formValues?.academic_year);
+};
+
 const APP_BASE_PATH = '/app';
 
 const prefixPath = (path) => {
@@ -111,7 +179,7 @@ const rawResources = [
         type: 'objectList',
         subFields: [
           { header: 'Name', accessor: 'name', required: true, placeholder: 'Enter external contributor name' },
-          { header: 'Email', accessor: 'email', placeholder: 'Enter email address' },
+          { header: 'Email', accessor: 'email', type: 'email', placeholder: 'Enter email address' },
           { header: 'Affiliation', accessor: 'affiliation', placeholder: 'Enter affiliation' },
           { header: 'Role', accessor: 'role', type: 'select', options: ['Author', 'Co-Author', 'Editor', 'Other'] }
         ],
@@ -119,7 +187,7 @@ const rawResources = [
       },
     ],
   },
-  {
+  { 
     id: 'capability_enhancement_schemes',
     title: 'Capability Enhancement Schemes',
     icon: FiTrendingUp,
@@ -151,11 +219,61 @@ const rawResources = [
         required: true,
         placeholder: 'Select scheme type'
       },
-      ACADEMIC_YEAR_FIELD,
+      { ...ACADEMIC_YEAR_FIELD, readOnlyFromSession: true, placeholder: 'Session year' },
+      { header: 'Select Month & Year', accessor: 'year_of_sanction', type: 'monthYearSelect', required: true, placeholder: 'Select month and year' },
       { header: 'Semester', accessor: 'semester', required: true, placeholder: 'e.g., Odd/Even' },
-      { header: 'Start Date', accessor: 'start_date', type: 'date', required: true },
-      { header: 'End Date', accessor: 'end_date', type: 'date', required: true },
-      { header: 'Enrolled', accessor: 'no_of_students_enrolled', type: 'number', required: true, placeholder: 'Number of students' },
+      { 
+        header: 'Start Date', 
+        accessor: 'start_date', 
+        type: 'date', 
+        required: true,
+        min: (formValues) => getCapabilityDateBounds(formValues).startDate,
+        max: (formValues) => getCapabilityDateBounds(formValues).endDate,
+        validate: (value, formValues) => {
+          if (!value) return undefined;
+
+          if (formValues?.end_date && value >= formValues.end_date) {
+            return 'Start date must be before the end date.';
+          }
+
+          if (formValues?.year_of_sanction) {
+            const { startDate: monthStart, endDate: monthEnd } = getSelectedMonthBounds(formValues.year_of_sanction);
+            if (monthStart && monthEnd && (value < monthStart || value > monthEnd)) {
+              return `Start date must be within the selected month (${monthStart} to ${monthEnd}).`;
+            }
+          }
+
+          const { startDate: sessionStart, endDate: sessionEnd } = getAcademicSessionBounds(formValues?.academic_year);
+          if (sessionStart && sessionEnd && (value < sessionStart || value > sessionEnd)) {
+            return `Start date must be between ${sessionStart} and ${sessionEnd}.`;
+          }
+
+          return undefined;
+        }
+      },
+      { 
+        header: 'End Date', 
+        accessor: 'end_date', 
+        type: 'date', 
+        required: true,
+        min: (formValues) => getAcademicSessionBounds(formValues?.academic_year).startDate,
+        max: (formValues) => getAcademicSessionBounds(formValues?.academic_year).endDate,
+        validate: (value, formValues) => {
+          if (!value) return undefined;
+
+          if (formValues?.start_date && value <= formValues.start_date) {
+            return 'End date must be after the start date.';
+          }
+
+          const { startDate: sessionStart, endDate: sessionEnd } = getAcademicSessionBounds(formValues?.academic_year);
+          if (sessionStart && sessionEnd && (value < sessionStart || value > sessionEnd)) {
+            return `End date must be between ${sessionStart} and ${sessionEnd}.`;
+          }
+
+          return undefined;
+        }
+      },
+      { header: 'Enrolled', accessor: 'no_of_students_enrolled', type: 'number', required: true, min: 0, step: 1, integer: true, placeholder: 'Number of students' },
       { header: 'Agencies', accessor: 'name_of_agencies_involved', placeholder: 'Enter agency names' },
       {
         header: 'Mode',
@@ -203,8 +321,8 @@ const rawResources = [
         accessor: 'external_contributors',
         type: 'objectList',
         subFields: [
-          { header: 'Name', accessor: 'name', required: true, placeholder: 'Enter external contributor name' },
-          { header: 'Email', accessor: 'email', placeholder: 'Enter email address' },
+          { header: 'Name', accessor: 'name', placeholder: 'Enter external contributor name' },
+          { header: 'Email', accessor: 'email', type: 'email', placeholder: 'Enter email address' },
           { header: 'Affiliation', accessor: 'affiliation', placeholder: 'Enter affiliation' },
           { header: 'Role', accessor: 'role', type: 'select', options: ['Participant', 'Collaborator', 'Trainer', 'Other'] }
         ],
@@ -291,7 +409,7 @@ const rawResources = [
         type: 'objectList',
         subFields: [
           { header: 'Name', accessor: 'name', required: true, placeholder: 'Enter external contributor name' },
-          { header: 'Email', accessor: 'email', placeholder: 'Enter email address' },
+          { header: 'Email', accessor: 'email', type: 'email', placeholder: 'Enter email address' },
           { header: 'Affiliation', accessor: 'affiliation', placeholder: 'Enter affiliation' },
           { header: 'Role', accessor: 'role', type: 'select', options: ['Coordinator', 'Participant', 'Lead', 'Other'] }
         ],
@@ -376,7 +494,7 @@ const rawResources = [
         type: 'objectList',
         subFields: [
           { header: 'Name', accessor: 'name', required: true, placeholder: 'Enter external contributor name' },
-          { header: 'Email', accessor: 'email', placeholder: 'Enter email address' },
+          { header: 'Email', accessor: 'email', type: 'email', placeholder: 'Enter email address' },
           { header: 'Affiliation', accessor: 'affiliation', placeholder: 'Enter affiliation' },
           { header: 'Role', accessor: 'role', type: 'select', options: ['Researcher', 'Collaborator', 'Visiting Faculty', 'Other'] }
         ],
@@ -468,7 +586,7 @@ const rawResources = [
         type: 'objectList',
         subFields: [
           { header: 'Name', accessor: 'name', required: true, placeholder: 'Enter external contributor name' },
-          { header: 'Email', accessor: 'email', placeholder: 'Enter email address' },
+          { header: 'Email', accessor: 'email', type: 'email', placeholder: 'Enter email address' },
           { header: 'Affiliation', accessor: 'affiliation', placeholder: 'Enter affiliation' }
         ],
         transform: (externals) => Array.isArray(externals) ? externals.map(e => e.name) : [],
@@ -530,7 +648,7 @@ const rawResources = [
       { header: 'Department ID', accessor: 'department_id', required: true, placeholder: 'Enter new department ID' },
       { header: 'Name', accessor: 'department_name', required: true, placeholder: 'Enter department name' },
       { header: 'Head', accessor: 'head_of_department', required: true, placeholder: 'Enter HOD name' },
-      { header: 'Email', accessor: 'contact_email', required: true, placeholder: 'e.g., dept@example.com' },
+      { header: 'Email', accessor: 'contact_email', type: 'email', required: true, placeholder: 'e.g., dept@example.com' },
       { header: 'Phone', accessor: 'contact_phone', required: true, placeholder: 'e.g., 9876543210' },
       { header: 'Location', accessor: 'location', placeholder: 'Enter location' },
       {
@@ -632,11 +750,60 @@ const rawResources = [
       { header: 'Sanction Number', accessor: 'sanction_number', placeholder: 'Enter sanction number' },
       { header: 'Principal Investigator', accessor: 'principal_investigator', required: true, placeholder: 'Enter PI name' },
       { header: 'Co-Investigators', accessor: 'co_investigators', placeholder: 'Enter co-investigator names' },
-      { header: 'Sanction Year', accessor: 'year_of_sanction', type: 'number', required: true, placeholder: 'e.g., 2024' },
-      ACADEMIC_YEAR_FIELD,
+      { header: 'Select Month & Year', accessor: 'year_of_sanction', type: 'monthYearSelect', required: true, placeholder: 'Select month and year' },
+      { ...ACADEMIC_YEAR_FIELD, readOnlyFromSession: true, placeholder: 'Session year' },
       { header: 'Funds Amount', accessor: 'funds_amount', type: 'number', placeholder: 'Amount in INR' },
-      { header: 'Start Date', accessor: 'duration_start_date', type: 'date', required: true },
-      { header: 'End Date', accessor: 'end_date', type: 'date', required: true },
+      { 
+        header: 'Start Date', 
+        accessor: 'duration_start_date', 
+        type: 'date', 
+        required: true,
+        min: (formValues) => getCapabilityDateBounds(formValues).startDate,
+        max: (formValues) => getCapabilityDateBounds(formValues).endDate,
+        validate: (value, formValues) => {
+          if (!value) return undefined;
+
+          if (formValues?.end_date && value >= formValues.end_date) {
+            return 'Start date must be before the end date.';
+          }
+
+          if (formValues?.year_of_sanction) {
+            const { startDate: monthStart, endDate: monthEnd } = getSelectedMonthBounds(formValues.year_of_sanction);
+            if (monthStart && monthEnd && (value < monthStart || value > monthEnd)) {
+              return `Start date must be within the selected month (${monthStart} to ${monthEnd}).`;
+            }
+          }
+
+          const { startDate: sessionStart, endDate: sessionEnd } = getAcademicSessionBounds(formValues?.academic_year);
+          if (sessionStart && sessionEnd && (value < sessionStart || value > sessionEnd)) {
+            return `Start date must be between ${sessionStart} and ${sessionEnd}.`;
+          }
+
+          return undefined;
+        }
+      },
+      { 
+        header: 'End Date', 
+        accessor: 'end_date', 
+        type: 'date', 
+        required: true,
+        min: (formValues) => getAcademicSessionBounds(formValues?.academic_year).startDate,
+        max: (formValues) => getAcademicSessionBounds(formValues?.academic_year).endDate,
+        validate: (value, formValues) => {
+          if (!value) return undefined;
+
+          if (formValues?.duration_start_date && value <= formValues.duration_start_date) {
+            return 'End date must be after the start date.';
+          }
+
+          const { startDate: sessionStart, endDate: sessionEnd } = getAcademicSessionBounds(formValues?.academic_year);
+          if (sessionStart && sessionEnd && (value < sessionStart || value > sessionEnd)) {
+            return `End date must be between ${sessionStart} and ${sessionEnd}.`;
+          }
+
+          return undefined;
+        }
+      },
       {
         header: 'Status',
         accessor: 'status',
@@ -693,8 +860,25 @@ const rawResources = [
         required: true,
         placeholder: 'Select platform type'
       },
-      { header: 'Launch Date', accessor: 'date_of_launching', type: 'date', required: true },
-      ACADEMIC_YEAR_FIELD,
+      {
+        header: 'Launch Date',
+        accessor: 'date_of_launching',
+        type: 'date',
+        required: true,
+        min: (formValues) => getAcademicSessionBounds(formValues?.academic_year).startDate,
+        max: (formValues) => getAcademicSessionBounds(formValues?.academic_year).endDate,
+        validate: (value, formValues) => {
+          if (!value) return undefined;
+
+          const { startDate: sessionStart, endDate: sessionEnd } = getAcademicSessionBounds(formValues?.academic_year);
+          if (sessionStart && sessionEnd && (value < sessionStart || value > sessionEnd)) {
+            return `Launch date must be between ${sessionStart} and ${sessionEnd}.`;
+          }
+
+          return undefined;
+        }
+      },
+      { ...ACADEMIC_YEAR_FIELD, readOnlyFromSession: true, placeholder: 'Session year' },
       { header: 'Semester', accessor: 'semester', required: true, placeholder: 'e.g., Odd/Even' },
       {
         header: 'Target Audience',
@@ -742,12 +926,64 @@ const rawResources = [
         required: true,
         placeholder: 'Select activity type'
       },
-      { header: 'Start Date', accessor: 'start_date', type: 'date', required: true },
-      { header: 'End Date', accessor: 'end_date', type: 'date', required: true },
+     
       { header: 'Location', accessor: 'location', required: true, placeholder: 'Enter location' },
       { header: 'Geo Tag Link', accessor: 'geo_tag_location_link', type: 'textarea', placeholder: 'Enter geo-tagged location link' },
-      ACADEMIC_YEAR_FIELD,
-      { header: 'Participants', accessor: 'no_of_participants', type: 'number', placeholder: 'Number of participants' },
+      { ...ACADEMIC_YEAR_FIELD, readOnlyFromSession: true, placeholder: 'Session year' },
+      { header: 'Select Month & Year', accessor: 'year_of_sanction', type: 'monthYearSelect', required: true, placeholder: 'Select month and year' },
+      //{ header: 'Semester', accessor: 'semester', required: true, placeholder: 'e.g., Odd/Even' },
+      { 
+        header: 'Start Date', 
+        accessor: 'start_date', 
+        type: 'date', 
+        required: true,
+        min: (formValues) => getCapabilityDateBounds(formValues).startDate,
+        max: (formValues) => getCapabilityDateBounds(formValues).endDate,
+        validate: (value, formValues) => {
+          if (!value) return undefined;
+
+          if (formValues?.end_date && value >= formValues.end_date) {
+            return 'Start date must be before the end date.';
+          }
+
+          if (formValues?.year_of_sanction) {
+            const { startDate: monthStart, endDate: monthEnd } = getSelectedMonthBounds(formValues.year_of_sanction);
+            if (monthStart && monthEnd && (value < monthStart || value > monthEnd)) {
+              return `Start date must be within the selected month (${monthStart} to ${monthEnd}).`;
+            }
+          }
+
+          const { startDate: sessionStart, endDate: sessionEnd } = getAcademicSessionBounds(formValues?.academic_year);
+          if (sessionStart && sessionEnd && (value < sessionStart || value > sessionEnd)) {
+            return `Start date must be between ${sessionStart} and ${sessionEnd}.`;
+          }
+
+          return undefined;
+        }
+      },
+      { 
+        header: 'End Date', 
+        accessor: 'end_date', 
+        type: 'date', 
+        required: true,
+        min: (formValues) => getAcademicSessionBounds(formValues?.academic_year).startDate,
+        max: (formValues) => getAcademicSessionBounds(formValues?.academic_year).endDate,
+        validate: (value, formValues) => {
+          if (!value) return undefined;
+
+          if (formValues?.start_date && value <= formValues.start_date) {
+            return 'End date must be after the start date.';
+          }
+
+          const { startDate: sessionStart, endDate: sessionEnd } = getAcademicSessionBounds(formValues?.academic_year);
+          if (sessionStart && sessionEnd && (value < sessionStart || value > sessionEnd)) {
+            return `End date must be between ${sessionStart} and ${sessionEnd}.`;
+          }
+
+          return undefined;
+        }
+      },
+      { header: 'Participants', accessor: 'no_of_participants', type: 'number', required: true, min: 0, step: 1, integer: true, placeholder: 'Number of participants' },
       { header: 'Target Beneficiaries', accessor: 'target_beneficiaries', required: true, placeholder: 'Describe target beneficiaries' },
       { header: 'Sponsoring Agency', accessor: 'sponsoring_agency', placeholder: 'Enter sponsoring agency' },
       { header: 'Outcome', accessor: 'outcome', placeholder: 'Describe outcome' },
@@ -778,8 +1014,8 @@ const rawResources = [
         accessor: 'external_contributors',
         type: 'objectList',
         subFields: [
-          { header: 'Name', accessor: 'name', required: true, placeholder: 'Enter external contributor name' },
-          { header: 'Email', accessor: 'email', placeholder: 'Enter email address' },
+          { header: 'Name', accessor: 'name', placeholder: 'Enter external contributor name' },
+          { header: 'Email', accessor: 'email', type: 'email', placeholder: 'Enter email address' },
           { header: 'Affiliation', accessor: 'affiliation', placeholder: 'Enter affiliation' },
           { header: 'Role', accessor: 'role', type: 'select', options: ['Coordinator', 'Volunteer', 'Partner', 'Other'] }
         ],
@@ -811,7 +1047,7 @@ const rawResources = [
       { header: 'Gender', accessor: 'gender', placeholder: 'Enter gender' },
       { header: 'DOB', accessor: 'date_of_birth', type: 'date' },
       { header: 'Designation', accessor: 'designation', required: true, placeholder: 'Enter designation' },
-      { header: 'Email', accessor: 'email', required: true, placeholder: 'e.g., name@example.com' },
+      { header: 'Email', accessor: 'email', type: 'email', required: true, placeholder: 'e.g., name@example.com' },
       { header: 'Phone', accessor: 'phone', placeholder: 'e.g., 9876543210' },
       { header: 'Department ID', accessor: 'department_id', required: true, type: 'entitySelect', entityType: 'department' },
       { header: 'Qualification', accessor: 'qualification', placeholder: 'e.g., Ph.D., M.Tech' },
@@ -867,13 +1103,81 @@ const rawResources = [
         required: true,
         placeholder: 'Select mode'
       },
-      { header: 'Start Date', accessor: 'start_date', type: 'date', required: true },
-      { header: 'End Date', accessor: 'end_date', type: 'date', required: true },
-      { header: 'Duration (Days)', accessor: 'duration_days', type: 'number', placeholder: 'Duration in days' },
       { header: 'Organising Body', accessor: 'organising_body', placeholder: 'Enter organising body' },
       { header: 'Funding Agency', accessor: 'funding_agency', placeholder: 'Enter funding agency' },
       { header: 'Venue', accessor: 'venue', placeholder: 'Enter venue' },
-      ACADEMIC_YEAR_FIELD,
+      { ...ACADEMIC_YEAR_FIELD, readOnlyFromSession: true, placeholder: 'Session year' },
+      { header: 'Select Month & Year', accessor: 'year_of_sanction', type: 'monthYearSelect', required: true, placeholder: 'Select month and year' },
+      //{ header: 'Semester', accessor: 'semester', required: true, placeholder: 'e.g., Odd/Even' },
+      { 
+        header: 'Start Date', 
+        accessor: 'start_date', 
+        type: 'date', 
+        required: true,
+        min: (formValues) => getCapabilityDateBounds(formValues).startDate,
+        max: (formValues) => getCapabilityDateBounds(formValues).endDate,
+        validate: (value, formValues) => {
+          if (!value) return undefined;
+
+          if (formValues?.end_date && value >= formValues.end_date) {
+            return 'Start date must be before the end date.';
+          }
+
+          if (formValues?.year_of_sanction) {
+            const { startDate: monthStart, endDate: monthEnd } = getSelectedMonthBounds(formValues.year_of_sanction);
+            if (monthStart && monthEnd && (value < monthStart || value > monthEnd)) {
+              return `Start date must be within the selected month (${monthStart} to ${monthEnd}).`;
+            }
+          }
+
+          const { startDate: sessionStart, endDate: sessionEnd } = getAcademicSessionBounds(formValues?.academic_year);
+          if (sessionStart && sessionEnd && (value < sessionStart || value > sessionEnd)) {
+            return `Start date must be between ${sessionStart} and ${sessionEnd}.`;
+          }
+
+          return undefined;
+        }
+      },
+      { 
+        header: 'End Date', 
+        accessor: 'end_date', 
+        type: 'date', 
+        required: true,
+        min: (formValues) => getAcademicSessionBounds(formValues?.academic_year).startDate,
+        max: (formValues) => getAcademicSessionBounds(formValues?.academic_year).endDate,
+        validate: (value, formValues) => {
+          if (!value) return undefined;
+
+          if (formValues?.start_date && value <= formValues.start_date) {
+            return 'End date must be after the start date.';
+          }
+
+          const { startDate: sessionStart, endDate: sessionEnd } = getAcademicSessionBounds(formValues?.academic_year);
+          if (sessionStart && sessionEnd && (value < sessionStart || value > sessionEnd)) {
+            return `End date must be between ${sessionStart} and ${sessionEnd}.`;
+          }
+
+          return undefined;
+        }
+      },
+      {
+        header: 'Duration (Days)',
+        accessor: 'duration_days',
+        type: 'number',
+        placeholder: 'Auto-calculated duration',
+        readOnly: true,
+        value: (formValues) => {
+          if (formValues?.start_date && formValues?.end_date) {
+            const start = new Date(formValues.start_date);
+            const end = new Date(formValues.end_date);
+            const diffInMs = end - start;
+            const days = Math.floor(diffInMs / (1000 * 60 * 60 * 24));
+            return days >= 0 ? days : 0;
+          }
+          return '';
+        }
+      },
+      
       { header: 'Outcome', accessor: 'outcome', required: true, placeholder: 'Describe outcome' },
       { header: 'Remarks', accessor: 'remarks', placeholder: 'Additional remarks' },
       { header: 'PDF', accessor: 'certificate_link', type: 'hyperlink', fileKey: 'doc' , description: 'Upload relevant supporting document (Max 5MB PDF)' },
@@ -892,8 +1196,8 @@ const rawResources = [
         accessor: 'external_participants',
         type: 'objectList',
         subFields: [
-          { header: 'Name', accessor: 'name', required: true, placeholder: 'Enter external participant name' },
-          { header: 'Email', accessor: 'email', placeholder: 'Enter email address' },
+          { header: 'Name', accessor: 'name', placeholder: 'Enter external participant name' },
+          { header: 'Email', accessor: 'email', type: 'email', placeholder: 'Enter email address' },
           { header: 'Affiliation', accessor: 'affiliation', placeholder: 'Enter affiliation' },
           { header: 'Role', accessor: 'role', type: 'select', options: ['Participant', 'Trainer', 'Resource Person', 'Other'] }
         ],
@@ -926,7 +1230,7 @@ const rawResources = [
       { header: 'Faculty ID', accessor: 'faculty_id', required: true, type: 'entitySelect', entityType: 'faculty' },
       { header: 'Department ID', accessor: 'department_id', required: true, type: 'entitySelect', entityType: 'department' },
       { header: 'Organisation', accessor: 'organisation_name', required: true, placeholder: 'Enter organisation name' },
-      { header: 'Faculty Name', accessor: 'faculty_name', placeholder: 'Enter faculty name (for display)' },
+      { header: 'Faculty Name', accessor: 'faculty_name', placeholder: 'Auto-filled from Faculty ID', readOnly: true },
       { header: 'Title', accessor: 'title', required: true, placeholder: 'Enter visit title' },
       {
         header: 'Visit Type',
@@ -947,9 +1251,61 @@ const rawResources = [
         placeholder: 'Select level'
       },
       { header: 'Funding Agency', accessor: 'funding_agency', placeholder: 'Enter funding agency' },
-      { header: 'Start Date', accessor: 'start_date', type: 'date', required: true },
-      { header: 'End Date', accessor: 'end_date', type: 'date', required: true },
-      ACADEMIC_YEAR_FIELD,
+      
+      { ...ACADEMIC_YEAR_FIELD, readOnlyFromSession: true, placeholder: 'Session year' },
+     { header: 'Select Month & Year', accessor: 'year_of_sanction', type: 'monthYearSelect', required: true, placeholder: 'Select month and year' },
+      //{ header: 'Semester', accessor: 'semester', required: true, placeholder: 'e.g., Odd/Even' },
+      { 
+        header: 'Start Date', 
+        accessor: 'start_date', 
+        type: 'date', 
+        required: true,
+        min: (formValues) => getCapabilityDateBounds(formValues).startDate,
+        max: (formValues) => getCapabilityDateBounds(formValues).endDate,
+        validate: (value, formValues) => {
+          if (!value) return undefined;
+
+          if (formValues?.end_date && value >= formValues.end_date) {
+            return 'Start date must be before the end date.';
+          }
+
+          if (formValues?.year_of_sanction) {
+            const { startDate: monthStart, endDate: monthEnd } = getSelectedMonthBounds(formValues.year_of_sanction);
+            if (monthStart && monthEnd && (value < monthStart || value > monthEnd)) {
+              return `Start date must be within the selected month (${monthStart} to ${monthEnd}).`;
+            }
+          }
+
+          const { startDate: sessionStart, endDate: sessionEnd } = getAcademicSessionBounds(formValues?.academic_year);
+          if (sessionStart && sessionEnd && (value < sessionStart || value > sessionEnd)) {
+            return `Start date must be between ${sessionStart} and ${sessionEnd}.`;
+          }
+
+          return undefined;
+        }
+      },
+      { 
+        header: 'End Date', 
+        accessor: 'end_date', 
+        type: 'date', 
+        required: true,
+        min: (formValues) => getAcademicSessionBounds(formValues?.academic_year).startDate,
+        max: (formValues) => getAcademicSessionBounds(formValues?.academic_year).endDate,
+        validate: (value, formValues) => {
+          if (!value) return undefined;
+
+          if (formValues?.start_date && value <= formValues.start_date) {
+            return 'End date must be after the start date.';
+          }
+
+          const { startDate: sessionStart, endDate: sessionEnd } = getAcademicSessionBounds(formValues?.academic_year);
+          if (sessionStart && sessionEnd && (value < sessionStart || value > sessionEnd)) {
+            return `End date must be between ${sessionStart} and ${sessionEnd}.`;
+          }
+
+          return undefined;
+        }
+      },
       { header: 'Outcome', accessor: 'outcome', placeholder: 'Describe outcome' },
       { header: 'Remarks', accessor: 'remarks', placeholder: 'Additional remarks' },
       { header: 'PDF', accessor: 'link', type: 'hyperlink', fileKey: 'doc' , description: 'Upload visit order, invitation, or certificate (Max 5MB PDF)' },
@@ -999,10 +1355,61 @@ const rawResources = [
       { header: 'Host Institution', accessor: 'host_institution', required: true, placeholder: 'Enter host institution' },
       { header: 'Location', accessor: 'location', required: true, placeholder: 'Enter location' },
       { header: 'Purpose', accessor: 'purpose', required: true, placeholder: 'Describe purpose' },
-      { header: 'Amount', accessor: 'amount', type: 'number', required: true, placeholder: 'Amount in INR' },
-      { header: 'Start Date', accessor: 'date_start', type: 'date', required: true },
-      { header: 'End Date', accessor: 'date_end', type: 'date', required: true },
-      ACADEMIC_YEAR_FIELD,
+      { header: 'Amount', accessor: 'amount', type: 'number', required: true, min: 0, step: 1, integer: true, placeholder: 'Amount in INR' },
+      { ...ACADEMIC_YEAR_FIELD, readOnlyFromSession: true, placeholder: 'Session year' },
+      { header: 'Select Month & Year', accessor: 'year_of_sanction', type: 'monthYearSelect', required: true, placeholder: 'Select month and year' },
+      //{ header: 'Semester', accessor: 'semester', required: true, placeholder: 'e.g., Odd/Even' },
+      { 
+        header: 'Start Date', 
+        accessor: 'start_date', 
+        type: 'date', 
+        required: true,
+        min: (formValues) => getCapabilityDateBounds(formValues).startDate,
+        max: (formValues) => getCapabilityDateBounds(formValues).endDate,
+        validate: (value, formValues) => {
+          if (!value) return undefined;
+
+          if (formValues?.end_date && value >= formValues.end_date) {
+            return 'Start date must be before the end date.';
+          }
+
+          if (formValues?.year_of_sanction) {
+            const { startDate: monthStart, endDate: monthEnd } = getSelectedMonthBounds(formValues.year_of_sanction);
+            if (monthStart && monthEnd && (value < monthStart || value > monthEnd)) {
+              return `Start date must be within the selected month (${monthStart} to ${monthEnd}).`;
+            }
+          }
+
+          const { startDate: sessionStart, endDate: sessionEnd } = getAcademicSessionBounds(formValues?.academic_year);
+          if (sessionStart && sessionEnd && (value < sessionStart || value > sessionEnd)) {
+            return `Start date must be between ${sessionStart} and ${sessionEnd}.`;
+          }
+
+          return undefined;
+        }
+      },
+      { 
+        header: 'End Date', 
+        accessor: 'end_date', 
+        type: 'date', 
+        required: true,
+        min: (formValues) => getAcademicSessionBounds(formValues?.academic_year).startDate,
+        max: (formValues) => getAcademicSessionBounds(formValues?.academic_year).endDate,
+        validate: (value, formValues) => {
+          if (!value) return undefined;
+
+          if (formValues?.start_date && value <= formValues.start_date) {
+            return 'End date must be after the start date.';
+          }
+
+          const { startDate: sessionStart, endDate: sessionEnd } = getAcademicSessionBounds(formValues?.academic_year);
+          if (sessionStart && sessionEnd && (value < sessionStart || value > sessionEnd)) {
+            return `End date must be between ${sessionStart} and ${sessionEnd}.`;
+          }
+
+          return undefined;
+        }
+      },
       { header: 'Outcome', accessor: 'outcome', placeholder: 'Describe outcome' },
       { header: 'PDF', accessor: 'link', type: 'hyperlink', fileKey: 'doc' , description: 'Upload financial approval or receipt (Max 5MB PDF)' },
       {
@@ -1020,8 +1427,8 @@ const rawResources = [
         accessor: 'external_contributors',
         type: 'objectList',
         subFields: [
-          { header: 'Name', accessor: 'name', required: true, placeholder: 'Enter external contributor name' },
-          { header: 'Email', accessor: 'email', placeholder: 'Enter email address' },
+          { header: 'Name', accessor: 'name',  placeholder: 'Enter external contributor name' },
+          { header: 'Email', accessor: 'email', type: 'email', placeholder: 'Enter email address' },
           { header: 'Affiliation', accessor: 'affiliation', placeholder: 'Enter affiliation' },
           { header: 'Role', accessor: 'role', type: 'select', options: ['Recipient', 'Coordinator', 'Lead', 'Other'] }
         ],
@@ -1069,10 +1476,8 @@ const rawResources = [
         required: true,
         placeholder: 'Select level'
       },
-      { header: 'Start Date', accessor: 'start_date', type: 'date', required: true },
-      { header: 'End Date', accessor: 'end_date', type: 'date' },
-      { header: 'Year of Signing', accessor: 'year_of_signing', type: 'number', required: true, placeholder: 'e.g., 2024' },
-      { header: 'Duration', accessor: 'duration', placeholder: 'e.g., 5 years' },
+      
+      { header: 'Duration(in Days)',type: 'number', accessor: 'duration', min: 0, step: 1, integer: true, placeholder: 'e.g., 5 years' },
       { header: 'Purpose', accessor: 'purpose', required: true, placeholder: 'Describe purpose' },
       {
         header: 'Activities',
@@ -1085,8 +1490,58 @@ const rawResources = [
         ],
         transform: (items) => Array.isArray(items) ? items.map(i => i.activity_title).join(', ') : ''
       },
-      { header: 'Funding Amount', accessor: 'funding_amount', type: 'number', placeholder: 'Amount in INR' },
-      ACADEMIC_YEAR_FIELD,
+      { header: 'Funding Amount', accessor: 'funding_amount', type: 'number', required: true, min: 0, step: 1, integer: true, placeholder: 'Amount in INR' },
+      { ...ACADEMIC_YEAR_FIELD, readOnlyFromSession: true, placeholder: 'Session year' },
+      { header: 'Month & Year of Signing', accessor: 'year_of_signing',  type: 'monthYearSelect', required: true, placeholder: 'Select signing month and year'},
+      {
+        header: 'Start Date',
+        accessor: 'start_date',
+        type: 'date',
+        required: true,
+        min: (formValues) => getSelectedMonthBounds(formValues?.year_of_signing).startDate || getAcademicSessionBounds(formValues?.academic_year).startDate,
+        max: (formValues) => getAcademicSessionBounds(formValues?.academic_year).endDate,
+        validate: (value, formValues) => {
+          if (!value) return undefined;
+
+          const { startDate: signingMonthStart } = getSelectedMonthBounds(formValues?.year_of_signing);
+          if (signingMonthStart && value < signingMonthStart) {
+            return `Start date must be on or after the signing month (${signingMonthStart}).`;
+          }
+
+          if (formValues?.end_date && value >= formValues.end_date) {
+            return 'Start date must be before the end date.';
+          }
+
+          const { startDate: sessionStart, endDate: sessionEnd } = getAcademicSessionBounds(formValues?.academic_year);
+          if (sessionStart && sessionEnd && (value < sessionStart || value > sessionEnd)) {
+            return `Start date must be between ${sessionStart} and ${sessionEnd}.`;
+          }
+
+          return undefined;
+        }
+      },
+      { 
+        header: 'End Date', 
+        accessor: 'end_date', 
+        type: 'date', 
+        required: true,
+        min: (formValues) => getAcademicSessionBounds(formValues?.academic_year).startDate,
+        max: (formValues) => getAcademicSessionBounds(formValues?.academic_year).endDate,
+        validate: (value, formValues) => {
+          if (!value) return undefined;
+
+          if (formValues?.start_date && value <= formValues.start_date) {
+            return 'End date must be after the start date.';
+          }
+
+          const { startDate: sessionStart, endDate: sessionEnd } = getAcademicSessionBounds(formValues?.academic_year);
+          if (sessionStart && sessionEnd && (value < sessionStart || value > sessionEnd)) {
+            return `End date must be between ${sessionStart} and ${sessionEnd}.`;
+          }
+
+          return undefined;
+        }
+      },
       { header: 'Outcome', accessor: 'outcome', placeholder: 'Describe outcome' },
       { header: 'Remarks', accessor: 'remarks', placeholder: 'Additional remarks' },
       { header: 'PDF', accessor: 'link', type: 'hyperlink', fileKey: 'doc' , description: 'Upload scanned copy of the MoU (Max 5MB PDF)' },
@@ -1115,8 +1570,8 @@ const rawResources = [
         accessor: 'external_contributors',
         type: 'objectList',
         subFields: [
-          { header: 'Name', accessor: 'name', required: true, placeholder: 'Enter external contributor name' },
-          { header: 'Email', accessor: 'email', placeholder: 'Enter email address' },
+          { header: 'Name', accessor: 'name', placeholder: 'Enter external contributor name' },
+          { header: 'Email', accessor: 'email', type: 'email', placeholder: 'Enter email address' },
           { header: 'Affiliation', accessor: 'affiliation', placeholder: 'Enter affiliation' },
           { header: 'Role', accessor: 'role', type: 'select', options: ['Coordinator', 'Lead', 'Participant', 'Other'] }
         ],
@@ -1246,7 +1701,7 @@ const rawResources = [
         type: 'objectList',
         subFields: [
           { header: 'Name', accessor: 'name', required: true, placeholder: 'Enter external author name' },
-          { header: 'Email', accessor: 'email', placeholder: 'Enter email address' },
+          { header: 'Email', accessor: 'email', type: 'email', placeholder: 'Enter email address' },
           { header: 'Affiliation', accessor: 'affiliation', placeholder: 'Enter institution/affiliation' }
         ],
         transform: (externals) =>
@@ -1388,7 +1843,7 @@ const rawResources = [
         type: 'objectList',
         subFields: [
           { header: 'Name', accessor: 'name', required: true, placeholder: 'Enter external inventor name' },
-          { header: 'Email', accessor: 'email', placeholder: 'Enter email address' },
+          { header: 'Email', accessor: 'email', type: 'email', placeholder: 'Enter email address' },
           { header: 'Affiliation', accessor: 'affiliation', placeholder: 'Enter institution/affiliation' }
         ],
         transform: (externals) =>
@@ -1476,7 +1931,7 @@ const rawResources = [
         type: 'objectList',
         subFields: [
           { header: 'Name', accessor: 'name', required: true, placeholder: 'Enter external examiner name' },
-          { header: 'Email', accessor: 'email', placeholder: 'Enter email address' },
+          { header: 'Email', accessor: 'email', type: 'email', placeholder: 'Enter email address' },
           { header: 'Affiliation', accessor: 'affiliation', placeholder: 'Enter institution/affiliation' },
           { header: 'Role', accessor: 'role', type: 'select', options: ['External Examiner', 'Subject Expert', 'Industry Expert', 'Other'] }
         ],
@@ -1521,8 +1976,6 @@ const rawResources = [
         placeholder: 'Select level'
       },
       { header: 'Area of Support', accessor: 'area_of_support', placeholder: 'Enter area of support' },
-      { header: 'Start Date', accessor: 'start_date', type: 'date', required: true },
-      { header: 'End Date', accessor: 'end_date', type: 'date' },
       {
         header: 'Status',
         accessor: 'status',
@@ -1531,7 +1984,60 @@ const rawResources = [
         required: true,
         placeholder: 'Select status'
       },
-      ACADEMIC_YEAR_FIELD,
+      { ...ACADEMIC_YEAR_FIELD, readOnlyFromSession: true, placeholder: 'Session year' },
+      { header: 'Select Month & Year', accessor: 'year_of_sanction', type: 'monthYearSelect', required: true, placeholder: 'Select month and year' },
+      //{ header: 'Semester', accessor: 'semester', required: true, placeholder: 'e.g., Odd/Even' },
+      { 
+        header: 'Start Date', 
+        accessor: 'start_date', 
+        type: 'date', 
+        required: true,
+        min: (formValues) => getCapabilityDateBounds(formValues).startDate,
+        max: (formValues) => getCapabilityDateBounds(formValues).endDate,
+        validate: (value, formValues) => {
+          if (!value) return undefined;
+
+          if (formValues?.end_date && value >= formValues.end_date) {
+            return 'Start date must be before the end date.';
+          }
+
+          if (formValues?.year_of_sanction) {
+            const { startDate: monthStart, endDate: monthEnd } = getSelectedMonthBounds(formValues.year_of_sanction);
+            if (monthStart && monthEnd && (value < monthStart || value > monthEnd)) {
+              return `Start date must be within the selected month (${monthStart} to ${monthEnd}).`;
+            }
+          }
+
+          const { startDate: sessionStart, endDate: sessionEnd } = getAcademicSessionBounds(formValues?.academic_year);
+          if (sessionStart && sessionEnd && (value < sessionStart || value > sessionEnd)) {
+            return `Start date must be between ${sessionStart} and ${sessionEnd}.`;
+          }
+
+          return undefined;
+        }
+      },
+      { 
+        header: 'End Date', 
+        accessor: 'end_date', 
+        type: 'date', 
+        required: true,
+        min: (formValues) => getAcademicSessionBounds(formValues?.academic_year).startDate,
+        max: (formValues) => getAcademicSessionBounds(formValues?.academic_year).endDate,
+        validate: (value, formValues) => {
+          if (!value) return undefined;
+
+          if (formValues?.start_date && value <= formValues.start_date) {
+            return 'End date must be after the start date.';
+          }
+
+          const { startDate: sessionStart, endDate: sessionEnd } = getAcademicSessionBounds(formValues?.academic_year);
+          if (sessionStart && sessionEnd && (value < sessionStart || value > sessionEnd)) {
+            return `End date must be between ${sessionStart} and ${sessionEnd}.`;
+          }
+
+          return undefined;
+        }
+      },
       { header: 'Remarks', accessor: 'remarks', placeholder: 'Additional remarks' },
       { header: 'PDF', accessor: 'link', type: 'hyperlink', fileKey: 'doc' , description: 'Upload membership certificate (Max 5MB PDF)' },
     ],
@@ -1576,10 +2082,59 @@ const rawResources = [
         required: true,
         placeholder: 'Select mode'
       },
-      { header: 'Year', accessor: 'year_of_training', type: 'number', placeholder: 'e.g., 2024' },
-      ACADEMIC_YEAR_FIELD,
-      { header: 'Start Date', accessor: 'start_date', type: 'date', required: true },
-      { header: 'End Date', accessor: 'end_date', type: 'date', required: true },
+      { ...ACADEMIC_YEAR_FIELD, readOnlyFromSession: true, placeholder: 'Session year' },
+      { header: 'Month & Year of Training', accessor: 'year_of_training', type: 'monthYearSelect', required: true, placeholder: 'Select training month and year' },
+     { 
+        header: 'Start Date', 
+        accessor: 'start_date', 
+        type: 'date', 
+        required: true,
+        min: (formValues) => getSelectedMonthBounds(formValues?.year_of_training).startDate || getAcademicSessionBounds(formValues?.academic_year).startDate,
+        max: (formValues) => getAcademicSessionBounds(formValues?.academic_year).endDate,
+        validate: (value, formValues) => {
+          if (!value) return undefined;
+
+          if (formValues?.end_date && value >= formValues.end_date) {
+            return 'Start date must be before the end date.';
+          }
+
+          if (formValues?.year_of_training) {
+            const { startDate: monthStart } = getSelectedMonthBounds(formValues.year_of_training);
+            if (monthStart && value < monthStart) {
+              return `Start date must be on or after the training month (${monthStart}).`;
+            }
+          }
+
+          const { startDate: sessionStart, endDate: sessionEnd } = getAcademicSessionBounds(formValues?.academic_year);
+          if (sessionStart && sessionEnd && (value < sessionStart || value > sessionEnd)) {
+            return `Start date must be between ${sessionStart} and ${sessionEnd}.`;
+          }
+
+          return undefined;
+        }
+      },
+      { 
+        header: 'End Date', 
+        accessor: 'end_date', 
+        type: 'date', 
+        required: true,
+        min: (formValues) => getAcademicSessionBounds(formValues?.academic_year).startDate,
+        max: (formValues) => getAcademicSessionBounds(formValues?.academic_year).endDate,
+        validate: (value, formValues) => {
+          if (!value) return undefined;
+
+          if (formValues?.start_date && value <= formValues.start_date) {
+            return 'End date must be after the start date.';
+          }
+
+          const { startDate: sessionStart, endDate: sessionEnd } = getAcademicSessionBounds(formValues?.academic_year);
+          if (sessionStart && sessionEnd && (value < sessionStart || value > sessionEnd)) {
+            return `End date must be between ${sessionStart} and ${sessionEnd}.`;
+          }
+
+          return undefined;
+        }
+      },
       { header: 'Participants', accessor: 'number_of_participants', type: 'number', required: true, placeholder: 'Number of participants' },
       { header: 'Sponsoring Agencies', accessor: 'sponsoring_agencies', placeholder: 'Enter sponsoring agencies' },
       { header: 'Outcome', accessor: 'outcome', placeholder: 'Describe outcome' },
@@ -1610,8 +2165,8 @@ const rawResources = [
         accessor: 'external_contributors',
         type: 'objectList',
         subFields: [
-          { header: 'Name', accessor: 'name', required: true, placeholder: 'Enter external contributor name' },
-          { header: 'Email', accessor: 'email', placeholder: 'Enter email address' },
+          { header: 'Name', accessor: 'name', placeholder: 'Enter external contributor name' },
+          { header: 'Email', accessor: 'email', type: 'email', placeholder: 'Enter email address' },
           { header: 'Affiliation', accessor: 'affiliation', placeholder: 'Enter affiliation' },
           { header: 'Role', accessor: 'role', type: 'select', options: ['Coordinator', 'Trainer', 'Participant', 'Other'] }
         ],
@@ -1673,9 +2228,11 @@ const rawResources = [
       { header: 'Programme Code', accessor: 'programme_code', required: true, placeholder: 'Enter programme code' },
       { header: 'Component Name', accessor: 'component_name', required: true, placeholder: 'Enter component name' },
       { header: 'Component Course Code', accessor: 'course_code_of_component', placeholder: 'Enter course code' },
-      { header: 'Students Undertaking', accessor: 'number_of_students_undertaking', type: 'number', placeholder: 'Number of students' },
+      { header: 'Students Undertaking', accessor: 'number_of_students_undertaking', type: 'number', required: true, min: 0, step: 1, integer: true,  placeholder: 'Number of students' },
       { header: 'Has Field Research', accessor: 'has_field_research_component', type: 'boolean', required: true },
-      ACADEMIC_YEAR_FIELD,
+      { ...ACADEMIC_YEAR_FIELD, readOnlyFromSession: true, placeholder: 'Session year' },
+      { header: 'Select Month & Year', accessor: 'year_of_sanction', type: 'monthYearSelect', required: true, placeholder: 'Select month and year' },
+     
       { header: 'PDF', accessor: 'link', type: 'hyperlink', fileKey: 'doc' , description: 'Upload relevant supporting document (Max 5MB PDF)' },
     ],
   },
@@ -1764,7 +2321,7 @@ const rawResources = [
         type: 'objectList',
         subFields: [
           { header: 'Name', accessor: 'name', required: true, placeholder: 'Enter external collaborator name' },
-          { header: 'Email', accessor: 'email', placeholder: 'Enter email address' },
+          { header: 'Email', accessor: 'email', type: 'email', placeholder: 'Enter email address' },
           { header: 'Affiliation', accessor: 'affiliation', placeholder: 'Enter institution/affiliation' },
           { header: 'Role', accessor: 'role', type: 'select', options: ['Principal Investigator', 'Co-PI', 'Research Collaborator', 'Other'] }
         ],
@@ -1849,7 +2406,7 @@ const rawResources = [
         type: 'objectList',
         subFields: [
           { header: 'Name', accessor: 'name', required: true, placeholder: 'Enter external recipient name' },
-          { header: 'Email', accessor: 'email', placeholder: 'Enter email address' },
+          { header: 'Email', accessor: 'email', type: 'email', placeholder: 'Enter email address' },
           { header: 'Affiliation', accessor: 'affiliation', placeholder: 'Enter institution/affiliation' },
           { header: 'Role', accessor: 'role', type: 'select', options: ['Recipient', 'Co-recipient', 'Lead', 'Other'] }
         ],
@@ -1892,7 +2449,7 @@ const rawResources = [
       },
       { header: 'Grant Amount', accessor: 'grant_amount', type: 'number', required: true, placeholder: 'Grant amount in INR' },
       { header: 'Revenue', accessor: 'revenue_generated', type: 'number', required: true, placeholder: 'Revenue in INR' },
-      { header: 'Start Date', accessor: 'duration_start_date', type: 'date', required: true },
+      { header: 'Start Date', accessor: 'start_date', type: 'date', required: true },
       { header: 'End Date', accessor: 'end_date', type: 'date', required: true },
       { header: 'Year', accessor: 'year_of_consultancy', type: 'number', required: true, placeholder: 'e.g., 2024' },
       ACADEMIC_YEAR_FIELD,
@@ -1940,7 +2497,7 @@ const rawResources = [
         type: 'objectList',
         subFields: [
           { header: 'Name', accessor: 'name', required: true, placeholder: 'Enter external consultant name' },
-          { header: 'Email', accessor: 'email', placeholder: 'Enter email address' },
+          { header: 'Email', accessor: 'email', type: 'email', placeholder: 'Enter email address' },
           { header: 'Affiliation', accessor: 'affiliation', placeholder: 'Enter institution/affiliation' },
           { header: 'Role', accessor: 'role', type: 'select', options: ['Principal Consultant', 'Co-Consultant', 'Technical Expert', 'Other'] }
         ],
@@ -2027,7 +2584,7 @@ const rawResources = [
         type: 'objectList',
         subFields: [
           { header: 'Name', accessor: 'name', required: true, placeholder: 'Enter external trainer name' },
-          { header: 'Email', accessor: 'email', placeholder: 'Enter email address' },
+          { header: 'Email', accessor: 'email', type: 'email', placeholder: 'Enter email address' },
           { header: 'Affiliation', accessor: 'affiliation', placeholder: 'Enter institution/company' },
           { header: 'Role', accessor: 'role', type: 'select', options: ['Lead Trainer', 'Co-Trainer', 'Subject Expert', 'Other'] }
         ],
@@ -2076,9 +2633,60 @@ const rawResources = [
         required: true,
         placeholder: 'Select mode'
       },
-      { header: 'Start Date', accessor: 'start_date', type: 'date', required: true },
-      { header: 'End Date', accessor: 'end_date', type: 'date', required: true },
-      ACADEMIC_YEAR_FIELD,
+     { ...ACADEMIC_YEAR_FIELD, readOnlyFromSession: true, placeholder: 'Session year' },
+      { header: 'Select Month & Year', accessor: 'year_of_sanction', type: 'monthYearSelect', required: true, placeholder: 'Select month and year' },
+      //{ header: 'Semester', accessor: 'semester', required: true, placeholder: 'e.g., Odd/Even' },
+      { 
+        header: 'Start Date', 
+        accessor: 'start_date', 
+        type: 'date', 
+        required: true,
+        min: (formValues) => getCapabilityDateBounds(formValues).startDate,
+        max: (formValues) => getCapabilityDateBounds(formValues).endDate,
+        validate: (value, formValues) => {
+          if (!value) return undefined;
+
+          if (formValues?.end_date && value >= formValues.end_date) {
+            return 'Start date must be before the end date.';
+          }
+
+          if (formValues?.year_of_sanction) {
+            const { startDate: monthStart, endDate: monthEnd } = getSelectedMonthBounds(formValues.year_of_sanction);
+            if (monthStart && monthEnd && (value < monthStart || value > monthEnd)) {
+              return `Start date must be within the selected month (${monthStart} to ${monthEnd}).`;
+            }
+          }
+
+          const { startDate: sessionStart, endDate: sessionEnd } = getAcademicSessionBounds(formValues?.academic_year);
+          if (sessionStart && sessionEnd && (value < sessionStart || value > sessionEnd)) {
+            return `Start date must be between ${sessionStart} and ${sessionEnd}.`;
+          }
+
+          return undefined;
+        }
+      },
+      { 
+        header: 'End Date', 
+        accessor: 'end_date', 
+        type: 'date', 
+        required: true,
+        min: (formValues) => getAcademicSessionBounds(formValues?.academic_year).startDate,
+        max: (formValues) => getAcademicSessionBounds(formValues?.academic_year).endDate,
+        validate: (value, formValues) => {
+          if (!value) return undefined;
+
+          if (formValues?.start_date && value <= formValues.start_date) {
+            return 'End date must be after the start date.';
+          }
+
+          const { startDate: sessionStart, endDate: sessionEnd } = getAcademicSessionBounds(formValues?.academic_year);
+          if (sessionStart && sessionEnd && (value < sessionStart || value > sessionEnd)) {
+            return `End date must be between ${sessionStart} and ${sessionEnd}.`;
+          }
+
+          return undefined;
+        }
+      },
       { header: 'Organising Agency', accessor: 'organising_agency', required: true, placeholder: 'Enter organising agency' },
       { header: 'Funding Details', accessor: 'funding_details', placeholder: 'Describe funding details' },
       { header: 'Outcome', accessor: 'outcome', required: true, placeholder: 'Describe outcome' },
@@ -2099,8 +2707,8 @@ const rawResources = [
         accessor: 'external_participants',
         type: 'objectList',
         subFields: [
-          { header: 'Name', accessor: 'name', required: true, placeholder: 'Enter external participant name' },
-          { header: 'Email', accessor: 'email', placeholder: 'Enter email address' },
+          { header: 'Name', accessor: 'name', placeholder: 'Enter external participant name' },
+          { header: 'Email', accessor: 'email', type: 'email', placeholder: 'Enter email address' },
           { header: 'Affiliation', accessor: 'affiliation', placeholder: 'Enter institution/company' },
           { header: 'Role', accessor: 'role', type: 'select', options: ['Coordinator', 'Trainer', 'Participant', 'Other'] }
         ],
@@ -2185,7 +2793,7 @@ const rawResources = [
     columns: [
       // { header: 'Support ID', accessor: 'support_id' },
       { header: 'Department ID', accessor: 'department_id', required: true, type: 'entitySelect', entityType: 'department' },
-      { header: 'Event Date', accessor: 'date_of_event', type: 'date', required: true },
+      //{ header: 'Event Date', accessor: 'date_of_event', type: 'date', required: true },
       { header: 'Event Name', accessor: 'name_of_event', required: true, placeholder: 'Enter event name' },
       {
         header: 'Support Type',
@@ -2196,8 +2804,32 @@ const rawResources = [
         placeholder: 'Select support type'
       },
       { header: 'Funding Agency', accessor: 'funding_agency', placeholder: 'Enter funding agency' },
-      ACADEMIC_YEAR_FIELD,
-      { header: 'Amount', accessor: 'amount_of_support', type: 'number', required: true, placeholder: 'Amount in INR' },
+      { ...ACADEMIC_YEAR_FIELD, readOnlyFromSession: true, placeholder: 'Session year' },
+      { header: 'Select Month & Year', accessor: 'year_of_sanction', type: 'monthYearSelect', required: true, placeholder: 'Select month and year' },
+      {
+        header: 'Event Date',
+        accessor: 'date_of_event',
+        type: 'date',
+        required: true,
+        min: (formValues) => getSelectedMonthBounds(formValues?.year_of_sanction).startDate,
+        max: (formValues) => getSelectedMonthBounds(formValues?.year_of_sanction).endDate,
+        validate: (value, formValues) => {
+          if (!value) return undefined;
+
+          const { startDate: monthStart, endDate: monthEnd } = getSelectedMonthBounds(formValues?.year_of_sanction);
+          if (monthStart && monthEnd && (value < monthStart || value > monthEnd)) {
+            return `Event date must be within the selected month (${monthStart} to ${monthEnd}).`;
+          }
+
+          const { startDate: sessionStart, endDate: sessionEnd } = getAcademicSessionBounds(formValues?.academic_year);
+          if (sessionStart && sessionEnd && (value < sessionStart || value > sessionEnd)) {
+            return `Event date must be between ${sessionStart} and ${sessionEnd}.`;
+          }
+
+          return undefined;
+        }
+      },
+      { header: 'Amount', accessor: 'amount_of_support', type: 'number', required: true,  min: 0, step: 1, placeholder: 'Amount in INR' },
       { header: 'Outcome', accessor: 'outcome', placeholder: 'Describe outcome' },
       { header: 'Remarks', accessor: 'remarks', placeholder: 'Additional remarks' },
       { header: 'PDF', accessor: 'link', type: 'hyperlink', fileKey: 'doc' , description: 'Upload student scholarship or support receipt (Max 5MB PDF)' },
@@ -2219,7 +2851,7 @@ const rawResources = [
         type: 'objectList',
         subFields: [
           { header: 'Name', accessor: 'name', required: true, placeholder: 'Enter external recipient name' },
-          { header: 'Email', accessor: 'email', placeholder: 'Enter email address' },
+          { header: 'Email', accessor: 'email', type: 'email', placeholder: 'Enter email address' },
           { header: 'Amount', accessor: 'amount', type: 'number', placeholder: 'Amount in INR' },
           { header: 'PAN No.', accessor: 'pan_no', placeholder: 'Enter PAN number' }
         ],
@@ -2292,7 +2924,7 @@ const rawResources = [
         type: 'objectList',
         subFields: [
           { header: 'Name', accessor: 'name', required: true, placeholder: 'Enter external participant name' },
-          { header: 'Email', accessor: 'email', placeholder: 'Enter email address' },
+          { header: 'Email', accessor: 'email', type: 'email', placeholder: 'Enter email address' },
           { header: 'Affiliation', accessor: 'affiliation', placeholder: 'Enter institution/organization' },
           { header: 'Role', accessor: 'role', type: 'select', options: ['Participant', 'Winner', 'Team Lead', 'Other'] }
         ],
@@ -2324,7 +2956,7 @@ const rawResources = [
       { header: 'Name', accessor: 'name', required: true, placeholder: 'Enter full name' },
       { header: 'Gender', accessor: 'gender', placeholder: 'Enter gender' },
       { header: 'DOB', accessor: 'date_of_birth', type: 'date' },
-      { header: 'Email', accessor: 'email', required: true, placeholder: 'e.g., student@example.com' },
+      { header: 'Email', accessor: 'email', type: 'email', required: true, placeholder: 'e.g., student@example.com' },
       { header: 'Phone', accessor: 'phone', placeholder: 'e.g., 9876543210' },
       { header: 'Department ID', accessor: 'department_id', required: true, type: 'entitySelect', entityType: 'department' },
       { header: 'Programme', accessor: 'programme_id', required: true, placeholder: 'Enter programme ID' },
@@ -2376,7 +3008,7 @@ const rawResources = [
       },
       { header: 'Year Qualified', accessor: 'year_of_qualifying', type: 'number', required: true, placeholder: 'e.g., 2024' },
       ACADEMIC_YEAR_FIELD,
-      { header: 'Rank/Score', accessor: 'rank_or_score', required: true, placeholder: 'Enter rank or score' },
+      { header: 'Rank/Score', accessor: 'rank_or_score', required: true, type: 'number', min: 0, step: 1, integer: true, placeholder: 'Enter rank or score' },
       { header: 'Attempt No.', accessor: 'attempt_number', type: 'number', placeholder: 'e.g., 1' },
       { header: 'Programme Applied For', accessor: 'programme_applied_for', placeholder: 'Enter programme name' },
       {
@@ -2514,3 +3146,4 @@ export const resources = rawResources.map((resource) => {
 });
 
 export const resourceMap = new Map(resources.map(r => [r.id, r]));
+
