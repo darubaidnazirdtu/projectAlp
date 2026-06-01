@@ -102,7 +102,35 @@ export const getProfileByFaculty = asyncHandler(async (req, res) => {
 
   await assertFacultyAccess(req.user, requestedFacultyId);
 
-  const existing = await FacultyProfile.findOne({ faculty_id: requestedFacultyId }).lean();
+  // Check FacultyProfile collection first
+  let existing = await FacultyProfile.findOne({ faculty_id: requestedFacultyId }).lean();
+
+  // If not found, check legacy Faculty collection and transform
+  if (!existing) {
+    const legacyFaculty = await Faculty.findOne({ faculty_id: requestedFacultyId }).lean();
+    if (legacyFaculty) {
+      existing = {
+        faculty_id: legacyFaculty.faculty_id,
+        basic_info: {
+          full_name: legacyFaculty.name,
+          gender: legacyFaculty.gender,
+          date_of_birth: legacyFaculty.date_of_birth
+        },
+        contact_info: {
+          email_address: legacyFaculty.email,
+          mobile_number: legacyFaculty.phone
+        },
+        professional_info: {
+          designation: legacyFaculty.designation,
+          department: legacyFaculty.department_id,
+          specialization: legacyFaculty.specialization,
+          date_of_joining: legacyFaculty.joining_date,
+          employment_type: legacyFaculty.employment_type
+        }
+      };
+    }
+  }
+
   const payload = existing || await buildDefaultProfile(requestedFacultyId);
 
   res.status(200).json(new ApiResponse(200, { profile: sanitizeProfile(payload) }, 'Profile fetched'));
@@ -125,4 +153,83 @@ export const updateProfileByFaculty = asyncHandler(async (req, res) => {
   ).lean();
 
   res.status(200).json(new ApiResponse(200, { profile: sanitizeProfile(doc) }, 'Profile saved'));
+});
+
+export const getAllProfiles = asyncHandler(async (req, res) => {
+  // Get all profiles from FacultyProfile collection
+  const profiles = await FacultyProfile.find({}).lean();
+
+  // Get all legacy faculty records
+  const legacyFaculty = await Faculty.find({}).lean();
+
+  // Create a map of existing profiles by faculty_id
+  const profileMap = new Map();
+  profiles.forEach(p => {
+    profileMap.set(p.faculty_id, {
+      faculty_id: p.faculty_id,
+      basic_info: p.basic_info,
+      contact_info: p.contact_info,
+      professional_info: p.professional_info
+    });
+  });
+
+  // Merge legacy faculty records, transforming them to match profile structure
+  legacyFaculty.forEach(f => {
+    if (!profileMap.has(f.faculty_id)) {
+      profileMap.set(f.faculty_id, {
+        faculty_id: f.faculty_id,
+        basic_info: {
+          full_name: f.name,
+          gender: f.gender,
+          date_of_birth: f.date_of_birth
+        },
+        contact_info: {
+          email_address: f.email,
+          mobile_number: f.phone
+        },
+        professional_info: {
+          designation: f.designation,
+          department: f.department_id,
+          specialization: f.specialization,
+          date_of_joining: f.joining_date,
+          employment_type: f.employment_type
+        }
+      });
+    }
+  });
+
+  const data = Array.from(profileMap.values());
+  res.status(200).json(new ApiResponse(200, data, 'All profiles fetched'));
+});
+
+export const createProfile = asyncHandler(async (req, res) => {
+  const data = req.body?.profile || req.body || {};
+  if (!data.faculty_id) throw new ApiError(400, 'Faculty ID is required');
+
+  const existing = await FacultyProfile.findOne({ faculty_id: data.faculty_id });
+  if (existing) throw new ApiError(400, 'Profile already exists for this faculty');
+
+  const doc = await FacultyProfile.create(data);
+  res.status(201).json(new ApiResponse(201, { profile: sanitizeProfile(doc) }, 'Profile created'));
+});
+
+export const deleteProfile = asyncHandler(async (req, res) => {
+  const facultyId = String(req.params.faculty_id || '').trim();
+  if (!facultyId) throw new ApiError(400, 'Faculty ID is required');
+
+  // Delete faculty profile
+  const profile = await FacultyProfile.findOneAndDelete({ faculty_id: facultyId });
+  if (!profile) throw new ApiError(404, 'Profile not found');
+
+  // Delete legacy faculty record
+  await Faculty.deleteOne({ faculty_id: facultyId });
+
+  // Delete user record
+  await User.deleteOne({ user_id: facultyId });
+
+  // Delete all APAR forms for this faculty
+  const { AparForm } = await import('../models/aparForm.model.js');
+  await AparForm.deleteMany({ faculty_id: facultyId });
+
+  res.status(200).json(new ApiResponse(200, {}, 'Faculty permanently deleted'));
 });

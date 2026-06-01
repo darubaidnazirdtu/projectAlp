@@ -16,6 +16,8 @@ import {
 } from '../data-access/users.data-access.js';
 import { getByDepartmentId } from '../data-access/departments.data-access.js';
 import { set as createFaculty, findByEmail as findFacultyByEmail, findById as findFacultyById } from '../data-access/faculty.data-access.js';
+import { FacultyProfile } from '../models/facultyProfile.model.js';
+import { Faculty } from '../models/index.js';
 import { validatePasswordPolicy } from '../utils/password-policy.js';
 import { isValidEmail } from '../utils/validation.js';
 
@@ -120,7 +122,7 @@ export const createManagedUser = asyncHandler(async (req, res) => {
   }
   // Password policy validation bypassed for auto-generated passwords
 
-  const shouldCreateFaculty = isFaculty !== undefined ? normalizeBoolean(isFaculty) : normalizedRole === 'Faculty Member';
+  const shouldCreateFaculty = isFaculty !== undefined ? normalizeBoolean(isFaculty) : ['Faculty Member', 'IQAC Head', 'Dean', 'Department HOD'].includes(normalizedRole);
   const shouldBeReportingOfficer = normalizeBoolean(isReportingOfficer);
   const shouldBeReviewingOfficer = normalizeBoolean(isReviewingOfficer);
 
@@ -188,6 +190,37 @@ export const createManagedUser = asyncHandler(async (req, res) => {
       id: req.user?.id,
       userId: req.user?.userId || req.user?.id
     });
+
+    // Also create FacultyProfile entry
+    await FacultyProfile.findOneAndUpdate(
+      { faculty_id: normalizedUserId },
+      {
+        $set: {
+          faculty_id: normalizedUserId,
+          basic_info: {
+            full_name: name.trim(),
+            gender: '',
+            date_of_birth: null
+          },
+          contact_info: {
+            email_address: emailToUse,
+            mobile_number: ''
+          },
+          professional_info: {
+            designation: designation.trim(),
+            department: normalizedDepartmentId,
+            specialization: [],
+            date_of_joining: null,
+            date_of_continuous_employment: null,
+            employment_type: 'Regular',
+            present_grade: '',
+            years_of_experience: null
+          },
+          educational_qualifications: []
+        }
+      },
+      { upsert: true, new: true }
+    );
   }
 
   res.status(201).json(
@@ -273,7 +306,23 @@ export const deleteManagedUser = asyncHandler(async (req, res) => {
     throw new ApiError(404, 'User not found');
   }
 
+  const facultyId = existingUser.userId;
+
+  // Delete user record
   await deleteUserById(id);
+
+  // Delete faculty records if they exist
+  if (facultyId) {
+    // Delete from FacultyProfile collection
+    await FacultyProfile.deleteOne({ faculty_id: facultyId });
+
+    // Delete from legacy Faculty collection
+    await Faculty.deleteOne({ faculty_id: facultyId });
+
+    // Delete all APAR forms for this faculty
+    const { AparForm } = await import('../models/aparForm.model.js');
+    await AparForm.deleteMany({ faculty_id: facultyId });
+  }
 
   res.status(200).json(
     new ApiResponse(200, null, 'User deleted successfully')

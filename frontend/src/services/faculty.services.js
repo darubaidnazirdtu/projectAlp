@@ -8,10 +8,8 @@ class FacultyServices{
 
     async getFacultyDetails(){
         try {
-
-            const response = await this.api.get("/faculty/get")            
-            return response
-            
+            const response = await this.api.get("/apar/profile/all")
+            return response?.data || response || []
         } catch (error) {
             console.log("Error getting faculty details")
             throw error
@@ -20,29 +18,26 @@ class FacultyServices{
 
     async createFaculty(data){
         try {
-            
-            const response = await this.api.post("/faculty/set", data)
+            const response = await this.api.post("/apar/profile", data)
             return response
-
         } catch (error) {
             console.log("Error creating faculty")
             throw error
         }
     }
-    
 
     async updateFaculty(id, data, headers = {}) {
-        const response = await this.api.put(`/faculty/update/${id}`, data, headers)
+        const response = await this.api.put(`/apar/profile/${id}`, data, headers)
         return response
     }
 
     async deleteFaculty(id) {
-        const response = await this.api.delete(`/faculty/delete/${id}`)
+        const response = await this.api.delete(`/apar/profile/${id}`)
         return response
     }
 
     async getFacultyById(id) {
-        const response = await this.api.get(`/faculty/get/${id}`)
+        const response = await this.api.get(`/apar/profile/${id}`)
         return response
     }
 }

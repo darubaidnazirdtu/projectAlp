@@ -21,6 +21,7 @@ import AparTimeline from '../components/AparTimeline.jsx';
 import { mergeNewEntry } from '../hooks/useAparRealTimeSync';
 import NotificationBell from '../components/NotificationBell.jsx';
 import { DepartmentService } from '../services/department.services.js';
+import { facultyProfileService } from '../services/faculty_profile.service.js';
 import { useSocket } from '../context/SocketContext.jsx'; 
 import { normalizeQualifications, hasRequiredGraduation } from '../utils/qualification.util.js';
 import { getAcademicYearFromAparForm, normalizeAcademicYear } from '../utils/academicYear.util.js';
@@ -430,30 +431,60 @@ export default function AparForm() {
         if (!aparUser) return;
         (async () => {
             try {
-                const infoRes = await AparFormGradedService.getFacultyInfo();
-                const info = infoRes?.data || infoRes;
-                if (info) {
+                const profile = await facultyProfileService.getSelf();
+                if (profile) {
+                    const basicInfo = profile.basic_info || {};
+                    const professionalInfo = profile.professional_info || {};
+                    const qualifications = profile.educational_qualifications || [];
+                    
+                    // Map educational qualifications to undergraduate, postgraduate, phd
+                    let undergrad = '', postgrad = '', phd = '';
+                    qualifications.forEach(q => {
+                        const degree = (q.degree || '').toLowerCase();
+                        if (degree.includes('graduation') || degree.includes('bachelor') || degree.includes('b.')) {
+                            undergrad = q.field_of_study || q.degree || '';
+                        } else if (degree.includes('master') || degree.includes('m.')) {
+                            postgrad = q.field_of_study || q.degree || '';
+                        } else if (degree.includes('phd') || degree.includes('doctorate')) {
+                            phd = q.field_of_study || q.degree || '';
+                        }
+                    });
+
                     setFormData(prev => ({
                         ...prev,
                         personal: {
                             ...prev.personal,
-                            name: info.name || prev.personal.name,
-                            designation: info.designation || prev.personal.designation,
-                            email: info.email || prev.personal.email,
-                            phone: info.phone || prev.personal.phone,
-                            department_id: info.department_id || prev.personal.department_id,
-                            
-                             ...normalizeQualifications(info),
-                            joining_date: info.joining_date ? info.joining_date.substring(0, 10) : prev.personal.joining_date,
-                            date_of_birth: info.date_of_birth ? info.date_of_birth.substring(0, 10) : prev.personal.date_of_birth,
-                            sc_st_status: info.sc_st_status || prev.personal.sc_st_status,
-                            grade: info.grade || prev.personal.grade
-                        }
+                            name: basicInfo.full_name || prev.personal.name,
+                            designation: professionalInfo.designation || prev.personal.designation,
+                            email: profile.contact_info?.email_address || prev.personal.email,
+                            phone: profile.contact_info?.mobile_number || prev.personal.phone,
+                            department_id: professionalInfo.department || prev.personal.department_id,
+                            qualification_undergraduate: undergrad || prev.personal.qualification_undergraduate,
+                            qualification_postgraduate: postgrad || prev.personal.qualification_postgraduate,
+                            qualification_phd: phd || prev.personal.qualification_phd,
+                            joining_date: professionalInfo.date_of_continuous_employment
+                                ? new Date(professionalInfo.date_of_continuous_employment).toISOString().substring(0, 10)
+                                : prev.personal.joining_date,
+                            date_of_birth: basicInfo.date_of_birth
+                                ? new Date(basicInfo.date_of_birth).toISOString().substring(0, 10)
+                                : prev.personal.date_of_birth,
+                            sc_st_status: basicInfo.caste_category || prev.personal.sc_st_status,
+                            grade: professionalInfo.present_grade || prev.personal.grade
+                        },
+                        profileQualifications: qualifications || []
                     }));
-                    console.log('Prefilled faculty information from /apar/mongo/info');
+                    // Evaluate profile completeness
+                    try {
+                        const issues = computeProfileIssues(profile);
+                        setProfileGate({ checked: true, ok: issues.length === 0, issues, loading: false });
+                    } catch (_) {
+                        setProfileGate({ checked: true, ok: false, issues: ['Unable to evaluate profile completeness'], loading: false });
+                    }
+                    console.log('Prefilled faculty information from faculty profile');
                 }
             } catch (err) {
-                console.error('Failed to prefill faculty information', err);
+                console.error('Failed to prefill faculty information from profile', err);
+                setProfileGate({ checked: true, ok: false, issues: ['Unable to load profile. Please update your profile first.'], loading: false });
             }
         })();
     }, [aparUser]);
@@ -554,6 +585,53 @@ export default function AparForm() {
     const [submittedForms, setSubmittedForms] = useState([]);
     const [certified, setCertified] = useState(false);
     const [selectedFacultyRaw, setSelectedFacultyRaw] = useState(null);
+
+    // Profile completeness gate
+    const [profileGate, setProfileGate] = useState({ checked: false, ok: false, issues: [], loading: false });
+    const getByPath = (obj, path) => path.split('.').reduce((o,k)=>o && o[k]!==undefined ? o[k] : undefined, obj);
+    const isFilled = (v) => v !== null && v !== undefined && String(v).trim() !== '';
+    const hasGraduationIn = (quals = []) => (quals||[]).some((q) => {
+        const d = String(q?.degree || '').toLowerCase();
+        return d.includes('graduation') || d.includes('bachelor') || d.includes('b.');
+    });
+    const computeProfileIssues = (profile) => {
+        const issues = [];
+        const req = [
+            ['basic_info.gender','Gender'],
+            ['basic_info.date_of_birth','Date of Birth'],
+            ['basic_info.nationality','Nationality'],
+            ['basic_info.marital_status','Marital Status'],
+            ['contact_info.mobile_number','Mobile Number'],
+            ['contact_info.current_address','Current Address'],
+            ['contact_info.city','Current City'],
+            ['contact_info.state','Current State'],
+            ['contact_info.postal_code','Current Postal Code'],
+            ['contact_info.permanent_address','Permanent Address'],
+            ['contact_info.permanent_city','Permanent City'],
+            ['contact_info.permanent_state','Permanent State'],
+            ['contact_info.permanent_postal_code','Permanent Postal Code'],
+            ['professional_info.date_of_joining','Date of Joining'],
+            ['professional_info.date_of_continuous_employment','Date of Continuous Employment'],
+            ['professional_info.employment_type','Employment Type'],
+            ['professional_info.present_grade','Present Grade']
+        ];
+        req.forEach(([path,label]) => { if (!isFilled(getByPath(profile, path))) issues.push(`${label} is required in Profile`); });
+        if (!hasGraduationIn(profile?.educational_qualifications)) {
+            issues.push("Add at least one 'Graduation' degree in Educational Qualifications");
+        }
+        return issues;
+    };
+    const recheckProfile = async () => {
+        try {
+            setProfileGate(prev => ({ ...prev, loading: true }));
+            const prof = await facultyProfileService.getSelf();
+            const issues = computeProfileIssues(prof || {});
+            setProfileGate({ checked: true, ok: issues.length === 0, issues, loading: false });
+        } catch (e) {
+            console.error('Profile recheck failed', e);
+            setProfileGate({ checked: true, ok: false, issues: ['Unable to load profile. Please try again.'], loading: false });
+        }
+    };
 
     const [queryModalOpen, setQueryModalOpen] = useState(false);
     const [queryComment, setQueryComment] = useState('');
@@ -659,6 +737,7 @@ export default function AparForm() {
             caste: '',
             grade: ''
         },
+        profileQualifications: [],
         teaching: {
             immovable_property_return: '',
             health_checkup_file: null,
@@ -1427,6 +1506,16 @@ export default function AparForm() {
                 return;
             }
 
+            // Check for graduation qualification in profile
+            const hasGraduation = (formData.profileQualifications || []).some(q => {
+                const degree = (q.degree || '').toLowerCase();
+                return degree.includes('graduation') || degree.includes('bachelor') || degree.includes('b.');
+            });
+            if (!hasGraduation) {
+                toast.error('Please add at least a Graduation qualification in your Profile section before submitting the APAR form.');
+                return;
+            }
+
             if (!isReadOnlyMode() && !certified) {
                 toast.error('Please certify the form before submitting.');
                 return;
@@ -1876,6 +1965,23 @@ export default function AparForm() {
                     </>
                 ) : (
                     <>
+                        {(activeRole === 'Officer (Graded)') && profileGate.checked && !profileGate.ok ? (
+                            <div className="p-6 mb-6 border border-amber-200 bg-amber-50 rounded-lg">
+                                <h3 className="text-lg font-semibold text-amber-800 mb-2">Please complete your Profile before filling the APAR form</h3>
+                                <p className="text-sm text-amber-800 mb-3">Update your Profile with the required information, then return here.</p>
+                                {Array.isArray(profileGate.issues) && profileGate.issues.length > 0 && (
+                                    <ul className="list-disc pl-5 text-sm text-amber-900 space-y-1">
+                                        {profileGate.issues.map((m,i) => (<li key={`${i}-${m}`}>{m}</li>))}
+                                    </ul>
+                                )}
+                                <div className="mt-4 flex gap-3">
+                                    <button type="button" onClick={() => navigate('/apar/profile')} className="px-4 py-2 rounded-md bg-indigo-600 text-white text-sm font-semibold hover:bg-indigo-700">Go to Profile</button>
+                                    <button type="button" onClick={recheckProfile} disabled={profileGate.loading} className="px-4 py-2 rounded-md bg-gray-100 text-gray-800 text-sm font-semibold hover:bg-gray-200 disabled:opacity-60">{profileGate.loading ? 'Checking…' : 'Recheck'}</button>
+                                </div>
+                            </div>
+                        ) : null}
+                        {(!(activeRole === 'Officer (Graded)') || !profileGate.checked || profileGate.ok) && (
+                        <>
                         <div className="border-b-2 border-gray-200 pb-6 mb-8">
                             <div className="flex items-center justify-center gap-6 mb-6">
                                 <img src="/dtu_logo.jpeg" alt="DTU Logo" className="h-28 w-auto object-contain" />
@@ -1925,7 +2031,7 @@ export default function AparForm() {
                                 <div className="shadow-lg">
                                     <div>
                                         <button onClick={() => setPersonalOpen(p => !p)} className="text-sm text-indigo-600 mb-3">{personalOpen ? 'Hide' : 'Show'} Personal Data</button>
-                                        {personalOpen && <PartIPersonal personal={formData.personal} onChange={handlePersonalChange} readOnly={isReadOnlyMode()} departments={departments} />}
+                                        {personalOpen && <PartIPersonal personal={formData.personal} onChange={handlePersonalChange} readOnly={isReadOnlyMode()} departments={departments} qualifications={formData.profileQualifications} />}
                                     </div>
                                 </div>
                             </div>
@@ -2072,6 +2178,8 @@ export default function AparForm() {
                                 </div>
                             )}
                         </form>
+                        </>
+                        )}
                     </>
                 )}
             </div>

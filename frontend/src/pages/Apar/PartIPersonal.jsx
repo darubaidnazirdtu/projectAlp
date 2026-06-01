@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { validateDateOfBirth, validateJoiningDate, getFieldError } from '../../utils/personal.validation.util.js';
 import { FiAlertCircle, FiPlus, FiTrash2 } from 'react-icons/fi';
 import { toast } from 'sonner';
-export default function PartIPersonal({ personal, onChange, readOnly, departments = [], validationErrors = [] }) {
+export default function PartIPersonal({ personal, onChange, readOnly, departments = [], validationErrors = [], qualifications = [] }) {
   const [dateErrors, setDateErrors] = useState({});
 
   const validateAbsenceStartDate = (startDate, index) => {  
@@ -154,118 +154,108 @@ export default function PartIPersonal({ personal, onChange, readOnly, department
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">3) Select the designation <span className="text-red-500">*</span></label>
-          <select required aria-required="true" name="designation" value={personal.designation} onChange={onChange} disabled={readOnly} className="w-full border-gray-300 rounded-lg shadow-sm focus:ring-indigo-500 focus:border-indigo-500 px-4 py-2.5 disabled:bg-gray-50 disabled:text-gray-500 transition-colors">
-            <option value="">Select Designation</option>
-            <option value="Professor">Professor</option>
-            <option value="Associate Professor">Associate Professor</option>
-            <option value="Assistant Professor">Assistant Professor</option>
-            <option value="Lecturer">Lecturer</option>
-          </select>
+          <label className="block text-sm font-medium text-gray-700 mb-1">3) Designation <span className="text-red-500">*</span></label>
+          <input
+            required
+            aria-required="true"
+            type="text"
+            name="designation"
+            value={personal.designation}
+            disabled={true}
+            className="w-full border-gray-300 rounded-lg shadow-sm focus:ring-indigo-500 focus:border-indigo-500 px-4 py-2.5 bg-gray-50 text-gray-500 transition-colors"
+          />
+          <p className="mt-1 text-xs text-gray-500">Fetched from your profile. Update in Profile section.</p>
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">4) Enter your date of birth <span className="text-red-500">*</span></label>
-          <input 
-            required 
-            aria-required="true" 
-            type="date" 
-            name="date_of_birth" 
-            value={personal.date_of_birth} 
-            onChange={onChange} 
-            disabled={readOnly} 
-            className={`w-full border rounded-lg shadow-sm focus:ring-indigo-500 focus:border-indigo-500 px-4 py-2.5 disabled:bg-gray-50 disabled:text-gray-500 transition-colors ${
-              dateErrors.date_of_birth ? 'border-red-500 focus:ring-red-500 focus:border-red-500' : 'border-gray-300'
-            }`}
+          <label className="block text-sm font-medium text-gray-700 mb-1">4) Date of birth <span className="text-red-500">*</span></label>
+          <input
+            required
+            aria-required="true"
+            type="date"
+            name="date_of_birth"
+            value={personal.date_of_birth}
+            disabled={true}
+            className="w-full border-gray-300 rounded-lg shadow-sm focus:ring-indigo-500 focus:border-indigo-500 px-4 py-2.5 bg-gray-50 text-gray-500 transition-colors"
           />
-          {renderFieldError('date_of_birth')}
+          <p className="mt-1 text-xs text-gray-500">Fetched from your profile. Update in Profile section.</p>
         </div>
 
         <div className="md:col-span-2">
-          <label className="block text-sm font-medium text-gray-700 mb-1">5) Enter the Academic Qualifications <span className="text-red-500">*</span></label>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Graduation <span className="text-red-500">*</span></label>
-              <input
-                required
-                aria-required="true"
-                type="text"
-                name="qualification_undergraduate"
-                value={personal.qualification_undergraduate}
-                onChange={onChange}
-                disabled={readOnly}
-                className="w-full border-gray-300 rounded-lg shadow-sm focus:ring-indigo-500 focus:border-indigo-500 px-4 py-2.5 disabled:bg-gray-50 disabled:text-gray-500 transition-colors"
-                placeholder="e.g., B.Sc., B.Tech"
-              />
+          <label className="block text-sm font-medium text-gray-700 mb-1">5) Academic Qualifications <span className="text-red-500">*</span></label>
+          <p className="text-xs text-gray-500 mb-2">Fetched from your faculty profile. Update qualifications in Profile section.</p>
+          {qualifications.length > 0 ? (
+            <div className="border border-gray-200 rounded-lg overflow-hidden">
+              <table className="min-w-full divide-y divide-gray-200">
+                <thead className="bg-gray-50">
+                  <tr>
+                    <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Degree</th>
+                    <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Field of Study</th>
+                    <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Institution</th>
+                    <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Year</th>
+                    <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Score</th>
+                  </tr>
+                </thead>
+                <tbody className="bg-white divide-y divide-gray-200">
+                  {qualifications.map((q, idx) => (
+                    <tr key={idx}>
+                      <td className="px-4 py-2 text-sm text-gray-900">{q.degree || '-'}</td>
+                      <td className="px-4 py-2 text-sm text-gray-900">{q.field_of_study || '-'}</td>
+                      <td className="px-4 py-2 text-sm text-gray-900">{q.institution_name || '-'}</td>
+                      <td className="px-4 py-2 text-sm text-gray-900">{q.year_of_passing || '-'}</td>
+                      <td className="px-4 py-2 text-sm text-gray-900">{q.percentage_cgpa || '-'}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
             </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Postgraduation</label>
-              <input
-                type="text"
-                name="qualification_postgraduate"
-                value={personal.qualification_postgraduate}
-                onChange={onChange}
-                disabled={readOnly}
-                className="w-full border-gray-300 rounded-lg shadow-sm focus:ring-indigo-500 focus:border-indigo-500 px-4 py-2.5 disabled:bg-gray-50 disabled:text-gray-500 transition-colors"
-                placeholder="e.g., M.Sc., M.Tech"
-              />
+          ) : (
+            <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
+              <p className="text-sm text-yellow-800">No qualifications found in your profile. Please add at least a Graduation qualification in your Profile section.</p>
             </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">PhD</label>
-              <input
-                type="text"
-                name="qualification_phd"
-                value={personal.qualification_phd}
-                onChange={onChange}
-                disabled={readOnly}
-                className="w-full border-gray-300 rounded-lg shadow-sm focus:ring-indigo-500 focus:border-indigo-500 px-4 py-2.5 disabled:bg-gray-50 disabled:text-gray-500 transition-colors"
-                placeholder="e.g., Ph.D. in Physics"
-              />
-            </div>
-          </div>
+          )}
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">6) Select the caste <span className="text-red-500">*</span></label>
-          <select required aria-required="true" name="sc_st_status" value={personal.sc_st_status} onChange={onChange} disabled={readOnly} className="w-full border-gray-300 rounded-lg shadow-sm focus:ring-indigo-500 focus:border-indigo-500 px-4 py-2.5 disabled:bg-gray-50 disabled:text-gray-500 transition-colors">
-            <option value="">Select Category</option>
-            <option value="UR">UR</option>
-            <option value="OBC-NCL">OBC-NCL</option>
-            <option value="SC">SC</option>
-            <option value="ST">ST</option>
-            <option value="EWS">EWS</option>
-          </select>
+          <label className="block text-sm font-medium text-gray-700 mb-1">6) Category <span className="text-red-500">*</span></label>
+          <input
+            required
+            aria-required="true"
+            type="text"
+            name="sc_st_status"
+            value={personal.sc_st_status || ''}
+            disabled={true}
+            className="w-full border-gray-300 rounded-lg shadow-sm focus:ring-indigo-500 focus:border-indigo-500 px-4 py-2.5 bg-gray-50 text-gray-500 transition-colors"
+          />
+          <p className="mt-1 text-xs text-gray-500">Fetched from your profile. Update in Profile section.</p>
         </div>
 
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-1">7) Date of continuous employment <span className="text-red-500">*</span></label>
-          <input 
-            required 
-            aria-required="true" 
-            type="date" 
-            name="joining_date" 
-            value={personal.joining_date} 
-            onChange={onChange} 
-            disabled={readOnly} 
-            className={`w-full border rounded-lg shadow-sm focus:ring-indigo-500 focus:border-indigo-500 px-4 py-2.5 disabled:bg-gray-50 disabled:text-gray-500 transition-colors ${
-              dateErrors.joining_date ? 'border-red-500 focus:ring-red-500 focus:border-red-500' : 'border-gray-300'
-            }`}
+          <input
+            required
+            aria-required="true"
+            type="date"
+            name="joining_date"
+            value={personal.joining_date}
+            disabled={true}
+            className="w-full border-gray-300 rounded-lg shadow-sm focus:ring-indigo-500 focus:border-indigo-500 px-4 py-2.5 bg-gray-50 text-gray-500 transition-colors"
           />
-          {renderFieldError('joining_date')}
+          <p className="mt-1 text-xs text-gray-500">Fetched from your profile. Update in Profile section.</p>
         </div>
-            
+
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-1">8) Present Grade <span className="text-red-500">*</span></label>
-           <select required aria-required="true" name="grade" value={personal.grade} onChange={onChange} disabled={readOnly} className="w-full border-gray-300 rounded-lg shadow-sm focus:ring-indigo-500 focus:border-indigo-500 px-4 py-2.5 disabled:bg-gray-50 disabled:text-gray-500 transition-colors">
-           <option value="">Select Grade</option>
-           <option value="Level 10">Level 10</option>
-           <option value="Level 11">Level 11</option>
-           <option value="Level 12">Level 12</option>
-           <option value="Level 13A">Level 13</option>
-           <option value="Level 13A">Level 13A</option>
-           <option value="Level 14">Level 14</option>
-           <option value="Level 15">Level 15</option>
-          </select>
+          <input
+            required
+            aria-required="true"
+            type="text"
+            name="grade"
+            value={personal.grade || ''}
+            disabled={true}
+            className="w-full border-gray-300 rounded-lg shadow-sm focus:ring-indigo-500 focus:border-indigo-500 px-4 py-2.5 bg-gray-50 text-gray-500 transition-colors"
+          />
+          <p className="mt-1 text-xs text-gray-500">Fetched from your profile. Update in Profile section.</p>
         </div>
 
         <div className="md:col-span-2">

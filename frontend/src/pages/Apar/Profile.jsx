@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { facultyProfileService } from '../../services/faculty_profile.service.js';
 import { toast } from 'sonner';
 import AparShellHeader from '../../components/AparShellHeader.jsx';
@@ -8,6 +8,11 @@ export default function Profile() {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [saveStatus, setSaveStatus] = useState('idle'); // idle | saving | saved | error
+  const [errorSummary, setErrorSummary] = useState([]);
+  const summaryRef = useRef(null);
+  const [saveError, setSaveError] = useState(null);
+  const [educationError, setEducationError] = useState('');
+  const eduSectionRef = useRef(null);
   const [profile, setProfile] = useState({
     faculty_id: '',
     basic_info: {},
@@ -210,6 +215,7 @@ export default function Profile() {
         if (!val) return 'Employment Type is required';
         return '';
       case 'basic_info.date_of_birth':
+        if (!val) return 'Date of Birth is required';
         if (val && !isPastOrToday(val)) return 'Date cannot be in the future';
         return '';
       case 'professional_info.years_of_experience':
@@ -276,9 +282,10 @@ export default function Profile() {
           fixed.professional_info = fixed.professional_info || {};
           fixed.professional_info.specialization = spec ? [String(spec)] : [];
         }
+        console.info('[Profile] Loaded profile payload', fixed);
         setProfile(fixed);
       } catch (e) {
-        console.error(e);
+        console.error('[Profile] Failed to load profile', e?.response?.data || e);
         toast.error('Failed to load profile');
       } finally {
         setLoading(false);
@@ -331,8 +338,8 @@ export default function Profile() {
     e.preventDefault();
     // Final validation
     const pathsToValidate = [
-      'basic_info.full_name','basic_info.aadhaar_card','basic_info.date_of_birth','basic_info.caste_category',
-      'contact_info.mobile_number','contact_info.email_address','contact_info.city','contact_info.state','contact_info.postal_code','contact_info.emergency_contact_number','contact_info.emergency_contact_name',
+      'basic_info.full_name','basic_info.aadhaar_card','basic_info.gender','basic_info.date_of_birth','basic_info.nationality','basic_info.marital_status','basic_info.caste_category',
+      'contact_info.mobile_number','contact_info.email_address','contact_info.current_address','contact_info.city','contact_info.state','contact_info.postal_code','contact_info.emergency_contact_number','contact_info.emergency_contact_name',
       'contact_info.permanent_address','contact_info.permanent_city','contact_info.permanent_state','contact_info.permanent_postal_code',
       'professional_info.faculty_staff_id','professional_info.designation','professional_info.department','professional_info.date_of_joining','professional_info.years_of_experience','professional_info.office_contact_number',
       'professional_info.date_of_continuous_employment','professional_info.present_grade',
@@ -353,7 +360,12 @@ export default function Profile() {
     });
     setErrors(newErrors);
     if (Object.keys(newErrors).length) {
+      console.warn('[Profile] Validation failed before save', newErrors);
+      const list = Array.from(new Set(Object.values(newErrors).filter(Boolean)));
+      setErrorSummary(list);
       toast.error('Please correct the highlighted fields');
+      // Scroll to the error summary block
+      try { summaryRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' }); } catch (_) {}
       return;
     }
 
@@ -365,20 +377,44 @@ export default function Profile() {
         (q) => String(q?.degree || '').trim().toLowerCase() === 'graduation'
       );
       if (!hasGraduation) {
+        console.warn('[Profile] Blocking save: missing required Graduation qualification');
         setSaving(false);
         setSaveStatus('error');
         toast.error("Please add at least one 'Graduation' qualification");
+        setEducationError("Please add at least one 'Graduation' qualification in Educational Qualifications.");
+        try { eduSectionRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' }); } catch (_) {}
         setTimeout(() => setSaveStatus('idle'), 3000);
         return;
       }
+      console.info('[Profile] Submitting profile payload', profile);
       const saved = await facultyProfileService.upsertSelf(profile);
+      console.info('[Profile] Save success response', saved);
       setProfile(saved);
       toast.success('Profile saved');
       setSaveStatus('saved');
       setTimeout(() => setSaveStatus('idle'), 3000);
+      setErrorSummary([]);
+      setSaveError(null);
+      setEducationError('');
     } catch (e) {
-      console.error(e);
-      toast.error(e?.response?.data?.message || 'Failed to save profile');
+      const status = e?.response?.status;
+      const data = e?.response?.data;
+      console.group('[Profile] Save error');
+      console.error('Status:', status);
+      console.error('Message:', e?.message);
+      console.error('Response data:', data);
+      console.error('Full error:', e);
+      console.groupEnd();
+      try { if (typeof window !== 'undefined') window.__lastProfileSaveError = e; } catch (_) {}
+      const msg = e?.response?.data?.message || 'Failed to save profile';
+      toast.error(msg);
+      let details = [];
+      const raw = e?.response?.data;
+      const arr = (raw && (raw.errors || raw.issues || raw.details)) || [];
+      if (Array.isArray(arr)) {
+        details = arr.map((it) => typeof it === 'string' ? it : (it?.message || JSON.stringify(it)));
+      }
+      setSaveError({ message: msg, details });
       setSaveStatus('error');
       setTimeout(() => setSaveStatus('idle'), 4000);
     } finally {
@@ -425,6 +461,43 @@ export default function Profile() {
           }
         />
 
+        {saveError && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
+            <div className="w-full max-w-md rounded-lg bg-white p-5 shadow-lg">
+              <div className="text-lg font-semibold text-red-600">Save failed</div>
+              <div className="mt-2 text-sm text-gray-700">{saveError.message}</div>
+              {Array.isArray(saveError.details) && saveError.details.length > 0 && (
+                <ul className="mt-3 list-disc pl-5 text-sm text-gray-700 space-y-1">
+                  {saveError.details.map((d, i) => (
+                    <li key={`${i}-${d}`}>{d}</li>
+                  ))}
+                </ul>
+              )}
+              <div className="mt-5 flex justify-end gap-2">
+                <button
+                  type="button"
+                  onClick={() => setSaveError(null)}
+                  className="rounded-md bg-gray-200 px-3 py-1.5 text-sm font-medium text-gray-800 hover:bg-gray-300"
+                >
+                  Close
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Error Summary */}
+        {Array.isArray(errorSummary) && errorSummary.length > 0 && (
+          <div ref={summaryRef} className="mb-6 rounded-xl border border-red-200 bg-red-50 p-4 text-sm text-red-800">
+            <div className="font-semibold mb-2">Please fix the following:</div>
+            <ul className="list-disc pl-5 space-y-1">
+              {errorSummary.map((msg, i) => (
+                <li key={`${msg}-${i}`}>{msg}</li>
+              ))}
+            </ul>
+          </div>
+        )}
+
         <form onSubmit={handleSave} className="space-y-8">
           <section className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
             <h2 className="text-lg font-bold text-gray-900 mb-4">Basic Information</h2>
@@ -441,10 +514,16 @@ export default function Profile() {
               </div>
               <div>
                 <label className={labelBase}>Gender</label>
-                <select className={inputBase} value={profile.basic_info?.gender || ''} onChange={(e) => update('basic_info.gender', e.target.value)}>
+                <select
+                  className={`${inputBase} ${errors['basic_info.gender'] ? 'border-red-500' : ''}`}
+                  value={profile.basic_info?.gender || ''}
+                  onChange={(e) => update('basic_info.gender', e.target.value)}
+                  required
+                >
                   <option value="">Select</option>
                   {GENDER_OPTIONS.map(o => <option key={o} value={o}>{o}</option>)}
                 </select>
+                {errors['basic_info.gender'] && <div className={errorText}>{errors['basic_info.gender']}</div>}
               </div>
               <div>
                 <label className={labelBase}>Date of Birth</label>
@@ -453,14 +532,26 @@ export default function Profile() {
               </div>
               <div>
                 <label className={labelBase}>Nationality</label>
-                <input className={inputBase} value={profile.basic_info?.nationality || ''} onChange={(e) => update('basic_info.nationality', sanitizeAlpha(e.target.value))} />
+                <input
+                  className={`${inputBase} ${errors['basic_info.nationality'] ? 'border-red-500' : ''}`}
+                  value={profile.basic_info?.nationality || ''}
+                  onChange={(e) => update('basic_info.nationality', sanitizeAlpha(e.target.value))}
+                  required
+                />
+                {errors['basic_info.nationality'] && <div className={errorText}>{errors['basic_info.nationality']}</div>}
               </div>
               <div>
                 <label className={labelBase}>Marital Status</label>
-                <select className={inputBase} value={profile.basic_info?.marital_status || ''} onChange={(e) => update('basic_info.marital_status', e.target.value)}>
+                <select
+                  className={`${inputBase} ${errors['basic_info.marital_status'] ? 'border-red-500' : ''}`}
+                  value={profile.basic_info?.marital_status || ''}
+                  onChange={(e) => update('basic_info.marital_status', e.target.value)}
+                  required
+                >
                   <option value="">Select</option>
                   {MARITAL_STATUS_OPTIONS.map(o => <option key={o} value={o}>{o}</option>)}
                 </select>
+                {errors['basic_info.marital_status'] && <div className={errorText}>{errors['basic_info.marital_status']}</div>}
               </div>
               <div>
                 <label className={labelBase}>Category</label>
@@ -510,6 +601,7 @@ export default function Profile() {
                 <div className="sm:col-span-2">
                   <label className={labelBase}>Address</label>
                   <input className={`${inputBase} ${errors['contact_info.current_address'] ? 'border-red-500' : ''}`} value={profile.contact_info?.current_address || ''} onChange={(e) => update('contact_info.current_address', sanitizeAlphaNumLoose(e.target.value))} />
+                  {errors['contact_info.current_address'] && <div className={errorText}>{errors['contact_info.current_address']}</div>}
                 </div>
                 <div>
                   <label className={labelBase}>City</label>
@@ -668,11 +760,16 @@ export default function Profile() {
             </div>
           </section>
 
-          <section className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
-            <div className="flex items-center justify-between mb-4">
+          <section ref={eduSectionRef} className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
+            <div className="flex items-center justify-between mb-2">
               <h2 className="text-lg font-bold text-gray-900">Educational Qualifications</h2>
               <button type="button" onClick={handleAddQualification} className="rounded-md bg-emerald-600 text-white px-3 py-1 text-sm font-semibold hover:bg-emerald-700">Add</button>
             </div>
+            {educationError && (
+              <div className="mb-3 rounded-md border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700">
+                {educationError} (Tip: set Degree to <strong>Graduation</strong> in one entry.)
+              </div>
+            )}
             <div className="space-y-4">
               {(profile.educational_qualifications||[]).map((q, idx) => (
                 <div key={idx} className="grid grid-cols-1 sm:grid-cols-2 gap-4 border border-gray-100 p-4 rounded-lg">
@@ -697,6 +794,7 @@ export default function Profile() {
                               list[idx] = { ...list[idx], degree: val };
                               return { ...prev, educational_qualifications: list };
                             });
+                            if (String(val).trim().toLowerCase() === 'graduation') setEducationError('');
                             const path = `educational_qualifications.${idx}.degree`;
                             const msg = validateField(path, val);
                             if (msg) setErrorFor(path, msg); else clearErrorFor(path);

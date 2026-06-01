@@ -30,6 +30,12 @@ export const assertFacultyAccess = async (user, facultyId) => {
   const currentFacultyId = getCurrentFacultyId(user);
   const role = normalizeRoleValue(user?.role);
 
+  // Allow IQAC users to access any faculty profile
+  const normalizedRole = String(user?.role || '').toLowerCase();
+  if (normalizedRole.includes('iqac') || normalizedRole.includes('dean')) {
+    return true;
+  }
+
   // Always allow users to access their own record regardless of role
   if (currentFacultyId === normalizedFacultyId) {
     return true;
