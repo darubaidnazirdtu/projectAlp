@@ -97,6 +97,17 @@ export default function ProfileDropdown() {
                         type="button"
                         onClick={() => {
                             setIsOpen(false);
+                            navigate('/apar/profile');
+                        }}
+                        className="flex items-center w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors"
+                    >
+                        <FaUserCircle className="mr-3 text-gray-500" />
+                        My Profile
+                    </button>
+                    <button
+                        type="button"
+                        onClick={() => {
+                            setIsOpen(false);
                             setIsModalOpen(true);
                         }}
                         className="flex items-center w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors"

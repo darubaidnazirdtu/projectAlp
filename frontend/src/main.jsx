@@ -21,6 +21,7 @@ import AparLogin from './components/AparLogin.jsx';
 import ProtectedAparRoute from './components/ProtectedAparRoute.jsx';
 import ReportingDashboard from './pages/Apar/ReportingDashboard.jsx';
 import OfficerDashboard from './pages/Apar/OfficerDashboard.jsx';
+import AparProfile from './pages/Apar/Profile.jsx';
 import DeanDashboard from './pages/Apar/DeanDashboard.jsx';
 import UserManagement from './pages/UserManagement.jsx';
 import IqacApprovals from './pages/Apar/IqacApprovals.jsx';
@@ -63,6 +64,14 @@ const router = createBrowserRouter([
     element: (
       <ProtectedAparRoute>
         <OfficerDashboard />
+      </ProtectedAparRoute>
+    ),
+  },
+  {
+    path: '/apar/profile',
+    element: (
+      <ProtectedAparRoute>
+        <AparProfile />
       </ProtectedAparRoute>
     ),
   },

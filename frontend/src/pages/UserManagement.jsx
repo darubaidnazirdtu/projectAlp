@@ -10,6 +10,8 @@ import { DepartmentService } from '../services/department.services.js';
 import { validatePasswordPolicy } from '../utils/passwordPolicy.js';
 
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+const EMPLOYEE_ID_REGEX = /^[a-zA-Z0-9]+$/;
+const NAME_REGEX = /^[a-zA-Z\s]+$/;
 
 const ROLE_OPTIONS = [ROLES.IQAC_HEAD, ROLES.DEAN, ROLES.DEPARTMENT_HOD, ROLES.FACULTY];
 const APAR_ROLE_OPTIONS = [
@@ -21,6 +23,12 @@ const APAR_ROLE_OPTIONS = [
 const YES_NO_OPTIONS = [
   { value: 'no', label: 'No' },
   { value: 'yes', label: 'Yes' }
+];
+const DESIGNATION_OPTIONS = [
+  { value: '', label: 'Select designation', disabled: true },
+  { value: 'Professor', label: 'Professor' },
+  { value: 'Associate Professor', label: 'Associate Professor' },
+  { value: 'Assistant Professor', label: 'Assistant Professor' }
 ];
 
 const emptyCreateForm = {
@@ -173,17 +181,27 @@ export default function UserManagement() {
 
     const trimmedUserId = createForm.userId?.trim();
     if (!trimmedUserId) {
-      toast.error('User ID is required');
+      toast.error('Employee ID is required');
       return;
     }
 
     if (trimmedUserId.length < 5) {
-      toast.error('User ID must be at least 5 characters');
+      toast.error('Employee ID must be at least 5 characters');
+      return;
+    }
+
+    if (!EMPLOYEE_ID_REGEX.test(trimmedUserId)) {
+      toast.error('Employee ID can only contain letters and numbers (no special characters)');
       return;
     }
 
     if (!createForm.name?.trim()) {
       toast.error('Name is required');
+      return;
+    }
+
+    if (!NAME_REGEX.test(createForm.name.trim())) {
+      toast.error('Name can only contain letters and spaces (no special characters)');
       return;
     }
 
@@ -374,7 +392,7 @@ export default function UserManagement() {
           <div className="mt-6 space-y-4">
             <div className="grid gap-4 md:grid-cols-2">
               <label className="block">
-                <span className="mb-2 block text-sm font-medium text-gray-700">User ID</span>
+                <span className="mb-2 block text-sm font-medium text-gray-700">Employee ID</span>
                 <input
                   type="text"
                   value={createForm.userId || ''}
@@ -410,13 +428,16 @@ export default function UserManagement() {
 
               <label className="block">
                 <span className="mb-2 block text-sm font-medium text-gray-700">Designation</span>
-                <input
-                  type="text"
+                <select
                   value={createForm.designation || ''}
                   onChange={(event) => setCreateForm((current) => ({ ...current, designation: event.target.value }))}
+                  required
                   className="form-field-input-iqac"
-                  placeholder="Optional"
-                />
+                >
+                  {DESIGNATION_OPTIONS.map((option) => (
+                    <option key={option.value} value={option.value} disabled={option.disabled}>{option.label}</option>
+                  ))}
+                </select>
               </label>
             </div>
 
@@ -460,7 +481,7 @@ export default function UserManagement() {
             <div className="grid gap-4 md:grid-cols-2">
               <label className="block md:col-span-2">
                 <span className="mb-2 block text-sm font-medium text-gray-700">Temporary password</span>
-                <p className="mb-2 text-xs text-gray-500">Auto-generated: first 5 letters of User ID + @888</p>
+                <p className="mb-2 text-xs text-gray-500">Auto-generated: first 5 letters of Employee ID + @888</p>
                 <div className="relative">
                   <input
                     type={createPasswordVisible ? 'text' : 'password'}

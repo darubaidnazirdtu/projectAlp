@@ -146,10 +146,12 @@ import dashboardRoutes from "./routes/dashboard.routes.js"
 import userManagementRoutes from "./routes/user_management.routes.js"
 
 import aparMongoRoutes from "./routes/apar.mongo.routes.js"
+import aparProfileRoutes from "./routes/apar.profile.routes.js"
 
 // ...
 
 app.use('/api/v1/apar/mongo', authenticate, aparMongoRoutes)
+app.use('/api/v1/apar/profile', authenticate, aparProfileRoutes)
 
 
 const registerProtectedRoute = (path, router) => {
