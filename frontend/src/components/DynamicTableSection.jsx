@@ -1,8 +1,9 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { FiPlus, FiTrash2, FiEdit2, FiX, FiSave } from 'react-icons/fi';
 import { toast } from 'sonner';
 import SearchableSelect from './SearchableSelect';
 import FileUpload from './FileUpload';
+import { StudentService } from '../services/student.services.js';
 
 // ... (existing imports)
 
@@ -24,6 +25,69 @@ export default function DynamicTableSection({
     const [tempItem, setTempItem] = useState(initialItem);
     const [tempSubItems, setTempSubItems] = useState({}); // State for nested objectList forms
     const [activeSubForms, setActiveSubForms] = useState({}); // State to toggle visibility of sub-item forms
+
+    const studentsByEnrollRef = useRef(null);
+    const buildEnrollIndex = (list) => {
+        const idx = new Map();
+        (list || []).forEach((s) => {
+            const raw = String(s?.enrollment_no || '').trim().toLowerCase();
+            const key = raw.replace(/[^a-z0-9]/g, '');
+            if (key) idx.set(key, s);
+        });
+        return idx;
+    };
+    const lookupStudentByEnrollment = async (value) => {
+        const enroll = String(value || '').trim().toLowerCase().replace(/[^a-z0-9]/g, '');
+        if (!enroll) return null;
+        let idx = studentsByEnrollRef.current;
+        if (!idx) {
+            try {
+                const res = await StudentService.getStudentDetails();
+                let list = [];
+                if (Array.isArray(res)) list = res;
+                else if (Array.isArray(res?.data)) list = res.data;
+                else if (Array.isArray(res?.data?.data)) list = res.data.data;
+                else if (Array.isArray(res?.rows)) list = res.rows;
+                else list = [];
+                idx = buildEnrollIndex(list);
+                studentsByEnrollRef.current = idx;
+            } catch (e) {
+                toast.error('Unable to load students');
+                return null;
+            }
+        }
+        return idx.get(enroll) || null;
+    };
+    const handleEnrollmentLookup = async (value) => {
+        const found = await lookupStudentByEnrollment(value);
+        if (!found) {
+            toast.error('No student found for entered enrollment');
+            return;
+        }
+        if (found.student_id || found._id) {
+            handleChange('student_id', found.student_id || found._id);
+        }
+        if (fields.some(f => f.key === 'student_name')) {
+            handleChange('student_name', found.name || '');
+        }
+    };
+
+    const sanitizeAlphaNum = (s) => String(s || '').replace(/[^A-Za-z0-9 ]+/g, '');
+    const sanitizeEmail = (s) => String(s || '').replace(/[^A-Za-z0-9@._+\-]+/g, '');
+    const sanitizeUrl = (s) => String(s || '').replace(/[^A-Za-z0-9:\/?&=._#%\-]+/g, '');
+    const sanitizeNumeric = (s) => String(s || '').replace(/[^0-9]+/g, '');
+    const sanitizeForResearchKey = (key, value, type) => {
+        const v = String(value ?? '');
+        if (v === '') return v;
+        const lower = String(key || '').toLowerCase();
+        if (type === 'email' || lower.includes('email')) return sanitizeEmail(v);
+        if (lower.includes('url') || lower.includes('link') || lower.includes('http') || lower.includes('doi')) return sanitizeUrl(v);
+        if (type === 'date') return v;
+        if (type === 'month' || /(^|_)(year_of_publication|registration_year|year_of_sanction|academic_year|year)($|_)/.test(lower)) return v.replace(/[^0-9\-]+/g, '');
+        if (type === 'number' || /(amount|volume|page_numbers|citation_count|duration_hours|duration_days|number_of_participants|monetary_value|impact_factor)\b/.test(lower)) return sanitizeNumeric(v);
+        if (/(remarks|outcome|reason|description|details)\b/.test(lower)) return sanitizeAlphaNum(v);
+        return sanitizeAlphaNum(v);
+    };
 
     const formatMonthYearValue = (value) => {
         const normalized = String(value || '').trim();
@@ -565,7 +629,7 @@ export default function DynamicTableSection({
                                     <textarea
                                         rows={3}
                                         value={tempItem[f.key] || ''}
-                                        onChange={(e) => handleChange(f.key, e.target.value)}
+                                        onChange={(e) => handleChange(f.key, sanitizeForResearchKey(f.key, e.target.value, 'text'))}
                                         required={f.required || (typeof f.requiredIf === 'function' && f.requiredIf(tempItem))}
                                         disabled={f.disabled || f.readOnly || readOnly}
                                         className="w-full border-gray-300 rounded-lg shadow-sm focus:ring-indigo-500 focus:border-indigo-500 p-2.5"
@@ -599,7 +663,7 @@ export default function DynamicTableSection({
                                     <div>
                                         <FileUpload
                                             value={tempItem[f.key] || ''}
-                                            onChange={(url) => handleChange(f.key, url)}
+                                            onChange={(url) => handleChange(f.key, sanitizeForResearchKey(f.key, url, 'url'))}
                                             disabled={f.disabled || f.readOnly || readOnly}
                                             required={f.required || (typeof f.requiredIf === 'function' && f.requiredIf(tempItem))}
                                         />
@@ -699,13 +763,11 @@ export default function DynamicTableSection({
                                                                             } else if (subF.type === 'year') {
                                                                                 inputValue = inputValue.replace(/\D/g, '').slice(0, 4);
                                                                             } else if (subF.type === 'number') {
-                                                                                inputValue = inputValue.replace(/[^0-9.-]/g, '');
-                                                                                if (subF.min === 0) {
-                                                                                    inputValue = inputValue.replace(/-/g, '');
-                                                                                }
+                                                                                inputValue = inputValue.replace(/[^0-9]/g, '');
                                                                             } else if (subF.pattern === '^[0-9-]+$') {
                                                                                 inputValue = inputValue.replace(/[^0-9-]/g, '');
                                                                             }
+                                                                            inputValue = sanitizeForResearchKey(subF.key, inputValue, subF.type);
                                                                             handleSubItemChange(f.key, subF.key, inputValue);
                                                                         }}
                                                                         min={subF.type === 'monthYear' ? getMonthInputBoundary(subF.min, '01') : subF.min}
@@ -750,13 +812,11 @@ export default function DynamicTableSection({
                                                 } else if (f.type === 'year') {
                                                     inputValue = inputValue.replace(/\D/g, '').slice(0, 4);
                                                 } else if (f.type === 'number') {
-                                                    inputValue = inputValue.replace(/[^0-9.-]/g, '');
-                                                    if (f.min === 0) {
-                                                        inputValue = inputValue.replace(/-/g, '');
-                                                    }
+                                                    inputValue = inputValue.replace(/[^0-9]/g, '');
                                                 } else if (f.pattern === '^[0-9-]+$') {
                                                     inputValue = inputValue.replace(/[^0-9-]/g, '');
                                                 }
+                                                inputValue = sanitizeForResearchKey(f.key, inputValue, f.type);
                                                 handleChange(f.key, inputValue);
                                             }}
                                             min={f.type === 'monthYear' ? getMonthInputBoundary(f.min, '01') : f.min}
@@ -770,7 +830,17 @@ export default function DynamicTableSection({
                                             disabled={f.disabled || readOnly}
                                             required={f.required || (typeof f.requiredIf === 'function' && f.requiredIf(tempItem))}
                                             className="w-full border-gray-300 rounded-lg shadow-sm focus:ring-indigo-500 focus:border-indigo-500 p-2.5"
+                                            onBlur={() => {
+                                                if (title.includes('PhD') && f.key === 'enrollment_no' && tempItem.enrollment_no) {
+                                                    handleEnrollmentLookup(tempItem.enrollment_no);
+                                                }
+                                            }}
                                         />
+                                        {title.includes('PhD') && f.key === 'enrollment_no' && (
+                                            <div className="mt-1 flex justify-end">
+                                                <button type="button" onClick={() => handleEnrollmentLookup(tempItem.enrollment_no)} className="px-3 py-1 text-xs text-indigo-700 bg-indigo-50 border border-indigo-200 rounded hover:bg-indigo-100">Find Student</button>
+                                            </div>
+                                        )}
                                         {(() => {
                                             const associatedStartKey = getAssociatedStartKey(f.key);
                                             const startValue = associatedStartKey ? tempItem[associatedStartKey] : null;

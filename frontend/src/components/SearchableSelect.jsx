@@ -240,6 +240,23 @@ const SearchableSelect = ({
         isClearable
         isDisabled={disabled}
         isLoading={isLoading}
+        filterOption={(candidate, rawInput) => {
+          const input = String(rawInput || '').toLowerCase().trim();
+          if (!input) return true;
+          try {
+            const opt = candidate?.data || {};
+            const raw = opt.data || {};
+            const keys = Array.isArray(config.searchKeys) ? config.searchKeys : [];
+            const haystacks = [String(opt.label || '').toLowerCase()];
+            keys.forEach((k) => {
+              const v = raw && raw[k];
+              if (v !== undefined && v !== null) haystacks.push(String(v).toLowerCase());
+            });
+            return haystacks.some((txt) => txt.includes(input));
+          } catch (_) {
+            return true;
+          }
+        }}
         styles={customStyles}
         noOptionsMessage={({ inputValue }) =>
           inputValue ? 'No matches found' : 'No options available'
