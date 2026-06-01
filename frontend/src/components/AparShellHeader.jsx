@@ -31,7 +31,7 @@ export default function AparShellHeader({
             </div>
           </div>
         </div>
-        <div className="flex items-center gap-3 sm:justify-end">
+        <div className="flex items-center gap-3 justify-center">
           <NotificationBell />
           {actions}
         </div>

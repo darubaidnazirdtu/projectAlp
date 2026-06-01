@@ -262,6 +262,13 @@ export default function OfficerDashboard() {
                         >
                             IQAC Approvals
                         </button>
+                         <button
+                            type="button"
+                            onClick={() => navigate('/apar/profile')}
+                            className="rounded-lg border border-indigo-200 bg-white px-4 py-2 text-sm font-semibold text-indigo-800 shadow-sm transition hover:bg-indigo-50"
+                        >
+                            Profile
+                        </button>
                         <button
                             type="button"
                             onClick={handleLogout}
