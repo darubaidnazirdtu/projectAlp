@@ -60,6 +60,13 @@ export default function Profile() {
   const handleRemoveQualification = async (idx) => {
     const prevList = Array.isArray(profile.educational_qualifications) ? profile.educational_qualifications : [];
     if (idx < 0 || idx >= prevList.length) return;
+    
+    // Check if removal would leave no qualifications
+    if (prevList.length <= 1) {
+      toast.error('Cannot remove the last qualification. At least one qualification is required.');
+      return;
+    }
+    
     const newList = prevList.slice();
     newList.splice(idx, 1);
     const updated = { ...profile, educational_qualifications: newList };
@@ -86,9 +93,10 @@ export default function Profile() {
       await facultyProfileService.upsertSelf(updated);
       toast.success('Education removed');
     } catch (e) {
+      console.error('Failed to remove qualification:', e);
       // revert on failure
       setProfile((prev) => ({ ...prev, educational_qualifications: prevList }));
-      toast.error(e?.response?.data?.message || 'Failed to remove education');
+      toast.error(e?.response?.data?.message || e?.message || 'Failed to remove education');
     }
   };
 
@@ -129,7 +137,7 @@ export default function Profile() {
         if (!val) return 'Gender is required';
         return '';
       case 'basic_info.aadhaar_card':
-        if (!val) return '';
+        if (!val) return 'Aadhaar Card is required';
         if (!isAadhaar(val)) return 'Aadhaar must be 12 digits';
         return '';
       case 'basic_info.nationality':
@@ -227,16 +235,19 @@ export default function Profile() {
       case 'professional_info.office_contact_number':
         if (val && !isPhone(val)) return 'Enter a valid 10-digit mobile';
         return '';
-      case 'social_links.linkedin_profile':
-      case 'social_links.personal_website':
       case 'social_links.google_scholar_profile':
+        if (!val) return 'Google Scholar Profile is required';
+        if (val && !isUrl(val)) return 'Enter a valid http(s) URL';
+        return '';
       case 'social_links.researchgate_profile':
+        if (!val) return 'ResearchGate Profile is required';
         if (val && !isUrl(val)) return 'Enter a valid http(s) URL';
         return '';
       case 'social_links.orcid_id':
         if (val && !isOrcid(val)) return 'Format: 0000-0000-0000-000X';
         return '';
       case 'social_links.scopus_author_id':
+        if (!val) return 'Scopus Author ID is required';
         if (val && !isScopusId(val)) return 'Digits only';
         return '';
       case 'basic_info.caste_category':
@@ -323,6 +334,7 @@ export default function Profile() {
         ...(prev.educational_qualifications || []),
         {
           degree: '',
+          course: '',
           field_of_study: '',
           institution_name: '',
           university_board: '',
@@ -343,7 +355,7 @@ export default function Profile() {
       'contact_info.permanent_address','contact_info.permanent_city','contact_info.permanent_state','contact_info.permanent_postal_code',
       'professional_info.faculty_staff_id','professional_info.designation','professional_info.department','professional_info.date_of_joining','professional_info.years_of_experience','professional_info.office_contact_number',
       'professional_info.date_of_continuous_employment','professional_info.present_grade',
-      'social_links.linkedin_profile','social_links.personal_website','social_links.google_scholar_profile','social_links.researchgate_profile','social_links.orcid_id','social_links.scopus_author_id'
+      'social_links.google_scholar_profile','social_links.researchgate_profile','social_links.orcid_id','social_links.scopus_author_id'
     ];
     const newErrors = {};
     for (const pth of pathsToValidate) {
@@ -508,8 +520,8 @@ export default function Profile() {
                 {errors['basic_info.full_name'] && <div className={errorText}>{errors['basic_info.full_name']}</div>}
               </div>
               <div>
-                <label className={labelBase}>Aadhaar Card (optional)</label>
-                <input className={`${inputBase} ${errors['basic_info.aadhaar_card'] ? 'border-red-500' : ''}`} value={profile.basic_info?.aadhaar_card || ''} onChange={(e) => update('basic_info.aadhaar_card', e.target.value.replace(/[^0-9]/g, ''))} maxLength={12} />
+                <label className={labelBase}>Aadhaar Card</label>
+                <input className={`${inputBase} ${errors['basic_info.aadhaar_card'] ? 'border-red-500' : ''}`} value={profile.basic_info?.aadhaar_card || ''} onChange={(e) => update('basic_info.aadhaar_card', e.target.value.replace(/[^0-9]/g, ''))} maxLength={12} required />
                 {errors['basic_info.aadhaar_card'] && <div className={errorText}>{errors['basic_info.aadhaar_card']}</div>}
               </div>
               <div>
@@ -775,6 +787,7 @@ export default function Profile() {
                 <div key={idx} className="grid grid-cols-1 sm:grid-cols-2 gap-4 border border-gray-100 p-4 rounded-lg">
                   {[
                     ['degree','Degree'],
+                    ['course','Course'],
                     ['field_of_study','Field of Study'],
                     ['institution_name','Institution Name'],
                     ['university_board','University/Board'],
@@ -853,19 +866,18 @@ export default function Profile() {
             <h2 className="text-lg font-bold text-gray-900 mb-4">Social & Professional Links</h2>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               {[
-                ['social_links.linkedin_profile','LinkedIn Profile'],
-                ['social_links.personal_website','Personal Website'],
-                ['social_links.google_scholar_profile','Google Scholar Profile'],
-                ['social_links.researchgate_profile','ResearchGate Profile'],
-                ['social_links.orcid_id','ORCID ID'],
-                ['social_links.scopus_author_id','Scopus Author ID']
-              ].map(([path,label]) => (
+                ['social_links.google_scholar_profile','Google Scholar Profile', true],
+                ['social_links.researchgate_profile','ResearchGate Profile', true],
+                ['social_links.scopus_author_id','Scopus Author ID', true],
+                ['social_links.orcid_id','ORCID ID', false]
+              ].map(([path,label,required]) => (
                 <div key={path}>
                   <label className={labelBase}>{label}</label>
                   <input
                     className={`${inputBase} ${errors[path] ? 'border-red-500' : ''}`}
                     value={getByPath(profile, path) || ''}
                     onChange={(e) => update(path, e.target.value.trim())}
+                    required={required}
                   />
                   {errors[path] && <div className={errorText}>{errors[path]}</div>}
                 </div>
@@ -873,7 +885,10 @@ export default function Profile() {
             </div>
           </section>
 
-          <div className="flex justify-end">
+          <div className="flex flex-col items-end gap-2">
+            {saveStatus === 'saved' && (
+              <span className="text-sm font-medium text-emerald-700">Save successful</span>
+            )}
             <button type="submit" disabled={saving || Object.keys(errors).length>0} className="rounded-lg bg-indigo-600 px-6 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-indigo-700 disabled:opacity-60">
               {saving ? 'Saving…' : Object.keys(errors).length>0 ? 'Fix Errors to Save' : 'Save Changes'}
             </button>

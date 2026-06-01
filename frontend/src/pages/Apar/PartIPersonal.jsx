@@ -193,7 +193,7 @@ export default function PartIPersonal({ personal, onChange, readOnly, department
                     <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Field of Study</th>
                     <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Institution</th>
                     <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Year</th>
-                    <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Score</th>
+                    <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Percentage/CGPA</th>
                   </tr>
                 </thead>
                 <tbody className="bg-white divide-y divide-gray-200">

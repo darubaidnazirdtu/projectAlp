@@ -646,6 +646,67 @@ export default function AparForm() {
         setDeleteModal({ open: true, section, field, index });
     };
 
+    // Runtime sanitization helpers for APAR inputs
+    const sanitizeAlpha = (s) => String(s || '').replace(/[^A-Za-z ]+/g, '');
+    const sanitizeAlphaNum = (s) => String(s || '').replace(/[^A-Za-z0-9 ]+/g, '');
+    const sanitizeLoose = (s) => String(s || '').replace(/[^A-Za-z0-9 .,\-\/()]+/g, '');
+    const sanitizeEmail = (s) => String(s || '').replace(/[^A-Za-z0-9@._+\-]+/g, '');
+    const sanitizeUrl = (s) => String(s || '').replace(/[^A-Za-z0-9:/?&=._#%\-]+/g, '');
+    const sanitizeNumeric = (s) => String(s || '').replace(/[^0-9]+/g, '');
+
+    const sanitizeForApar = (value, path = '') => {
+        const v = String(value ?? '');
+        if (v === '') return v;
+        const lower = path.toLowerCase();
+        if (lower.includes('email')) return sanitizeEmail(v);
+        if (
+            lower.includes('url') || lower.includes('link') || lower.includes('http') || lower.includes('website') ||
+            lower.includes('immovable_property_return') || lower.includes('health_checkup_file') || lower.includes('document') || lower.includes('doi')
+        ) return sanitizeUrl(v);
+        if (lower.includes('absence_period')) return v;
+        if (lower.includes('date')) return v; // native date inputs restrict format
+        // Research-specific: stricter rules to disallow special characters broadly
+        if (lower.startsWith('research.')) {
+            // Preserve hyphen for Month-Year fields in research entries
+            if (/(^|\.)((year_of_publication)|(registration_year)|(year_of_sanction)|(academic_year)|year)(\.|$)/.test(lower)) {
+                return v.replace(/[^0-9\-]+/g, '');
+            }
+            // Numeric-only for common quantitative research fields
+            if (/\.(amount|volume|page_numbers|citation_count|duration_hours|duration_days|number_of_participants|monetary_value|impact_factor)\b/.test(lower)) {
+                return sanitizeNumeric(v);
+            }
+            // Remarks/description-like fields in research: alphanumeric only (strip punctuation)
+            if (/\.(remarks|outcome|reason|description|details)\b/.test(lower)) {
+                return sanitizeAlphaNum(v);
+            }
+        }
+        if (lower.includes('assessment.')) return sanitizeNumeric(v);
+        if (
+            lower.includes('time_table') ||
+            lower.includes('workload_week') ||
+            lower.includes('tutorials_tests') ||
+            (lower.includes('courses_taught') && (lower.includes('lectures') || lower.includes('tutorials') || lower.includes('labs')))
+        ) return sanitizeNumeric(v);
+        if (lower.includes('phone') || lower.includes('mobile') || lower.includes('contact_number')) return sanitizeNumeric(v);
+        if (lower.includes('id') || lower.includes('code') || lower.includes('number') || lower.includes('year')) return sanitizeAlphaNum(v);
+        if (lower.includes('address') || lower.includes('remarks') || lower.includes('reason') || lower.includes('description') || lower.includes('details')) return sanitizeLoose(v);
+        return sanitizeAlphaNum(v);
+    };
+
+    const sanitizeDeep = (obj, basePath = '') => {
+        if (obj === null || obj === undefined) return obj;
+        if (typeof obj === 'string') return sanitizeForApar(obj, basePath);
+        if (Array.isArray(obj)) return obj.map((it, i) => sanitizeDeep(it, `${basePath}[${i}]`));
+        if (typeof obj === 'object') {
+            const out = {};
+            Object.keys(obj).forEach((k) => {
+                out[k] = sanitizeDeep(obj[k], basePath ? `${basePath}.${k}` : k);
+            });
+            return out;
+        }
+        return obj;
+    };
+
     const confirmDelete = () => {
         if (deleteModal.section && deleteModal.field && deleteModal.index !== null) {
             removeItem(deleteModal.section, deleteModal.field, deleteModal.index);
@@ -1567,7 +1628,8 @@ export default function AparForm() {
 
     const handlePersonalChange = (e) => {
         const { name, value } = e.target;
-        setFormData(prev => ({ ...prev, personal: { ...prev.personal, [name]: value } }));
+        const sanitized = sanitizeForApar(value, `personal.${name}`);
+        setFormData(prev => ({ ...prev, personal: { ...prev.personal, [name]: sanitized } }));
     };
 
     const addItem = (section, field, initialItem) => {
@@ -1592,7 +1654,8 @@ export default function AparForm() {
 
     const updateArrayField = (section, field, index, key, value) => {
         const updatedArray = [...formData[section][field]];
-        updatedArray[index] = { ...updatedArray[index], [key]: value };
+        const sanitized = sanitizeForApar(value, `${section}.${field}.${key}`);
+        updatedArray[index] = { ...updatedArray[index], [key]: sanitized };
         setFormData(prev => ({
             ...prev,
             [section]: {
@@ -1604,7 +1667,8 @@ export default function AparForm() {
 
     const updateArrayItem = (section, field, index, newItem) => {
         const updatedArray = [...formData[section][field]];
-        updatedArray[index] = newItem;
+        const sanitizedItem = sanitizeDeep(newItem, `${section}.${field}`);
+        updatedArray[index] = sanitizedItem;
         setFormData(prev => ({
             ...prev,
             [section]: {
@@ -1615,6 +1679,7 @@ export default function AparForm() {
     };
 
     const updateAssessment = (section, key, value) => {
+        const sanitizedVal = sanitizeForApar(value, `assessment.${section}.${key}`);
         setFormData(prev => {
             const next = {
                 ...prev,
@@ -1622,7 +1687,7 @@ export default function AparForm() {
                     ...prev.assessment,
                     [section]: {
                         ...prev.assessment[section],
-                        [key]: value
+                        [key]: sanitizedVal
                     }
                 }
             };
@@ -1687,21 +1752,25 @@ export default function AparForm() {
     };
 
     const updateField = (section, key, value) => {
+        const sanitized = (value !== null && typeof value === 'object')
+            ? sanitizeDeep(value, `${section}.${key}`)
+            : sanitizeForApar(value, `${section}.${key}`);
         setFormData(prev => ({
             ...prev,
             [section]: {
                 ...prev[section],
-                [key]: value
+                [key]: sanitized
             }
         }));
     };
 
     const updateRemarks = (key, value) => {
+        const sanitized = sanitizeForApar(value, `remarks.${key}`);
         setFormData(prev => ({
             ...prev,
             remarks: {
                 ...prev.remarks,
-                [key]: value
+                [key]: sanitized
             }
         }));
     };

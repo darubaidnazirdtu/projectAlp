@@ -6,6 +6,7 @@ const requiredDateLike = z.preprocess((val) => val ? new Date(val) : null, z.dat
 
 const qualificationSchema = z.object({
   degree: nullableString,
+  course: nullableString,
   field_of_study: nullableString,
   institution_name: nullableString,
   university_board: nullableString,

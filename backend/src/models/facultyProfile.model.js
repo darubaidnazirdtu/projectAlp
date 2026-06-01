@@ -2,6 +2,7 @@ import mongoose from 'mongoose';
 
 const QualificationSchema = new mongoose.Schema({
   degree: { type: String, trim: true },
+  course: { type: String, trim: true },
   field_of_study: { type: String, trim: true },
   institution_name: { type: String, trim: true },
   university_board: { type: String, trim: true },
