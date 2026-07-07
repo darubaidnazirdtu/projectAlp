@@ -74,6 +74,10 @@ export const getSelfProfile = asyncHandler(async (req, res) => {
 
   const existing = await FacultyProfile.findOne({ faculty_id: facultyId }).lean();
   const payload = existing || await buildDefaultProfile(facultyId);
+  
+  if (payload.professional_info) {
+    payload.professional_info.faculty_staff_id = facultyId;
+  }
 
   res.status(200).json(new ApiResponse(200, { profile: sanitizeProfile(payload) }, 'Profile fetched'));
 });
@@ -85,6 +89,10 @@ export const upsertSelfProfile = asyncHandler(async (req, res) => {
   const update = req.body?.profile || req.body || {};
   if (update.faculty_id && String(update.faculty_id) !== String(facultyId)) {
     throw new ApiError(403, 'Cannot modify another faculty profile');
+  }
+  
+  if (update.professional_info) {
+    update.professional_info.faculty_staff_id = facultyId;
   }
 
   const doc = await FacultyProfile.findOneAndUpdate(
