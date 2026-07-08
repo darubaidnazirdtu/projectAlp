@@ -395,15 +395,15 @@ const AparFormSchema = new mongoose.Schema({
     // Step 4: Corporate Life
     corporate: {
         // Mapped fields
-        curriculum_development: String,
-        course_development_details: String,
-        lab_development: String,
-        cultural_activities: String,
-        sports_community: String,
-        admin_assignment_university: String,
-        admin_assignment_department: String,
-        admin_assignment_external: String,
-        any_other: String,
+        curriculum_development: [{ description: String }],
+        course_development_details: [{ description: String }],
+        lab_development: [{ description: String }],
+        cultural_activities: [{ description: String }],
+        sports_community: [{ description: String }],
+        admin_assignment_university: [{ description: String }],
+        admin_assignment_department: [{ description: String }],
+        admin_assignment_external: [{ description: String }],
+        any_other: [{ description: String }],
         certify: String, // Boolean/Checkbox often sends "true"/"on"/undefined, but making String is safer for draft
 
         // Legacy mappings support if needed (optional)

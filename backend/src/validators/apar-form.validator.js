@@ -976,15 +976,15 @@ const researchSchema = z.object({
 
 // Corporate Life Validation
 const corporateSchema = z.object({
-  curriculum_development: optionalString,
-  course_development_details: optionalString,
-  lab_development: optionalString,
-  cultural_activities: optionalString,
-  sports_community: optionalString,
-  admin_assignment_university: optionalString,
-  admin_assignment_department: optionalString,
-  admin_assignment_external: optionalString,
-  any_other: optionalString,
+  curriculum_development: z.array(z.object({ description: optionalString })).optional(),
+  course_development_details: z.array(z.object({ description: optionalString })).optional(),
+  lab_development: z.array(z.object({ description: optionalString })).optional(),
+  cultural_activities: z.array(z.object({ description: optionalString })).optional(),
+  sports_community: z.array(z.object({ description: optionalString })).optional(),
+  admin_assignment_university: z.array(z.object({ description: optionalString })).optional(),
+  admin_assignment_department: z.array(z.object({ description: optionalString })).optional(),
+  admin_assignment_external: z.array(z.object({ description: optionalString })).optional(),
+  any_other: z.array(z.object({ description: optionalString })).optional(),
   // Ensure that certification evaluates properly from both strings and booleans
   certify: z.preprocess(
     (val) => val === 'true' || val === true,

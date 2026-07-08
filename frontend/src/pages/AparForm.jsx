@@ -2123,7 +2123,7 @@ export default function AparForm() {
                             </div>
 
                             <div id="apar-step-4" className={currentStep === 4 ? 'block' : 'hidden print:block'}>
-                                <PartIV formData={formData} addItem={addItem} removeItem={requestDelete} updateArrayField={updateArrayField} updateField={updateField} readOnly={isReadOnlyMode()} />
+                                <PartIV formData={formData} addItem={addItem} removeItem={requestDelete} updateArrayField={updateArrayField} updateArrayItem={updateArrayItem} updateField={updateField} readOnly={isReadOnlyMode()} />
                             </div>
 
                             {(activeRole === 'Reporting Officer' || activeRole === 'Reviewing Officer') && (
@@ -2163,7 +2163,7 @@ export default function AparForm() {
                                             </div>
                                             <div>
                                                 <h4 className="text-xl font-bold text-gray-900 border-b-2 border-indigo-200 pb-2 mb-6 mt-8">Part IV: Corporate Life</h4>
-                                                <PartIV formData={formData} addItem={() => {}} removeItem={() => {}} updateArrayField={() => {}} updateField={() => {}} readOnly={true} />
+                                                <PartIV formData={formData} addItem={() => {}} removeItem={() => {}} updateArrayField={() => {}} updateArrayItem={() => {}} updateField={() => {}} readOnly={true} />
                                             </div>
                                             {(activeRole === 'Reporting Officer' || activeRole === 'Reviewing Officer') && (
                                                 <div>
