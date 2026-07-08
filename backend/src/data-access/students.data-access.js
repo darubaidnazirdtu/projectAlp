@@ -62,9 +62,13 @@ const set = async (data, loggedInUser = null) => {
   }
 }
 
-const get = async () => {
+const get = async (level) => {
   try {
-    const students = await Student.find().sort({ name: 1 });
+    const query = {};
+    if (level) {
+      query.level = { $in: level.split(',') };
+    }
+    const students = await Student.find(query).sort({ name: 1 });
     return students.map(s => s.toObject());
   } catch (error) {
     throw error;
@@ -80,9 +84,13 @@ const getByStudentId = async (student_id) => {
   }
 }
 
-const getByDepartmentId = async (department_id) => {
+const getByDepartmentId = async (department_id, level) => {
   try {
-    const students = await Student.find({ department_id }).sort({ name: 1 });
+    const query = { department_id };
+    if (level) {
+      query.level = { $in: level.split(',') };
+    }
+    const students = await Student.find(query).sort({ name: 1 });
     return students.map(s => s.toObject());
   } catch (error) {
     throw error;

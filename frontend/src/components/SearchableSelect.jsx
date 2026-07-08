@@ -25,6 +25,13 @@ const entityConfig = {
     searchKeys: ['student_id', 'name', 'enrollment_no'],
     placeholder: 'Search students...',
   },
+  phd_student: {
+    service: () => Services.StudentService.getStudentDetails({ level: 'PHD,POST DOC' }),
+    valueKey: 'student_id',
+    labelKey: 'name',
+    searchKeys: ['student_id', 'name', 'enrollment_no'],
+    placeholder: 'Search PhD/PostDoc students...',
+  },
   course: {
     service: () => Services.CourseService.getCourses(),
     valueKey: 'course_id',

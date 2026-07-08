@@ -31,15 +31,16 @@ const enterData = asyncHandler(async (req, res) => {
 
 const getData = asyncHandler(async (req, res) => {
     const { role, departmentId } = req.user || {};
+    const { level } = req.query || {};
     let response;
 
     // Always fetch all students unless specifically restricted by role
     if (role === 'Department HOD' && departmentId) {
-        response = await getByDepartmentId(departmentId);
+        response = await getByDepartmentId(departmentId, level);
     } else {
         // Fallback for Admin, Faculty, or unauthenticated (if route allows) to see all students
         // This fixes the issue where dropdowns were empty if req.user wasn't fully set
-        response = await get();
+        response = await get(level);
     }
 
     res.status(200)

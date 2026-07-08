@@ -6,10 +6,11 @@ class StudentServices{
         this.api = new Api(import.meta.env.VITE_BASEURL)
     }
 
-    async getStudentDetails(){
+    async getStudentDetails(queryParams = {}){
         try {
-
-            const response = await this.api.get("/students/get")            
+            const query = new URLSearchParams(queryParams).toString();
+            const url = query ? `/students/get?${query}` : `/students/get`;
+            const response = await this.api.get(url)            
             return response
             
         } catch (error) {

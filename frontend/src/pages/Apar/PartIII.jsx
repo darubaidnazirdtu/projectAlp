@@ -310,7 +310,7 @@ export default function PartIII({ formData, academicYear, addItem, removeItem, u
 
                     { label: 'Supervisor ID', key: 'supervisor_id', type: 'entitySelect', entityType: 'faculty', required: true, defaultValue: currentFacultyId, disabled: true },
                     { label: 'Supervisor Name', key: 'supervisor_name', required: true, placeholder: 'Enter supervisor name' },
-                    { label: 'Student ID', key: 'student_id', type: 'entitySelect', entityType: 'student', required: true },
+                    { label: 'Student ID', key: 'student_id', type: 'entitySelect', entityType: 'phd_student', required: true },
                     { label: 'Student Name', key: 'student_name', required: true, placeholder: 'Enter student name' },
                     { label: 'Thesis Title', key: 'thesis_title', required: true, placeholder: 'Enter thesis title' },
                     { label: 'Thesis Type', key: 'thesis_type', type: 'select', options: ['Full-time', 'Part-time', 'Sponsored', 'Industry-linked', 'Other'], required: true, placeholder: 'Select type' },
