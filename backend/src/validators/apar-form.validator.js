@@ -677,10 +677,13 @@ const teachingSchema = z.object({
     name_of_course: optionalString,
     total_lectures_scheduled: optionalString,
     total_lectures_engaged: optionalString,
+    extra_lectures_engaged: optionalString,
     tutorials_scheduled: optionalString,
     tutorials_engaged: optionalString,
+    extra_tutorials_engaged: optionalString,
     labs_scheduled: optionalString,
     labs_engaged: optionalString,
+    extra_labs_engaged: optionalString,
     reasons_not_engaged: optionalString,
     degree_type: z.preprocess(nullToUndefined, z.union([z.enum(['UG', 'PG']), z.literal('')]).optional())
   })).optional(),

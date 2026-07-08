@@ -1,5 +1,5 @@
 // import React from 'react';
-// import { FiPlus, FiTrash2 } from 'react-icons/fi';
+// import { FiPlus, FiTrash2, FiEdit2 } from 'react-icons/fi';
 
 // export default function PartII({ formData, addItem, removeItem, updateArrayField, updateAssessment, updateField, readOnly }) {
 //     const desc = (formData && formData.teaching && formData.teaching.description_of_duties) || '';
@@ -296,7 +296,7 @@
 
 
 // import React from 'react';
-// import { FiPlus, FiTrash2 } from 'react-icons/fi';
+// import { FiPlus, FiTrash2, FiEdit2 } from 'react-icons/fi';
 
 // export default function PartII({ formData, addItem, removeItem, updateArrayField, updateAssessment, updateField, readOnly }) {
 //     // Safely extract teaching data to prevent crashes
@@ -629,7 +629,7 @@
 
 
 //import React from 'react';
-import { FiPlus, FiTrash2 } from 'react-icons/fi';
+import { FiPlus, FiTrash2, FiEdit2 } from 'react-icons/fi';
 import { toast } from 'sonner';
 import React, { useState } from 'react';
 
@@ -679,41 +679,35 @@ const hasEngagedLessThanScheduled = (course = {}) => courseEngagementLimits.some
     return Number.isFinite(scheduled) && Number.isFinite(engaged) && engaged < scheduled;
 });
 
-const getFirstCourseValidationIssue = (coursesTaught) => {
-    for (let idx = 0; idx < coursesTaught.length; idx += 1) {
-        const course = coursesTaught[idx] || {};
-        const missingField = requiredCourseFields.find(({ key }) => {
-            const value = key === 'degree_type' ? (course[key] || 'UG') : course[key];
-            return isBlankCourseValue(value);
-        });
-        if (missingField) {
-            return {
-                idx,
-                idPrefix: missingField.idPrefix,
-                message: `Please fill ${missingField.label} in Course ${idx + 1} before adding another course.`
-            };
-        }
+const validateSingleCourse = (course) => {
+    const missingField = requiredCourseFields.find(({ key }) => {
+        const value = key === 'degree_type' ? (course[key] || 'UG') : course[key];
+        return isBlankCourseValue(value);
+    });
+    if (missingField) {
+        return {
+            idPrefix: missingField.idPrefix,
+            message: `Please fill ${missingField.label}.`
+        };
+    }
 
-        const exceededLimit = courseEngagementLimits.find(({ scheduledKey, engagedKey }) => {
-            const scheduled = Number(course[scheduledKey]);
-            const engaged = Number(course[engagedKey]);
-            return Number.isFinite(scheduled) && Number.isFinite(engaged) && engaged > scheduled;
-        });
-        if (exceededLimit) {
-            return {
-                idx,
-                idPrefix: exceededLimit.idPrefix,
-                message: `${exceededLimit.engagedLabel} cannot exceed ${exceededLimit.scheduledLabel} in Course ${idx + 1}.`
-            };
-        }
+    const exceededLimit = courseEngagementLimits.find(({ scheduledKey, engagedKey }) => {
+        const scheduled = Number(course[scheduledKey]);
+        const engaged = Number(course[engagedKey]);
+        return Number.isFinite(scheduled) && Number.isFinite(engaged) && engaged > scheduled;
+    });
+    if (exceededLimit) {
+        return {
+            idPrefix: exceededLimit.idPrefix,
+            message: `${exceededLimit.engagedLabel} cannot exceed ${exceededLimit.scheduledLabel}.`
+        };
+    }
 
-        if (hasEngagedLessThanScheduled(course) && isBlankCourseValue(course.reasons_not_engaged)) {
-            return {
-                idx,
-                idPrefix: 'reasons',
-                message: `Please fill reasons for not engaging all scheduled classes in Course ${idx + 1}.`
-            };
-        }
+    if (hasEngagedLessThanScheduled(course) && isBlankCourseValue(course.reasons_not_engaged)) {
+        return {
+            idPrefix: 'reasons',
+            message: `Please fill reasons for not engaging all scheduled classes.`
+        };
     }
     return null;
 };
@@ -731,6 +725,8 @@ export default function PartII({ formData, addItem, removeItem, updateArrayField
     const tutorialsTests = teachingData?.tutorials_tests || { ug_odd: {}, ug_even: {}, pg_odd: {}, pg_even: {} };
 
     const [errors, setErrors] = useState({});
+    const [editingCourseIndex, setEditingCourseIndex] = useState(null); // null: table, -1: new, >= 0: edit
+    const [tempCourse, setTempCourse] = useState(null);
 
     const validateURLField = (value, label) => {
         if (!value?.trim()) return '';
@@ -790,11 +786,21 @@ export default function PartII({ formData, addItem, removeItem, updateArrayField
 
         return Object.keys(newErrors).length === 0;
     };
-    const handleAddCourse = () => {
-        const issue = getFirstCourseValidationIssue(coursesTaught);
+    const handleStartAddCourse = () => {
+        setEditingCourseIndex(-1);
+        setTempCourse({ name_of_course: '', total_lectures_scheduled: '', total_lectures_engaged: '', extra_lectures_engaged: '', tutorials_scheduled: '', tutorials_engaged: '', extra_tutorials_engaged: '', labs_scheduled: '', labs_engaged: '', extra_labs_engaged: '', reasons_not_engaged: '', degree_type: 'UG' });
+    };
+
+    const handleStartEditCourse = (idx) => {
+        setEditingCourseIndex(idx);
+        setTempCourse({ ...coursesTaught[idx] });
+    };
+
+    const handleSaveCourse = () => {
+        const issue = validateSingleCourse(tempCourse);
         if (issue) {
             toast.error(issue.message);
-            const field = document.getElementById(`${issue.idPrefix}-${issue.idx}`);
+            const field = document.getElementById(`${issue.idPrefix}-temp`);
             if (field) {
                 field.focus();
                 if (typeof field.reportValidity === 'function') field.reportValidity();
@@ -802,13 +808,22 @@ export default function PartII({ formData, addItem, removeItem, updateArrayField
             return;
         }
 
-        addItem('teaching', 'courses_taught', { name_of_course: '', total_lectures_scheduled: '', total_lectures_engaged: '', tutorials_scheduled: '', tutorials_engaged: '', labs_scheduled: '', labs_engaged: '', reasons_not_engaged: '', degree_type: 'UG' });
+        if (editingCourseIndex === -1) {
+            addItem('teaching', 'courses_taught', tempCourse);
+        } else {
+            const newArray = [...coursesTaught];
+            newArray[editingCourseIndex] = tempCourse;
+            updateField('teaching', 'courses_taught', newArray);
+        }
+        
+        setEditingCourseIndex(null);
+        setTempCourse(null);
     };
 
-    const handleEngagedBlur = (idx, limit) => {
-        const course = coursesTaught[idx] || {};
-        const scheduledValue = course[limit.scheduledKey];
-        const engagedValue = course[limit.engagedKey];
+    const handleEngagedBlurTemp = (limit) => {
+        if (!tempCourse) return;
+        const scheduledValue = tempCourse[limit.scheduledKey];
+        const engagedValue = tempCourse[limit.engagedKey];
 
         if (isBlankCourseValue(scheduledValue) || isBlankCourseValue(engagedValue)) return;
 
@@ -817,11 +832,11 @@ export default function PartII({ formData, addItem, removeItem, updateArrayField
 
         if (!Number.isFinite(scheduled) || !Number.isFinite(engaged) || engaged <= scheduled) return;
 
-        toast.error(`${limit.engagedLabel} cannot exceed ${limit.scheduledLabel} in Course ${idx + 1}.`);
-        updateArrayField('teaching', 'courses_taught', idx, limit.engagedKey, '');
+        toast.error(`${limit.engagedLabel} cannot exceed ${limit.scheduledLabel}.`);
+        setTempCourse(prev => ({ ...prev, [limit.engagedKey]: '' }));
 
         window.setTimeout(() => {
-            const field = document.getElementById(`${limit.idPrefix}-${idx}`);
+            const field = document.getElementById(`${limit.idPrefix}-temp`);
             if (field) field.focus();
         }, 0);
     };
@@ -1008,67 +1023,121 @@ export default function PartII({ formData, addItem, removeItem, updateArrayField
                 <div>
                     <h4 className="text-md font-semibold text-gray-800 mb-2">i) Courses taught at various levels</h4>
                     <div className="space-y-4">
-                        {coursesTaught.map((course, idx) => {
-                            const showReasons = hasEngagedLessThanScheduled(course);
-
-                            return (
-                                <div key={idx} className="bg-gray-50 border border-gray-200 rounded-lg p-6">
-                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-3">
-                                        <div>
-                                            <label htmlFor={`course-name-${idx}`} className="block text-sm font-medium text-gray-700 mb-1">Name of the course <span className="text-red-500">*</span></label>
-                                            <input id={`course-name-${idx}`} type="text" required disabled={readOnly} value={course.name_of_course || ''} onChange={(e) => updateArrayField('teaching', 'courses_taught', idx, 'name_of_course', e.target.value)} className="w-full border border-gray-300 rounded-lg shadow-sm focus:ring-indigo-500 focus:border-indigo-500 px-4 py-2.5 disabled:bg-gray-100 disabled:text-gray-500 transition-colors" />
-                                        </div>
-                                        <div>
-                                            <label htmlFor={`degree-type-${idx}`} className="block text-sm font-medium text-gray-700 mb-1">Degree type of course <span className="text-red-500">*</span></label>
-                                            <select id={`degree-type-${idx}`} required disabled={readOnly} value={course.degree_type || 'UG'} onChange={(e) => updateArrayField('teaching', 'courses_taught', idx, 'degree_type', e.target.value)} className="w-full border border-gray-300 rounded-lg shadow-sm focus:ring-indigo-500 focus:border-indigo-500 px-4 py-2.5 disabled:bg-gray-100 disabled:text-gray-500 transition-colors">
-                                                <option>UG</option>
-                                                <option>PG</option>
-                                            </select>
-                                        </div>
-                                        <div>
-                                            <label htmlFor={`lectures-sch-${idx}`} className="block text-sm font-medium text-gray-700 mb-1">Total lectures Scheduled <span className="text-red-500">*</span></label>
-                                            <input id={`lectures-sch-${idx}`} type="number" min="0" required disabled={readOnly} value={course.total_lectures_scheduled || ''} onChange={(e) => updateArrayField('teaching', 'courses_taught', idx, 'total_lectures_scheduled', e.target.value)} className="w-full border border-gray-300 rounded-lg shadow-sm focus:ring-indigo-500 focus:border-indigo-500 px-4 py-2.5 disabled:bg-gray-100 disabled:text-gray-500 transition-colors" />
-                                        </div>
-                                        <div>
-                                            <label htmlFor={`lectures-eng-${idx}`} className="block text-sm font-medium text-gray-700 mb-1">Total lectures engaged <span className="text-red-500">*</span></label>
-                                            <input id={`lectures-eng-${idx}`} type="number" min="0" max={course.total_lectures_scheduled || ''} required disabled={readOnly} value={course.total_lectures_engaged || ''} onChange={(e) => updateArrayField('teaching', 'courses_taught', idx, 'total_lectures_engaged', e.target.value)} onBlur={() => handleEngagedBlur(idx, courseEngagementLimits[0])} className="w-full border border-gray-300 rounded-lg shadow-sm focus:ring-indigo-500 focus:border-indigo-500 px-4 py-2.5 disabled:bg-gray-100 disabled:text-gray-500 transition-colors" />
-                                        </div>
-                                        <div>
-                                            <label htmlFor={`tut-sch-${idx}`} className="block text-sm font-medium text-gray-700 mb-1">Tutorials Scheduled <span className="text-red-500">*</span></label>
-                                            <input id={`tut-sch-${idx}`} type="number" min="0" required disabled={readOnly} value={course.tutorials_scheduled || ''} onChange={(e) => updateArrayField('teaching', 'courses_taught', idx, 'tutorials_scheduled', e.target.value)} className="w-full border border-gray-300 rounded-lg shadow-sm focus:ring-indigo-500 focus:border-indigo-500 px-4 py-2.5 disabled:bg-gray-100 disabled:text-gray-500 transition-colors" />
-                                        </div>
-                                        <div>
-                                            <label htmlFor={`tut-eng-${idx}`} className="block text-sm font-medium text-gray-700 mb-1">Tutorials engaged <span className="text-red-500">*</span></label>
-                                            <input id={`tut-eng-${idx}`} type="number" min="0" max={course.tutorials_scheduled || ''} required disabled={readOnly} value={course.tutorials_engaged || ''} onChange={(e) => updateArrayField('teaching', 'courses_taught', idx, 'tutorials_engaged', e.target.value)} onBlur={() => handleEngagedBlur(idx, courseEngagementLimits[1])} className="w-full border border-gray-300 rounded-lg shadow-sm focus:ring-indigo-500 focus:border-indigo-500 px-4 py-2.5 disabled:bg-gray-100 disabled:text-gray-500 transition-colors" />
-                                        </div>
-                                        <div>
-                                            <label htmlFor={`labs-sch-${idx}`} className="block text-sm font-medium text-gray-700 mb-1">Labs Scheduled <span className="text-red-500">*</span></label>
-                                            <input id={`labs-sch-${idx}`} type="number" min="0" required disabled={readOnly} value={course.labs_scheduled || ''} onChange={(e) => updateArrayField('teaching', 'courses_taught', idx, 'labs_scheduled', e.target.value)} className="w-full border border-gray-300 rounded-lg shadow-sm focus:ring-indigo-500 focus:border-indigo-500 px-4 py-2.5 disabled:bg-gray-100 disabled:text-gray-500 transition-colors" />
-                                        </div>
-                                        <div>
-                                            <label htmlFor={`labs-eng-${idx}`} className="block text-sm font-medium text-gray-700 mb-1">Labs engaged <span className="text-red-500">*</span></label>
-                                            <input id={`labs-eng-${idx}`} type="number" min="0" max={course.labs_scheduled || ''} required disabled={readOnly} value={course.labs_engaged || ''} onChange={(e) => updateArrayField('teaching', 'courses_taught', idx, 'labs_engaged', e.target.value)} onBlur={() => handleEngagedBlur(idx, courseEngagementLimits[2])} className="w-full border border-gray-300 rounded-lg shadow-sm focus:ring-indigo-500 focus:border-indigo-500 px-4 py-2.5 disabled:bg-gray-100 disabled:text-gray-500 transition-colors" />
-                                        </div>
+                        {editingCourseIndex === null ? (
+                            <div className="bg-white border border-gray-200 rounded-lg overflow-hidden">
+                                <div className="overflow-x-auto">
+                                    <table className="w-full text-sm text-left">
+                                        <thead className="bg-gray-50 text-gray-700">
+                                            <tr>
+                                                <th className="px-4 py-3 border-b">Course Name</th>
+                                                <th className="px-4 py-3 border-b">Type</th>
+                                                <th className="px-4 py-3 border-b text-center">Lectures (Sch/Eng/Ext)</th>
+                                                <th className="px-4 py-3 border-b text-center">Tutorials (Sch/Eng/Ext)</th>
+                                                <th className="px-4 py-3 border-b text-center">Labs (Sch/Eng/Ext)</th>
+                                                {!readOnly && <th className="px-4 py-3 border-b text-right">Actions</th>}
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            {coursesTaught.length === 0 ? (
+                                                <tr>
+                                                    <td colSpan={!readOnly ? 6 : 5} className="px-4 py-8 text-center text-gray-500">
+                                                        No courses added yet.
+                                                    </td>
+                                                </tr>
+                                            ) : (
+                                                coursesTaught.map((course, idx) => (
+                                                    <tr key={idx} className="border-b hover:bg-gray-50 transition-colors">
+                                                        <td className="px-4 py-3 font-medium text-gray-900">{course.name_of_course || '-'}</td>
+                                                        <td className="px-4 py-3">{course.degree_type || 'UG'}</td>
+                                                        <td className="px-4 py-3 text-center">{course.total_lectures_scheduled || 0} / {course.total_lectures_engaged || 0} / {course.extra_lectures_engaged || 0}</td>
+                                                        <td className="px-4 py-3 text-center">{course.tutorials_scheduled || 0} / {course.tutorials_engaged || 0} / {course.extra_tutorials_engaged || 0}</td>
+                                                        <td className="px-4 py-3 text-center">{course.labs_scheduled || 0} / {course.labs_engaged || 0} / {course.extra_labs_engaged || 0}</td>
+                                                        {!readOnly && (
+                                                            <td className="px-4 py-3 text-right">
+                                                                <button type="button" onClick={() => handleStartEditCourse(idx)} className="text-blue-600 hover:text-blue-800 p-1 mr-2" title="Edit"><FiEdit2 /></button>
+                                                                <button type="button" onClick={() => removeItem('teaching', 'courses_taught', idx)} className="text-red-600 hover:text-red-800 p-1" title="Delete"><FiTrash2 /></button>
+                                                            </td>
+                                                        )}
+                                                    </tr>
+                                                ))
+                                            )}
+                                        </tbody>
+                                    </table>
+                                </div>
+                                {!readOnly && (
+                                    <div className="p-4 bg-gray-50 border-t">
+                                        <button type="button" onClick={handleStartAddCourse} className="bg-indigo-600 text-white rounded-lg px-4 py-2 hover:bg-indigo-700 shadow-sm transition-colors flex items-center font-medium text-sm">
+                                            <FiPlus className="mr-1.5" /> Add Course
+                                        </button>
+                                    </div>
+                                )}
+                            </div>
+                        ) : (
+                            <div className="bg-indigo-50/30 border border-indigo-100 rounded-lg p-6">
+                                <h5 className="font-semibold text-indigo-900 mb-4">{editingCourseIndex === -1 ? 'Add New Course' : 'Edit Course'}</h5>
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-3">
+                                    <div>
+                                        <label htmlFor="course-name-temp" className="block text-sm font-medium text-gray-700 mb-1">Name of the course <span className="text-red-500">*</span></label>
+                                        <input id="course-name-temp" type="text" required disabled={readOnly} value={tempCourse.name_of_course || ''} onChange={(e) => setTempCourse(prev => ({ ...prev, name_of_course: e.target.value }))} className="w-full border border-gray-300 rounded-lg shadow-sm focus:ring-indigo-500 focus:border-indigo-500 px-4 py-2.5 bg-white" />
+                                    </div>
+                                    <div>
+                                        <label htmlFor="degree-type-temp" className="block text-sm font-medium text-gray-700 mb-1">Degree type of course <span className="text-red-500">*</span></label>
+                                        <select id="degree-type-temp" required disabled={readOnly} value={tempCourse.degree_type || 'UG'} onChange={(e) => setTempCourse(prev => ({ ...prev, degree_type: e.target.value }))} className="w-full border border-gray-300 rounded-lg shadow-sm focus:ring-indigo-500 focus:border-indigo-500 px-4 py-2.5 bg-white">
+                                            <option>UG</option>
+                                            <option>PG</option>
+                                        </select>
+                                    </div>
+                                    <div>
+                                        <label htmlFor="lectures-sch-temp" className="block text-sm font-medium text-gray-700 mb-1">Total lectures Scheduled <span className="text-red-500">*</span></label>
+                                        <input id="lectures-sch-temp" type="number" min="0" required disabled={readOnly} value={tempCourse.total_lectures_scheduled || ''} onChange={(e) => setTempCourse(prev => ({ ...prev, total_lectures_scheduled: e.target.value, extra_lectures_engaged: (Number(e.target.value) === Number(prev.total_lectures_engaged) ? prev.extra_lectures_engaged : '') }))} className="w-full border border-gray-300 rounded-lg shadow-sm focus:ring-indigo-500 focus:border-indigo-500 px-4 py-2.5 bg-white" />
+                                    </div>
+                                    <div>
+                                        <label htmlFor="lectures-eng-temp" className="block text-sm font-medium text-gray-700 mb-1">Total lectures engaged <span className="text-red-500">*</span></label>
+                                        <input id="lectures-eng-temp" type="number" min="0" max={tempCourse.total_lectures_scheduled || ''} required disabled={readOnly} value={tempCourse.total_lectures_engaged || ''} onChange={(e) => setTempCourse(prev => ({ ...prev, total_lectures_engaged: e.target.value, extra_lectures_engaged: (Number(e.target.value) === Number(prev.total_lectures_scheduled) ? prev.extra_lectures_engaged : '') }))} onBlur={() => handleEngagedBlurTemp(courseEngagementLimits[0])} className="w-full border border-gray-300 rounded-lg shadow-sm focus:ring-indigo-500 focus:border-indigo-500 px-4 py-2.5 bg-white" />
+                                    </div>
+                                    <div>
+                                        <label htmlFor="extra-lectures-eng-temp" className="block text-sm font-medium text-gray-700 mb-1">Extra lectures engaged (Optional)</label>
+                                        <input id="extra-lectures-eng-temp" type="number" min="0" disabled={readOnly || !tempCourse.total_lectures_scheduled || !tempCourse.total_lectures_engaged || Number(tempCourse.total_lectures_scheduled) !== Number(tempCourse.total_lectures_engaged)} value={tempCourse.extra_lectures_engaged || ''} onChange={(e) => setTempCourse(prev => ({ ...prev, extra_lectures_engaged: e.target.value }))} className="w-full border border-gray-300 rounded-lg shadow-sm focus:ring-indigo-500 focus:border-indigo-500 px-4 py-2.5 bg-white disabled:bg-gray-100 disabled:text-gray-500" />
                                     </div>
                                     
-                                    {showReasons && (
-                                        <div className="mb-3 p-3 bg-red-50 border border-red-100 rounded-lg">
-                                            <label htmlFor={`reasons-${idx}`} className="block text-sm font-medium text-red-800 mb-1">Reasons for not engaging all scheduled classes<span className="text-red-500">*</span></label>
-                                            <textarea id={`reasons-${idx}`} rows="2" required disabled={readOnly} value={course.reasons_not_engaged || ''} onChange={(e) => updateArrayField('teaching', 'courses_taught', idx, 'reasons_not_engaged', e.target.value)} className="w-full border border-red-300 rounded-lg shadow-sm focus:ring-red-500 focus:border-red-500 p-3 disabled:bg-gray-100 disabled:text-gray-500 transition-colors"></textarea>
-                                        </div>
-                                    )}
+                                    <div>
+                                        <label htmlFor="tut-sch-temp" className="block text-sm font-medium text-gray-700 mb-1">Tutorials Scheduled <span className="text-red-500">*</span></label>
+                                        <input id="tut-sch-temp" type="number" min="0" required disabled={readOnly} value={tempCourse.tutorials_scheduled || ''} onChange={(e) => setTempCourse(prev => ({ ...prev, tutorials_scheduled: e.target.value, extra_tutorials_engaged: (Number(e.target.value) === Number(prev.tutorials_engaged) ? prev.extra_tutorials_engaged : '') }))} className="w-full border border-gray-300 rounded-lg shadow-sm focus:ring-indigo-500 focus:border-indigo-500 px-4 py-2.5 bg-white" />
+                                    </div>
+                                    <div>
+                                        <label htmlFor="tut-eng-temp" className="block text-sm font-medium text-gray-700 mb-1">Tutorials engaged <span className="text-red-500">*</span></label>
+                                        <input id="tut-eng-temp" type="number" min="0" max={tempCourse.tutorials_scheduled || ''} required disabled={readOnly} value={tempCourse.tutorials_engaged || ''} onChange={(e) => setTempCourse(prev => ({ ...prev, tutorials_engaged: e.target.value, extra_tutorials_engaged: (Number(e.target.value) === Number(prev.tutorials_scheduled) ? prev.extra_tutorials_engaged : '') }))} onBlur={() => handleEngagedBlurTemp(courseEngagementLimits[1])} className="w-full border border-gray-300 rounded-lg shadow-sm focus:ring-indigo-500 focus:border-indigo-500 px-4 py-2.5 bg-white" />
+                                    </div>
+                                    <div>
+                                        <label htmlFor="extra-tut-eng-temp" className="block text-sm font-medium text-gray-700 mb-1">Extra tutorials engaged (Optional)</label>
+                                        <input id="extra-tut-eng-temp" type="number" min="0" disabled={readOnly || !tempCourse.tutorials_scheduled || !tempCourse.tutorials_engaged || Number(tempCourse.tutorials_scheduled) !== Number(tempCourse.tutorials_engaged)} value={tempCourse.extra_tutorials_engaged || ''} onChange={(e) => setTempCourse(prev => ({ ...prev, extra_tutorials_engaged: e.target.value }))} className="w-full border border-gray-300 rounded-lg shadow-sm focus:ring-indigo-500 focus:border-indigo-500 px-4 py-2.5 bg-white disabled:bg-gray-100 disabled:text-gray-500" />
+                                    </div>
 
-                                    {!readOnly && (
-                                        <div className="flex justify-end">
-                                            <button type="button" onClick={() => removeItem('teaching', 'courses_taught', idx)} className="text-red-600 hover:text-red-800 font-medium text-sm flex items-center"><FiTrash2 className="mr-1"/> Remove Course</button>
-                                        </div>
-                                    )}
+                                    <div>
+                                        <label htmlFor="labs-sch-temp" className="block text-sm font-medium text-gray-700 mb-1">Labs Scheduled <span className="text-red-500">*</span></label>
+                                        <input id="labs-sch-temp" type="number" min="0" required disabled={readOnly} value={tempCourse.labs_scheduled || ''} onChange={(e) => setTempCourse(prev => ({ ...prev, labs_scheduled: e.target.value, extra_labs_engaged: (Number(e.target.value) === Number(prev.labs_engaged) ? prev.extra_labs_engaged : '') }))} className="w-full border border-gray-300 rounded-lg shadow-sm focus:ring-indigo-500 focus:border-indigo-500 px-4 py-2.5 bg-white" />
+                                    </div>
+                                    <div>
+                                        <label htmlFor="labs-eng-temp" className="block text-sm font-medium text-gray-700 mb-1">Labs engaged <span className="text-red-500">*</span></label>
+                                        <input id="labs-eng-temp" type="number" min="0" max={tempCourse.labs_scheduled || ''} required disabled={readOnly} value={tempCourse.labs_engaged || ''} onChange={(e) => setTempCourse(prev => ({ ...prev, labs_engaged: e.target.value, extra_labs_engaged: (Number(e.target.value) === Number(prev.labs_scheduled) ? prev.extra_labs_engaged : '') }))} onBlur={() => handleEngagedBlurTemp(courseEngagementLimits[2])} className="w-full border border-gray-300 rounded-lg shadow-sm focus:ring-indigo-500 focus:border-indigo-500 px-4 py-2.5 bg-white" />
+                                    </div>
+                                    <div>
+                                        <label htmlFor="extra-labs-eng-temp" className="block text-sm font-medium text-gray-700 mb-1">Extra labs engaged (Optional)</label>
+                                        <input id="extra-labs-eng-temp" type="number" min="0" disabled={readOnly || !tempCourse.labs_scheduled || !tempCourse.labs_engaged || Number(tempCourse.labs_scheduled) !== Number(tempCourse.labs_engaged)} value={tempCourse.extra_labs_engaged || ''} onChange={(e) => setTempCourse(prev => ({ ...prev, extra_labs_engaged: e.target.value }))} className="w-full border border-gray-300 rounded-lg shadow-sm focus:ring-indigo-500 focus:border-indigo-500 px-4 py-2.5 bg-white disabled:bg-gray-100 disabled:text-gray-500" />
+                                    </div>
                                 </div>
-                            );
-                        })}
-                        {!readOnly && (
-                            <div className="pt-2">
-                                <button type="button" onClick={handleAddCourse} className="w-full md:w-auto bg-indigo-600 text-white rounded-lg px-6 py-2.5 hover:bg-indigo-700 shadow-sm transition-colors flex items-center justify-center font-medium"><FiPlus className="mr-2" /> Add Course</button>
+                                
+                                {hasEngagedLessThanScheduled(tempCourse) && (
+                                    <div className="mb-4 p-3 bg-red-50 border border-red-100 rounded-lg">
+                                        <label htmlFor="reasons-temp" className="block text-sm font-medium text-red-800 mb-1">Reasons for not engaging all scheduled classes<span className="text-red-500">*</span></label>
+                                        <textarea id="reasons-temp" rows="2" required disabled={readOnly} value={tempCourse.reasons_not_engaged || ''} onChange={(e) => setTempCourse(prev => ({ ...prev, reasons_not_engaged: e.target.value }))} className="w-full border border-red-300 rounded-lg shadow-sm focus:ring-red-500 focus:border-red-500 p-3 bg-white"></textarea>
+                                    </div>
+                                )}
+
+                                <div className="flex justify-end space-x-3 mt-4">
+                                    <button type="button" onClick={() => { setEditingCourseIndex(null); setTempCourse(null); }} className="px-4 py-2 text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-lg font-medium transition-colors">Cancel</button>
+                                    <button type="button" onClick={handleSaveCourse} className="px-4 py-2 bg-indigo-600 text-white hover:bg-indigo-700 rounded-lg font-medium transition-colors shadow-sm">Save Course</button>
+                                </div>
                             </div>
                         )}
                     </div>

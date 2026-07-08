@@ -61,10 +61,13 @@ const AparFormSchema = new mongoose.Schema({
             name_of_course: String,
             total_lectures_scheduled: String,
             total_lectures_engaged: String,
+            extra_lectures_engaged: String,
             tutorials_scheduled: String,
             tutorials_engaged: String,
+            extra_tutorials_engaged: String,
             labs_scheduled: String,
             labs_engaged: String,
+            extra_labs_engaged: String,
             reasons_not_engaged: String,
             degree_type: String
         }],
