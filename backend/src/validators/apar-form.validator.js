@@ -78,6 +78,7 @@
 //   description_of_duties_admin: optionalString,
 //   courses_taught: z.array(z.object({
 //     name_of_course: optionalString,
+//     course_code: optionalString,
 //     total_lectures_scheduled: optionalString,
 //     total_lectures_engaged: optionalString,
 //     tutorials_scheduled: optionalString,
@@ -357,7 +358,8 @@
 //     academic_year: optionalString,
 //     department_id: optionalString
 //   })).optional(),
-//   summer_institutes: optionalString,
+//   summer_institutes_attended: optionalString,
+//   summer_institutes_organized: optionalString,
 //   ug_pg_guidance: optionalString,
 //   phd_guidance_text: optionalString,
 //   research_guidance: optionalString,
@@ -677,6 +679,7 @@ const teachingSchema = z.object({
   description_of_duties_admin: optionalString,
   courses_taught: z.array(z.object({
     name_of_course: optionalString,
+    course_code: optionalString,
     total_lectures_scheduled: optionalString,
     total_lectures_engaged: optionalString,
     extra_lectures_engaged: optionalString,
@@ -959,7 +962,8 @@ const researchSchema = z.object({
     academic_year: optionalString,
     department_id: optionalString
   })).optional(),
-  summer_institutes: optionalString,
+  summer_institutes_attended: optionalString,
+  summer_institutes_organized: optionalString,
   ug_pg_guidance: optionalString,
   phd_guidance_text: optionalString,
   research_guidance: optionalString,
@@ -975,7 +979,9 @@ const corporateSchema = z.object({
   lab_development: optionalString,
   cultural_activities: optionalString,
   sports_community: optionalString,
-  admin_assignment: optionalString,
+  admin_assignment_university: optionalString,
+  admin_assignment_department: optionalString,
+  admin_assignment_external: optionalString,
   any_other: optionalString,
   // Ensure that certification evaluates properly from both strings and booleans
   certify: z.preprocess(

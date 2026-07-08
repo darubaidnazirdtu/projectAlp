@@ -63,6 +63,7 @@ const AparFormSchema = new mongoose.Schema({
         description_of_duties_admin: String,
         courses_taught: [{
             name_of_course: String,
+            course_code: String,
             total_lectures_scheduled: String,
             total_lectures_engaged: String,
             extra_lectures_engaged: String,
@@ -380,7 +381,8 @@ const AparFormSchema = new mongoose.Schema({
         memberships: [],
 
         // Text fields
-        summer_institutes: String,
+        summer_institutes_attended: String,
+        summer_institutes_organized: String,
         ug_pg_guidance: String,
         phd_guidance_text: String,
         research_guidance: String,
@@ -397,7 +399,9 @@ const AparFormSchema = new mongoose.Schema({
         lab_development: String,
         cultural_activities: String,
         sports_community: String,
-        admin_assignment: String,
+        admin_assignment_university: String,
+        admin_assignment_department: String,
+        admin_assignment_external: String,
         any_other: String,
         certify: String, // Boolean/Checkbox often sends "true"/"on"/undefined, but making String is safer for draft
 

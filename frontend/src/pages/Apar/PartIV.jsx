@@ -375,19 +375,51 @@ export default function PartIV({ formData, updateField, readOnly }) {
                         />
                     </div>
 
-                    {/* 3(c) */}
+                    {/* 3(c) - University */}
                     <div className="flex flex-col gap-2">
-                        <label htmlFor="admin" className="text-sm font-semibold text-gray-700">
-                            3) c) Administrative Assignment
+                        <label htmlFor="admin-uni" className="text-sm font-semibold text-gray-700">
+                            3) c) i) Administrative Assignment (University Level)
                         </label>
                         <textarea 
-                            id="admin" 
-                            rows="3" 
+                            id="admin-uni" 
+                            rows="2" 
                             disabled={readOnly} 
-                            value={corporate.admin_assignment || ''} 
-                            onChange={(e) => updateField('corporate', 'admin_assignment', e.target.value)} 
+                            value={corporate.admin_assignment_university || ''} 
+                            onChange={(e) => updateField('corporate', 'admin_assignment_university', e.target.value)} 
                             className="w-full border-gray-300 rounded-lg shadow-sm focus:ring-indigo-500 focus:border-indigo-500 px-4 py-2.5 disabled:bg-gray-200 disabled:text-gray-500 disabled:cursor-not-allowed transition-colors" 
-                            placeholder="e.g., Head of Department, Warden, Committee Chair..."
+                            placeholder="e.g., Dean, Committee Chair..."
+                        />
+                    </div>
+
+                    {/* 3(c) - Department */}
+                    <div className="flex flex-col gap-2">
+                        <label htmlFor="admin-dept" className="text-sm font-semibold text-gray-700">
+                            3) c) ii) Administrative Assignment (Department Level)
+                        </label>
+                        <textarea 
+                            id="admin-dept" 
+                            rows="2" 
+                            disabled={readOnly} 
+                            value={corporate.admin_assignment_department || ''} 
+                            onChange={(e) => updateField('corporate', 'admin_assignment_department', e.target.value)} 
+                            className="w-full border-gray-300 rounded-lg shadow-sm focus:ring-indigo-500 focus:border-indigo-500 px-4 py-2.5 disabled:bg-gray-200 disabled:text-gray-500 disabled:cursor-not-allowed transition-colors" 
+                            placeholder="e.g., Head of Department, Coordinator..."
+                        />
+                    </div>
+
+                    {/* 3(c) - External */}
+                    <div className="flex flex-col gap-2">
+                        <label htmlFor="admin-ext" className="text-sm font-semibold text-gray-700">
+                            3) c) iii) Administrative Assignment (External)
+                        </label>
+                        <textarea 
+                            id="admin-ext" 
+                            rows="2" 
+                            disabled={readOnly} 
+                            value={corporate.admin_assignment_external || ''} 
+                            onChange={(e) => updateField('corporate', 'admin_assignment_external', e.target.value)} 
+                            className="w-full border-gray-300 rounded-lg shadow-sm focus:ring-indigo-500 focus:border-indigo-500 px-4 py-2.5 disabled:bg-gray-200 disabled:text-gray-500 disabled:cursor-not-allowed transition-colors" 
+                            placeholder="e.g., External Examiner, Board Member..."
                         />
                     </div>
 

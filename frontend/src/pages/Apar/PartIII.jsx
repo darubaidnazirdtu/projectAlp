@@ -24,7 +24,7 @@ export default function PartIII({ formData, academicYear, addItem, removeItem, u
     // Build a map of { value: course_id (or name if no id), label: course_name }
     const coursePairs = draftCourses
         .map(c => {
-            const value = String((c?.course_id ?? c?.name_of_course ?? '') || '').trim();
+            const value = String((c?.course_code ?? c?.course_id ?? c?.name_of_course ?? '') || '').trim();
             if (!value) return null;
             const label = String((c?.name_of_course ?? c?.course_name ?? value) || '').trim();
             return { value, label };
@@ -558,8 +558,17 @@ export default function PartIII({ formData, academicYear, addItem, removeItem, u
             {/* 3.. Textareas */}
             < div className="space-y-6 pt-6 border-t border-gray-100" >
                 <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">3) Summer institutes, refresher or orientation courses attended or conducted.</label>
-                    <textarea rows="3" disabled={readOnly} className="w-full border-gray-300 rounded-lg shadow-sm focus:ring-indigo-500 focus:border-indigo-500 p-4 disabled:bg-gray-50 disabled:text-gray-500 transition-colors" value={(formData.research && formData.research.summer_institutes) || ''} onChange={(e) => updateField('research', 'summer_institutes', e.target.value)}></textarea>
+                    <label className="block text-md font-semibold text-gray-800 mb-2">3) Summer institutes, refresher or orientation courses</label>
+                    <div className="space-y-4">
+                        <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-1">a) Attended</label>
+                            <textarea rows="3" disabled={readOnly} className="w-full border-gray-300 rounded-lg shadow-sm focus:ring-indigo-500 focus:border-indigo-500 p-4 disabled:bg-gray-50 disabled:text-gray-500 transition-colors" value={(formData.research && formData.research.summer_institutes_attended) || ''} onChange={(e) => updateField('research', 'summer_institutes_attended', e.target.value)}></textarea>
+                        </div>
+                        <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-1">b) Organized / Conducted</label>
+                            <textarea rows="3" disabled={readOnly} className="w-full border-gray-300 rounded-lg shadow-sm focus:ring-indigo-500 focus:border-indigo-500 p-4 disabled:bg-gray-50 disabled:text-gray-500 transition-colors" value={(formData.research && formData.research.summer_institutes_organized) || ''} onChange={(e) => updateField('research', 'summer_institutes_organized', e.target.value)}></textarea>
+                        </div>
+                    </div>
                 </div>
                 <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">4) Details of Guidance for: i) U.G. and P.G. Project Guidance</label>

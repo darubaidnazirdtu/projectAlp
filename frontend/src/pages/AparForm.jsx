@@ -46,6 +46,7 @@ const sectionLabels = {
 
 const requiredCourseFields = [
     { key: 'name_of_course', label: 'Name of the course', idPrefix: 'course-name' },
+    { key: 'course_code', label: 'Course Code', idPrefix: 'course-code' },
     { key: 'degree_type', label: 'Degree type of course', idPrefix: 'degree-type' },
     { key: 'total_lectures_scheduled', label: 'Total lectures Scheduled', idPrefix: 'lectures-sch' },
     { key: 'total_lectures_engaged', label: 'Total lectures engaged', idPrefix: 'lectures-eng' },
@@ -805,7 +806,7 @@ export default function AparForm() {
             description_of_duties_department: '',
             description_of_duties_admin: '',
             courses_taught: [
-                { name_of_course: '', total_lectures_scheduled: '', total_lectures_engaged: '', tutorials_scheduled: '', tutorials_engaged: '', labs_scheduled: '', labs_engaged: '', reasons_not_engaged: '', degree_type: 'UG' }
+                { name_of_course: '', course_code: '', total_lectures_scheduled: '', total_lectures_engaged: '', tutorials_scheduled: '', tutorials_engaged: '', labs_scheduled: '', labs_engaged: '', reasons_not_engaged: '', degree_type: 'UG' }
             ],
             time_table: {
                 provided: { odd_semester: '', even_semester: '' },
@@ -842,7 +843,8 @@ export default function AparForm() {
             collaborations: [],
             faculty_visits: [],
             memberships: [],
-            summer_institutes: '',
+            summer_institutes_attended: '',
+            summer_institutes_organized: '',
             ug_pg_guidance: '',
             phd_guidance_text: 'See PhD Supervision table above', 
             research_guidance: '',
@@ -856,7 +858,9 @@ export default function AparForm() {
             lab_development: '',
             cultural_activities: '',
             sports_community: '',
-            admin_assignment: '',
+            admin_assignment_university: '',
+            admin_assignment_department: '',
+            admin_assignment_external: '',
             any_other: '',
             certify: false
         },
@@ -1389,7 +1393,9 @@ export default function AparForm() {
                                         isFilled(corporate.lab_development) || 
                                         isFilled(corporate.cultural_activities) || 
                                         isFilled(corporate.sports_community) || 
-                                        isFilled(corporate.admin_assignment) || 
+                                        isFilled(corporate.admin_assignment_university) || 
+                                        isFilled(corporate.admin_assignment_department) || 
+                                        isFilled(corporate.admin_assignment_external) || 
                                         isFilled(corporate.any_other);
 
                 if (!hasContribution) {
@@ -1475,7 +1481,9 @@ export default function AparForm() {
                                 isFilled(corporate.lab_development) || 
                                 isFilled(corporate.cultural_activities) || 
                                 isFilled(corporate.sports_community) || 
-                                isFilled(corporate.admin_assignment) || 
+                                isFilled(corporate.admin_assignment_university) || 
+                                isFilled(corporate.admin_assignment_department) || 
+                                isFilled(corporate.admin_assignment_external) || 
                                 isFilled(corporate.any_other);
         
         if (!hasContribution) {

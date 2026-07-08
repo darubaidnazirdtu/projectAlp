@@ -637,6 +637,7 @@ import React, { useState } from 'react';
 
 const requiredCourseFields = [
     { key: 'name_of_course', label: 'Name of the course', idPrefix: 'course-name' },
+    { key: 'course_code', label: 'Course Code', idPrefix: 'course-code' },
     { key: 'degree_type', label: 'Degree type of course', idPrefix: 'degree-type' },
     { key: 'total_lectures_scheduled', label: 'Total lectures Scheduled', idPrefix: 'lectures-sch' },
     { key: 'total_lectures_engaged', label: 'Total lectures engaged', idPrefix: 'lectures-eng' },
@@ -789,7 +790,7 @@ export default function PartII({ formData, addItem, removeItem, updateArrayField
     };
     const handleStartAddCourse = () => {
         setEditingCourseIndex(-1);
-        setTempCourse({ name_of_course: '', total_lectures_scheduled: '', total_lectures_engaged: '', extra_lectures_engaged: '', tutorials_scheduled: '', tutorials_engaged: '', extra_tutorials_engaged: '', labs_scheduled: '', labs_engaged: '', extra_labs_engaged: '', reasons_not_engaged: '', degree_type: 'UG' });
+        setTempCourse({ name_of_course: '', course_code: '', total_lectures_scheduled: '', total_lectures_engaged: '', extra_lectures_engaged: '', tutorials_scheduled: '', tutorials_engaged: '', extra_tutorials_engaged: '', labs_scheduled: '', labs_engaged: '', extra_labs_engaged: '', reasons_not_engaged: '', degree_type: 'UG' });
     };
 
     const handleStartEditCourse = (idx) => {
@@ -1037,6 +1038,7 @@ export default function PartII({ formData, addItem, removeItem, updateArrayField
                                         <thead className="bg-gray-50 text-gray-700">
                                             <tr>
                                                 <th className="px-4 py-3 border-b">Course Name</th>
+                                                <th className="px-4 py-3 border-b">Course Code</th>
                                                 <th className="px-4 py-3 border-b">Type</th>
                                                 <th className="px-4 py-3 border-b text-center">Lectures (Sch/Eng/Ext)</th>
                                                 <th className="px-4 py-3 border-b text-center">Tutorials (Sch/Eng/Ext)</th>
@@ -1055,6 +1057,7 @@ export default function PartII({ formData, addItem, removeItem, updateArrayField
                                                 coursesTaught.map((course, idx) => (
                                                     <tr key={idx} className="border-b hover:bg-gray-50 transition-colors">
                                                         <td className="px-4 py-3 font-medium text-gray-900">{course.name_of_course || '-'}</td>
+                                                        <td className="px-4 py-3 font-medium text-gray-900">{course.course_code || '-'}</td>
                                                         <td className="px-4 py-3">{course.degree_type || 'UG'}</td>
                                                         <td className="px-4 py-3 text-center">{course.total_lectures_scheduled || 0} / {course.total_lectures_engaged || 0} / {course.extra_lectures_engaged || 0}</td>
                                                         <td className="px-4 py-3 text-center">{course.tutorials_scheduled || 0} / {course.tutorials_engaged || 0} / {course.extra_tutorials_engaged || 0}</td>
@@ -1086,6 +1089,10 @@ export default function PartII({ formData, addItem, removeItem, updateArrayField
                                     <div>
                                         <label htmlFor="course-name-temp" className="block text-sm font-medium text-gray-700 mb-1">Name of the course <span className="text-red-500">*</span></label>
                                         <input id="course-name-temp" type="text" required disabled={readOnly} value={tempCourse.name_of_course || ''} onChange={(e) => setTempCourse(prev => ({ ...prev, name_of_course: e.target.value }))} className="w-full border border-gray-300 rounded-lg shadow-sm focus:ring-indigo-500 focus:border-indigo-500 px-4 py-2.5 bg-white" />
+                                    </div>
+                                    <div>
+                                        <label htmlFor="course-code-temp" className="block text-sm font-medium text-gray-700 mb-1">Course Code <span className="text-red-500">*</span></label>
+                                        <input id="course-code-temp" type="text" required disabled={readOnly} value={tempCourse.course_code || ''} onChange={(e) => setTempCourse(prev => ({ ...prev, course_code: e.target.value }))} className="w-full border border-gray-300 rounded-lg shadow-sm focus:ring-indigo-500 focus:border-indigo-500 px-4 py-2.5 bg-white" />
                                     </div>
                                     <div>
                                         <label htmlFor="degree-type-temp" className="block text-sm font-medium text-gray-700 mb-1">Degree type of course <span className="text-red-500">*</span></label>
@@ -1234,14 +1241,14 @@ export default function PartII({ formData, addItem, removeItem, updateArrayField
 
                 {/* ICT Tools */}
                 <div>
-                    <h4 className="text-md font-semibold text-gray-800 mb-2">3.1) ICT Tools and Resources Used<span className="text-red-500">*</span></h4>
-                    <textarea rows="2" required disabled={readOnly} className="w-full border border-gray-300 rounded-lg shadow-sm focus:ring-indigo-500 focus:border-indigo-500 p-4 disabled:bg-gray-100 disabled:text-gray-500 transition-colors" value={teachingData?.ict_tools || ''} onChange={(e) => updateField('teaching', 'ict_tools', e.target.value)} placeholder="e.g., LCD Projector, Smart Board, Online Resources..."></textarea>
+                    <h4 className="text-md font-semibold text-gray-800 mb-2">3.1) ICT Tools and Resources Used</h4>
+                    <textarea rows="2" disabled={readOnly} className="w-full border border-gray-300 rounded-lg shadow-sm focus:ring-indigo-500 focus:border-indigo-500 p-4 disabled:bg-gray-100 disabled:text-gray-500 transition-colors" value={teachingData?.ict_tools || ''} onChange={(e) => updateField('teaching', 'ict_tools', e.target.value)} placeholder="e.g., LCD Projector, Smart Board, Online Resources..."></textarea>
                 </div>
 
                 {/* Student Centric Methods */}
                 <div>
-                    <h4 className="text-md font-semibold text-gray-800 mb-2">3.2) Student Centric Methods<span className="text-red-500">*</span></h4>
-                    <textarea rows="2" required disabled={readOnly} className="w-full border border-gray-300 rounded-lg shadow-sm focus:ring-indigo-500 focus:border-indigo-500 p-4 disabled:bg-gray-100 disabled:text-gray-500 transition-colors" value={teachingData?.student_centric_methods || ''} onChange={(e) => updateField('teaching', 'student_centric_methods', e.target.value)} placeholder="(Experiential/Participative/Problem Solving)..."></textarea>
+                    <h4 className="text-md font-semibold text-gray-800 mb-2">3.2) Student Centric Methods</h4>
+                    <textarea rows="2" disabled={readOnly} className="w-full border border-gray-300 rounded-lg shadow-sm focus:ring-indigo-500 focus:border-indigo-500 p-4 disabled:bg-gray-100 disabled:text-gray-500 transition-colors" value={teachingData?.student_centric_methods || ''} onChange={(e) => updateField('teaching', 'student_centric_methods', e.target.value)} placeholder="(Experiential/Participative/Problem Solving)..."></textarea>
                 </div>
 
                 {/* 4 a) Details of Tutorials/tests held */}
