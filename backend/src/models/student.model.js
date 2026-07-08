@@ -20,6 +20,7 @@ const StudentSchema = new mongoose.Schema({
     enrollment_no: { type: String, required: true, index: true },
     name: { type: String, required: true },
     gender: String,
+    level: { type: String, enum: ['UG', 'PG', 'PHD', 'POST DOC', 'others'] },
     date_of_birth: Date,
     email: { type: String, required: true },
     phone: String,

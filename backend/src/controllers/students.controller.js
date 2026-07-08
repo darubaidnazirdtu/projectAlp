@@ -6,8 +6,13 @@ import { set, get, getByStudentId, getByDepartmentId, getByProgrammeId, update, 
 const enterData = asyncHandler(async (req, res) => {
     const data = req.body
 
-    if (!data.student_id || !data.enrollment_no || !data.name || !data.gender || !data.date_of_birth || !data.email || !data.phone || !data.department_id || !data.programme_id || !data.year_of_admission || !data.current_semester) {
+    if (!data.student_id || !data.enrollment_no || !data.name || !data.gender || !data.level || !data.date_of_birth || !data.email || !data.phone || !data.department_id || !data.programme_id || !data.year_of_admission || !data.current_semester) {
         throw new ApiError(400, "all fields are required")
+    }
+
+    const alphanumericRegex = /^[a-zA-Z0-9]+$/;
+    if (!alphanumericRegex.test(data.student_id) || !alphanumericRegex.test(data.enrollment_no)) {
+        throw new ApiError(400, "Student ID and Enrollment No should only contain letters and numbers");
     }
 
     const loggedInUser = {
@@ -49,6 +54,12 @@ const updateData = asyncHandler(async (req, res) => {
     if (!id) {
         throw new ApiError(400, "id is required")
     }
+    
+    const alphanumericRegex = /^[a-zA-Z0-9]+$/;
+    if ((data.student_id && !alphanumericRegex.test(data.student_id)) || (data.enrollment_no && !alphanumericRegex.test(data.enrollment_no))) {
+        throw new ApiError(400, "Student ID and Enrollment No should only contain letters and numbers");
+    }
+
     const loggedInUser = {
         id: req.user?.id,
         userId: req.user?.userId || req.user?.id,

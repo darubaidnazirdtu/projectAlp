@@ -20,7 +20,8 @@ const set = async (data, loggedInUser = null) => {
       department_id,
       programme_id,
       year_of_admission,
-      current_semester
+      current_semester,
+      level
     } = data;
 
     if (!department_id) {
@@ -41,6 +42,7 @@ const set = async (data, loggedInUser = null) => {
       phone,
       year_of_admission,
       current_semester,
+      level,
       metadata: {
         created_by: loggedInUser?.userId || loggedInUser?.id || null,
         change_log: [{
@@ -108,7 +110,8 @@ const update = async (student_id, updateData, loggedInUser = null) => {
       department_id,
       year_of_admission,
       current_semester,
-      enrollment_no
+      enrollment_no,
+      level
     } = updateData;
 
     const updateFields = {};
@@ -122,6 +125,7 @@ const update = async (student_id, updateData, loggedInUser = null) => {
     if (year_of_admission) updateFields.year_of_admission = year_of_admission;
     if (current_semester) updateFields.current_semester = current_semester;
     if (enrollment_no) updateFields.enrollment_no = enrollment_no;
+    if (level) updateFields.level = level;
 
     const userId = loggedInUser?.userId || loggedInUser?.id || null;
     updateFields['metadata.updated_at'] = new Date();

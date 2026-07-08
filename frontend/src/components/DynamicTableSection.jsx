@@ -25,6 +25,7 @@ export default function DynamicTableSection({
     const [tempItem, setTempItem] = useState(initialItem);
     const [tempSubItems, setTempSubItems] = useState({}); // State for nested objectList forms
     const [activeSubForms, setActiveSubForms] = useState({}); // State to toggle visibility of sub-item forms
+    const [fieldErrors, setFieldErrors] = useState({}); // State for real-time validation errors
 
     const studentsByEnrollRef = useRef(null);
     const buildEnrollIndex = (list) => {
@@ -158,6 +159,52 @@ export default function DynamicTableSection({
         return nextItem;
     };
 
+    const validateField = (field, val, currentItem) => {
+        const errors = [];
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        
+        const isRequired = field.required || (typeof field.requiredIf === 'function' && field.requiredIf(currentItem));
+        const isEmpty = val === undefined || val === null || val === '' || (typeof val === 'string' && !val.trim()) || val === 'Select...';
+
+        if (isRequired && isEmpty) {
+            errors.push(`${field.label} is required`);
+            return errors;
+        }
+
+        if (isEmpty) return errors;
+
+        if (field.type === 'year') {
+            const normalized = String(val).trim();
+            const yearNum = Number(normalized);
+            const minYear = field.min || 0;
+            const maxYear = field.max || 9999;
+            if (!/^\d{4}$/.test(normalized) || Number.isNaN(yearNum) || yearNum < minYear || yearNum > maxYear) {
+                errors.push(`Must be a 4-digit year between ${minYear} and ${maxYear}`);
+            }
+        }
+        if (field.type === 'monthYear') {
+            const minYear = field.min || 0;
+            const maxYear = field.max || 9999;
+            if (!isValidMonthYearValue(val, field)) {
+                errors.push(`Must be in MM-YYYY format between ${minYear} and ${maxYear}`);
+            }
+        }
+        if (field.type === 'email') {
+            const normalized = String(val).trim();
+            if (!emailRegex.test(normalized)) {
+                errors.push(`Must be a valid email address`);
+            }
+        }
+        if (field.pattern) {
+            const normalized = String(val).trim();
+            const customRegex = new RegExp(field.pattern);
+            if (!customRegex.test(normalized)) {
+                errors.push(field.title || `Invalid format`);
+            }
+        }
+        return errors;
+    };
+
     const handleStartAdd = () => {
         const itemWithDefaults = { ...initialItem };
         fields.forEach(field => {
@@ -168,6 +215,7 @@ export default function DynamicTableSection({
         setTempItem(normalizeMonthYearFields(itemWithDefaults));
         // Reset sub-forms visibility: all hidden by default
         setActiveSubForms({});
+        setFieldErrors({});
 
         // Initialize tempSubItems with default values from fields configuration
         const defaultSubItems = {};
@@ -194,6 +242,7 @@ export default function DynamicTableSection({
         setTempItem(normalizeMonthYearFields(item));
         setTempSubItems({});
         setActiveSubForms({});
+        setFieldErrors({});
         setEditingIndex(index);
         setIsAdding(true);
     };
@@ -237,6 +286,7 @@ export default function DynamicTableSection({
         setTempItem(initialItem);
         setTempSubItems({});
         setActiveSubForms({});
+        setFieldErrors({});
     };
 
     const getAssociatedStartKey = (endKey) => {
@@ -268,56 +318,21 @@ export default function DynamicTableSection({
 
         // Validation Logic
         const validationErrors = [];
-        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        const newFieldErrors = {};
+
         fields.forEach(field => {
             const val = tempItem[field.key];
-            if (
-    field.type === 'select' &&
-    (!val || val === '')
-) {
-    validationErrors.push(`${field.label} is required`);
-    return;
-}
-            const isRequired = field.required || (typeof field.requiredIf === 'function' && field.requiredIf(tempItem));
-
-            if (isRequired) {
-    if (
-        val === undefined ||
-        val === null ||
-        val === '' ||
-        (typeof val === 'string' && !val.trim()) ||
-        val === 'Select...'
-    ) {
-        validationErrors.push(field.label);
-        return;
-    }
-}
-
-            if (field.type === 'year' && val) {
-                const normalized = String(val).trim();
-                const yearNum = Number(normalized);
-                const minYear = field.min || 0;
-                const maxYear = field.max || 9999;
-                if (!/^\d{4}$/.test(normalized) || Number.isNaN(yearNum) || yearNum < minYear || yearNum > maxYear) {
-                    validationErrors.push(`${field.label} must be a 4-digit year between ${minYear} and ${maxYear}`);
-                }
-            }
-            if (field.type === 'monthYear' && val) {
-                const minYear = field.min || 0;
-                const maxYear = field.max || 9999;
-                if (!isValidMonthYearValue(val, field)) {
-                    validationErrors.push(`${field.label} must be a valid month-year in MM-YYYY format between ${minYear} and ${maxYear}`);
-                }
-            }
-            if (field.type === 'email' && val) {
-                const normalized = String(val).trim();
-                if (!emailRegex.test(normalized)) {
-                    validationErrors.push(`${field.label} must be a valid email address`);
-                }
-            }
+            const errors = validateField(field, val, tempItem);
             
-           
+            if (errors.length > 0) {
+                newFieldErrors[field.key] = errors[0];
+                // For top-level toast, we might just push the field label to be concise, 
+                // but the error message from validateField works too.
+                validationErrors.push(...errors);
+            }
         });
+
+        setFieldErrors(newFieldErrors);
 
         // Validate nested objectList items for required sub-fields
         // Validate nested objectList items for required sub-fields; 
@@ -415,8 +430,22 @@ export default function DynamicTableSection({
         handleCancel();
     };
 
+    const handleFieldValidation = (fieldKey, value, currentItem) => {
+        const fieldConfig = fields.find(f => f.key === fieldKey);
+        if (!fieldConfig) return;
+        const errors = validateField(fieldConfig, value, currentItem);
+        setFieldErrors(prev => ({
+            ...prev,
+            [fieldKey]: errors.length > 0 ? errors[0] : null
+        }));
+    };
+
     const handleChange = (key, value) => {
-        setTempItem(prev => ({ ...prev, [key]: value }));
+        setTempItem(prev => {
+            const nextItem = { ...prev, [key]: value };
+            handleFieldValidation(key, value, nextItem);
+            return nextItem;
+        });
     };
 
     const getStudentName = (studentData) => {
@@ -432,6 +461,7 @@ export default function DynamicTableSection({
                 next.student_name = value ? getStudentName(selectedData) : '';
             }
 
+            handleFieldValidation(field.key, value, next);
             return next;
         });
     };
@@ -766,6 +796,8 @@ export default function DynamicTableSection({
                                                                                 inputValue = inputValue.replace(/[^0-9]/g, '');
                                                                             } else if (subF.pattern === '^[0-9-]+$') {
                                                                                 inputValue = inputValue.replace(/[^0-9-]/g, '');
+                                                                            } else if (subF.pattern === '^[a-zA-Z0-9]+$') {
+                                                                                inputValue = inputValue.replace(/[^a-zA-Z0-9]/g, '');
                                                                             }
                                                                             inputValue = sanitizeForResearchKey(subF.key, inputValue, subF.type);
                                                                             handleSubItemChange(f.key, subF.key, inputValue);
@@ -815,6 +847,8 @@ export default function DynamicTableSection({
                                                     inputValue = inputValue.replace(/[^0-9]/g, '');
                                                 } else if (f.pattern === '^[0-9-]+$') {
                                                     inputValue = inputValue.replace(/[^0-9-]/g, '');
+                                                } else if (f.pattern === '^[a-zA-Z0-9]+$') {
+                                                    inputValue = inputValue.replace(/[^a-zA-Z0-9]/g, '');
                                                 }
                                                 inputValue = sanitizeForResearchKey(f.key, inputValue, f.type);
                                                 handleChange(f.key, inputValue);
@@ -857,6 +891,9 @@ export default function DynamicTableSection({
                                             return null;
                                         })()}
                                     </>
+                                )}
+                                {fieldErrors[f.key] && (
+                                    <p className="text-xs text-red-600 mt-1 font-medium">{fieldErrors[f.key]}</p>
                                 )}
                             </div>
                         ))}

@@ -32,17 +32,17 @@ class StudentServices{
     
 
     async updateStudent(id, data, headers = {}) {
-        const response = await this.api.put(`/students/update/${id}`, data, headers)
+        const response = await this.api.put(`/students/update/${encodeURIComponent(id)}`, data, headers)
         return response
     }
 
     async deleteStudent(id) {
-        const response = await this.api.delete(`/students/delete/${id}`)
+        const response = await this.api.delete(`/students/delete/${encodeURIComponent(id)}`)
         return response
     }
 
     async getStudentById(id) {
-        const response = await this.api.get(`/students/get/${id}`)
+        const response = await this.api.get(`/students/get/${encodeURIComponent(id)}`)
         return response
     }
 }
