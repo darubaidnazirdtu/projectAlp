@@ -1253,6 +1253,17 @@ export default function PartII({ formData, addItem, removeItem, updateArrayField
                     </div>
                 </div>
 
+                {/* 2) Visit of faculty to other institution */}
+                <DynamicTableSection
+                    title="2) Visit of faculty to other institution for taking Experts’ Lectures/other academic work"
+                    data={teachingData?.faculty_visits_other_institutions || []}
+                    uniqueKey="description"
+                    {...createHandlers('teaching', 'faculty_visits_other_institutions')}
+                    readOnly={readOnly}
+                    initialItem={{ description: '' }}
+                    fields={[{ label: 'Description', key: 'description', fullWidth: true, required: true, placeholder: 'Enter details of visit' }]}
+                />
+
                 {/* 3) Details of teaching methods employed */}
                 <DynamicTableSection
                     title="3) Details of teaching methods employed by you (Lectures, Tutorials, Seminars, Practicals etc.)"
@@ -1271,8 +1282,11 @@ export default function PartII({ formData, addItem, removeItem, updateArrayField
                     uniqueKey="description"
                     {...createHandlers('teaching', 'ict_tools')}
                     readOnly={readOnly}
-                    initialItem={{ description: '' }}
-                    fields={[{ label: 'Description', key: 'description', fullWidth: true, required: true, placeholder: 'Enter ICT tools details' }]}
+                    initialItem={{ description: '', room_no: '' }}
+                    fields={[
+                        { label: 'Description', key: 'description', required: true, placeholder: 'Enter ICT tools details' },
+                        { label: 'Room No', key: 'room_no', placeholder: 'Enter Room No' }
+                    ]}
                 />
 
                 {/* Student Centric Methods */}

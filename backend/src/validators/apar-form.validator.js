@@ -717,7 +717,8 @@ const teachingSchema = z.object({
     }).optional()
   }).optional(),
   teaching_methods: z.array(z.object({ description: optionalString })).optional(),
-  ict_tools: z.array(z.object({ description: optionalString })).optional(),
+  faculty_visits_other_institutions: z.array(z.object({ description: optionalString })).optional(),
+  ict_tools: z.array(z.object({ description: optionalString, room_no: optionalString })).optional(),
   student_centric_methods: z.array(z.object({ description: optionalString })).optional(),
   tutorials_tests: z.object({
     ug_odd: z.object({
