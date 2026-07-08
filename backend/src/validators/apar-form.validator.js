@@ -74,7 +74,8 @@
 
 // // Teaching Validation
 // const teachingSchema = z.object({
-//   description_of_duties: optionalString,
+//   description_of_duties_department: optionalString,
+//   description_of_duties_admin: optionalString,
 //   courses_taught: z.array(z.object({
 //     name_of_course: optionalString,
 //     total_lectures_scheduled: optionalString,
@@ -672,7 +673,8 @@ const personalSchema = z.object({
 
 // Teaching Validation
 const teachingSchema = z.object({
-  description_of_duties: optionalString,
+  description_of_duties_department: z.string().optional(),
+  description_of_duties_admin: optionalString,
   courses_taught: z.array(z.object({
     name_of_course: optionalString,
     total_lectures_scheduled: optionalString,

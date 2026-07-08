@@ -717,7 +717,8 @@ export default function PartII({ formData, addItem, removeItem, updateArrayField
     // Safely extract teaching data to prevent crashes
     const teachingData = formData?.teaching || {};
     const coursesTaught = teachingData?.courses_taught || [];
-    const desc = teachingData?.description_of_duties || '';
+    const descDept = teachingData?.description_of_duties_department || '';
+    const descAdmin = teachingData?.description_of_duties_admin || '';
 
     // Safe extraction for nested objects
     const timeTable = teachingData?.time_table || { provided: {}, actual: {} };
@@ -911,10 +912,16 @@ export default function PartII({ formData, addItem, removeItem, updateArrayField
             </div>
 
             <div className="space-y-6">
-                {/* Description */}
-                <div>
-                    <label htmlFor="desc-duties" className="block text-sm font-medium text-gray-700 mb-2">Description of Duties<span className="text-red-500">*</span></label>
-                    <textarea id="desc-duties" rows="3" required disabled={readOnly} className="w-full border border-gray-300 rounded-lg shadow-sm focus:ring-indigo-500 focus:border-indigo-500 p-4 text-sm disabled:bg-gray-50 disabled:text-gray-500 transition-colors" placeholder="Brief description of duties..." value={desc} onChange={(e) => updateField('teaching', 'description_of_duties', e.target.value)}></textarea>
+                {/* Description of Duties */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                        <label htmlFor="desc-duties-dept" className="block text-sm font-medium text-gray-700 mb-2">Description of Duties (Department Level)<span className="text-red-500">*</span></label>
+                        <textarea id="desc-duties-dept" rows="3" required disabled={readOnly} className="w-full border border-gray-300 rounded-lg shadow-sm focus:ring-indigo-500 focus:border-indigo-500 p-4 text-sm disabled:bg-gray-50 disabled:text-gray-500 transition-colors" placeholder="Brief description of department level duties..." value={descDept} onChange={(e) => updateField('teaching', 'description_of_duties_department', e.target.value)}></textarea>
+                    </div>
+                    <div>
+                        <label htmlFor="desc-duties-admin" className="block text-sm font-medium text-gray-700 mb-2">Description of Duties (Administration)</label>
+                        <textarea id="desc-duties-admin" rows="3" disabled={readOnly} className="w-full border border-gray-300 rounded-lg shadow-sm focus:ring-indigo-500 focus:border-indigo-500 p-4 text-sm disabled:bg-gray-50 disabled:text-gray-500 transition-colors" placeholder="Brief description of administration duties (Optional)..." value={descAdmin} onChange={(e) => updateField('teaching', 'description_of_duties_admin', e.target.value)}></textarea>
+                    </div>
                 </div>
 
                 {/* Mandatory Documents (Schema Alignment) */}

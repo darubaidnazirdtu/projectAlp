@@ -802,7 +802,8 @@ export default function AparForm() {
         teaching: {
             immovable_property_return: '',
             health_checkup_file: null,
-            description_of_duties: '',
+            description_of_duties_department: '',
+            description_of_duties_admin: '',
             courses_taught: [
                 { name_of_course: '', total_lectures_scheduled: '', total_lectures_engaged: '', tutorials_scheduled: '', tutorials_engaged: '', labs_scheduled: '', labs_engaged: '', reasons_not_engaged: '', degree_type: 'UG' }
             ],

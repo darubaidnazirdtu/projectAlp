@@ -56,7 +56,11 @@ const AparFormSchema = new mongoose.Schema({
     teaching: {
         immovable_property_return: String,
         health_checkup_file: String, // URL or data
-        description_of_duties: String,
+        description_of_duties_department: {
+            type: String,
+            required: false // Kept false at DB level as draft saves might not have it
+        },
+        description_of_duties_admin: String,
         courses_taught: [{
             name_of_course: String,
             total_lectures_scheduled: String,
