@@ -632,6 +632,7 @@
 import { FiPlus, FiTrash2, FiEdit2 } from 'react-icons/fi';
 import { toast } from 'sonner';
 import React, { useState } from 'react';
+import DynamicTableSection from '../../components/DynamicTableSection';
 
 
 
@@ -714,12 +715,19 @@ const validateSingleCourse = (course) => {
 };
 
 
-export default function PartII({ formData, addItem, removeItem, updateArrayField, updateAssessment, updateField, readOnly }) {
+export default function PartII({ formData, addItem, removeItem, updateArrayField, updateArrayItem, updateAssessment, updateField, readOnly }) {
     // Safely extract teaching data to prevent crashes
     const teachingData = formData?.teaching || {};
     const coursesTaught = teachingData?.courses_taught || [];
     const descDept = teachingData?.description_of_duties_department || '';
     const descAdmin = teachingData?.description_of_duties_admin || '';
+
+    // Helper handlers generator for DynamicTableSection
+    const createHandlers = (category, field) => ({
+        onAdd: (item) => addItem(category, field, item),
+        onUpdate: (index, newItem) => updateArrayItem(category, field, index, newItem),
+        onRemove: removeItem ? (index) => removeItem(category, field, index) : undefined
+    });
 
     // Safe extraction for nested objects
     const timeTable = teachingData?.time_table || { provided: {}, actual: {} };
@@ -915,14 +923,24 @@ export default function PartII({ formData, addItem, removeItem, updateArrayField
             <div className="space-y-6">
                 {/* Description of Duties */}
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div>
-                        <label htmlFor="desc-duties-dept" className="block text-sm font-medium text-gray-700 mb-2">Description of Duties (Department Level)<span className="text-red-500">*</span></label>
-                        <textarea id="desc-duties-dept" rows="3" required disabled={readOnly} className="w-full border border-gray-300 rounded-lg shadow-sm focus:ring-indigo-500 focus:border-indigo-500 p-4 text-sm disabled:bg-gray-50 disabled:text-gray-500 transition-colors" placeholder="Brief description of department level duties..." value={descDept} onChange={(e) => updateField('teaching', 'description_of_duties_department', e.target.value)}></textarea>
-                    </div>
-                    <div>
-                        <label htmlFor="desc-duties-admin" className="block text-sm font-medium text-gray-700 mb-2">Description of Duties (Administration)</label>
-                        <textarea id="desc-duties-admin" rows="3" disabled={readOnly} className="w-full border border-gray-300 rounded-lg shadow-sm focus:ring-indigo-500 focus:border-indigo-500 p-4 text-sm disabled:bg-gray-50 disabled:text-gray-500 transition-colors" placeholder="Brief description of administration duties (Optional)..." value={descAdmin} onChange={(e) => updateField('teaching', 'description_of_duties_admin', e.target.value)}></textarea>
-                    </div>
+                    <DynamicTableSection
+                        title="Description of Duties (Department Level)"
+                        data={teachingData?.description_of_duties_department || []}
+                        uniqueKey="description"
+                        {...createHandlers('teaching', 'description_of_duties_department')}
+                        readOnly={readOnly}
+                        initialItem={{ description: '' }}
+                        fields={[{ label: 'Description', key: 'description', fullWidth: true, required: true, placeholder: 'Enter duty details' }]}
+                    />
+                    <DynamicTableSection
+                        title="Description of Duties (Administration)"
+                        data={teachingData?.description_of_duties_admin || []}
+                        uniqueKey="description"
+                        {...createHandlers('teaching', 'description_of_duties_admin')}
+                        readOnly={readOnly}
+                        initialItem={{ description: '' }}
+                        fields={[{ label: 'Description', key: 'description', fullWidth: true, required: true, placeholder: 'Enter administration duty details' }]}
+                    />
                 </div>
 
                 {/* Mandatory Documents (Schema Alignment) */}
@@ -1236,22 +1254,37 @@ export default function PartII({ formData, addItem, removeItem, updateArrayField
                 </div>
 
                 {/* 3) Details of teaching methods employed */}
-                <div>
-                    <h4 className="text-md font-semibold text-gray-800 mb-2">3) Details of teaching methods employed by you <span className="text-red-500">*</span></h4>
-                    <textarea rows="3" required disabled={readOnly} className="w-full border border-gray-300 rounded-lg shadow-sm focus:ring-indigo-500 focus:border-indigo-500 p-4 disabled:bg-gray-100 disabled:text-gray-500 transition-colors" value={teachingData?.teaching_methods || ''} onChange={(e) => updateField('teaching', 'teaching_methods', e.target.value)} placeholder="(Lectures, Tutorials, Seminars, Practicals etc.)"></textarea>
-                </div>
+                <DynamicTableSection
+                    title="3) Details of teaching methods employed by you (Lectures, Tutorials, Seminars, Practicals etc.)"
+                    data={teachingData?.teaching_methods || []}
+                    uniqueKey="description"
+                    {...createHandlers('teaching', 'teaching_methods')}
+                    readOnly={readOnly}
+                    initialItem={{ description: '' }}
+                    fields={[{ label: 'Description', key: 'description', fullWidth: true, required: true, placeholder: 'Enter teaching method details' }]}
+                />
 
                 {/* ICT Tools */}
-                <div>
-                    <h4 className="text-md font-semibold text-gray-800 mb-2">3.1) ICT Tools and Resources Used</h4>
-                    <textarea rows="2" disabled={readOnly} className="w-full border border-gray-300 rounded-lg shadow-sm focus:ring-indigo-500 focus:border-indigo-500 p-4 disabled:bg-gray-100 disabled:text-gray-500 transition-colors" value={teachingData?.ict_tools || ''} onChange={(e) => updateField('teaching', 'ict_tools', e.target.value)} placeholder="e.g., LCD Projector, Smart Board, Online Resources..."></textarea>
-                </div>
+                <DynamicTableSection
+                    title="3.1) ICT Tools and Resources Used"
+                    data={teachingData?.ict_tools || []}
+                    uniqueKey="description"
+                    {...createHandlers('teaching', 'ict_tools')}
+                    readOnly={readOnly}
+                    initialItem={{ description: '' }}
+                    fields={[{ label: 'Description', key: 'description', fullWidth: true, required: true, placeholder: 'Enter ICT tools details' }]}
+                />
 
                 {/* Student Centric Methods */}
-                <div>
-                    <h4 className="text-md font-semibold text-gray-800 mb-2">3.2) Student Centric Methods</h4>
-                    <textarea rows="2" disabled={readOnly} className="w-full border border-gray-300 rounded-lg shadow-sm focus:ring-indigo-500 focus:border-indigo-500 p-4 disabled:bg-gray-100 disabled:text-gray-500 transition-colors" value={teachingData?.student_centric_methods || ''} onChange={(e) => updateField('teaching', 'student_centric_methods', e.target.value)} placeholder="(Experiential/Participative/Problem Solving)..."></textarea>
-                </div>
+                <DynamicTableSection
+                    title="3.2) Student Centric Methods (Experiential/Participative/Problem Solving)"
+                    data={teachingData?.student_centric_methods || []}
+                    uniqueKey="description"
+                    {...createHandlers('teaching', 'student_centric_methods')}
+                    readOnly={readOnly}
+                    initialItem={{ description: '' }}
+                    fields={[{ label: 'Description', key: 'description', fullWidth: true, required: true, placeholder: 'Enter student centric method details' }]}
+                />
 
                 {/* 4 a) Details of Tutorials/tests held */}
                 <div>
@@ -1308,10 +1341,15 @@ export default function PartII({ formData, addItem, removeItem, updateArrayField
                 </div>
 
                 {/* 4 b) academic planning */}
-                <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">b) Details of academic planning/ presentation of lectures during the session</label>
-                    <textarea rows="3" disabled={readOnly} className="w-full border border-gray-300 rounded-lg shadow-sm focus:ring-indigo-500 focus:border-indigo-500 p-4 disabled:bg-gray-100 disabled:text-gray-500 transition-colors" value={teachingData?.academic_planning || ''} onChange={(e) => updateField('teaching', 'academic_planning', e.target.value)}></textarea>
-                </div>
+                <DynamicTableSection
+                    title="b) Details of academic planning/ presentation of lectures during the session"
+                    data={teachingData?.academic_planning || []}
+                    uniqueKey="description"
+                    {...createHandlers('teaching', 'academic_planning')}
+                    readOnly={readOnly}
+                    initialItem={{ description: '' }}
+                    fields={[{ label: 'Description', key: 'description', fullWidth: true, required: true, placeholder: 'Enter details' }]}
+                />
             </div>
         </div>
     );

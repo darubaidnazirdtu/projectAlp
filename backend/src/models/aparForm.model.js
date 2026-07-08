@@ -56,11 +56,8 @@ const AparFormSchema = new mongoose.Schema({
     teaching: {
         immovable_property_return: String,
         health_checkup_file: String, // URL or data
-        description_of_duties_department: {
-            type: String,
-            required: false // Kept false at DB level as draft saves might not have it
-        },
-        description_of_duties_admin: String,
+        description_of_duties_department: [{ description: String }],
+        description_of_duties_admin: [{ description: String }],
         courses_taught: [{
             name_of_course: String,
             course_code: String,
@@ -84,16 +81,16 @@ const AparFormSchema = new mongoose.Schema({
             odd_semester: { lectures: String, tutorials: String, practicals: String, seminars: String },
             even_semester: { lectures: String, tutorials: String, practicals: String, seminars: String }
         },
-        teaching_methods: String,
-        ict_tools: String,
-        student_centric_methods: String,
+        teaching_methods: [{ description: String }],
+        ict_tools: [{ description: String }],
+        student_centric_methods: [{ description: String }],
         tutorials_tests: {
             ug_odd: { number_of_tests: String, assignment_checked: String },
             ug_even: { number_of_tests: String, assignment_checked: String },
             pg_odd: { number_of_tests: String, assignment_checked: String },
             pg_even: { number_of_tests: String, assignment_checked: String }
         },
-        academic_planning: String
+        academic_planning: [{ description: String }]
     },
 
     // Step 3: Research
@@ -357,6 +354,7 @@ const AparFormSchema = new mongoose.Schema({
             program_id: String, // Alternate key
             program_title: String,
             type_of_program: String,
+            type_of_program_other: String,
             level: String,
             mode: String,
             duration_days: String, // IQAC: Number

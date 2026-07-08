@@ -528,6 +528,7 @@ export default function PartIII({ formData, academicYear, addItem, removeItem, u
 
                     { label: 'Program Title', key: 'program_title', required: true, placeholder: 'Enter title' },
                     { label: 'Type', key: 'type_of_program', type: 'select', options: ['FDP', 'Workshop', 'Seminar', 'STTP', 'Training', 'Orientation', 'Other'], required: true, placeholder: 'Select type' },
+                    { label: 'Specify Other Type', key: 'type_of_program_other', showIf: (item) => item.type_of_program === 'Other', requiredIf: (item) => item.type_of_program === 'Other', placeholder: 'Enter type', hideInTable: true },
                     { label: 'Level', key: 'level', type: 'select', options: ['Institutional', 'National', 'International'], required: true, placeholder: 'Select level' },
                     { label: 'Mode', key: 'mode', type: 'select', options: ['Online', 'Offline', 'Hybrid'], required: true, placeholder: 'Select mode' },
                     { label: 'Organizer', key: 'organising_body', required: true, placeholder: 'Enter organizer' },

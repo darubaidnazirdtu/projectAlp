@@ -803,8 +803,8 @@ export default function AparForm() {
         teaching: {
             immovable_property_return: '',
             health_checkup_file: null,
-            description_of_duties_department: '',
-            description_of_duties_admin: '',
+            description_of_duties_department: [],
+            description_of_duties_admin: [],
             courses_taught: [
                 { name_of_course: '', course_code: '', total_lectures_scheduled: '', total_lectures_engaged: '', tutorials_scheduled: '', tutorials_engaged: '', labs_scheduled: '', labs_engaged: '', reasons_not_engaged: '', degree_type: 'UG' }
             ],
@@ -816,16 +816,16 @@ export default function AparForm() {
                 odd_semester: { lectures: '', tutorials: '', practicals: '', seminars: '' },
                 even_semester: { lectures: '', tutorials: '', practicals: '', seminars: '' }
             },
-            teaching_methods: '',
-            ict_tools: '',
-            student_centric_methods: '',
+            teaching_methods: [],
+            ict_tools: [],
+            student_centric_methods: [],
             tutorials_tests: {
                 ug_odd: { number_of_tests: '', assignment_checked: '' },
                 ug_even: { number_of_tests: '', assignment_checked: '' },
                 pg_odd: { number_of_tests: '', assignment_checked: '' },
                 pg_even: { number_of_tests: '', assignment_checked: '' }
             },
-            academic_planning: ''
+            academic_planning: []
         },
         research: {
             journals: [],
@@ -2115,7 +2115,7 @@ export default function AparForm() {
                             </div>
 
                             <div id="apar-step-2" className={currentStep === 2 ? 'block' : 'hidden print:block'}>
-                                <PartII formData={formData} addItem={addItem} removeItem={requestDelete} updateArrayField={updateArrayField} updateAssessment={updateAssessment} updateField={updateField} readOnly={isReadOnlyMode()} />
+                                <PartII formData={formData} addItem={addItem} removeItem={requestDelete} updateArrayField={updateArrayField} updateArrayItem={updateArrayItem} updateAssessment={updateAssessment} updateField={updateField} readOnly={isReadOnlyMode()} />
                             </div>
 
                             <div id="apar-step-3" className={currentStep === 3 ? 'block' : 'hidden print:block'}>
@@ -2155,7 +2155,7 @@ export default function AparForm() {
                                             </div>
                                             <div>
                                                 <h4 className="text-xl font-bold text-gray-900 border-b-2 border-indigo-200 pb-2 mb-6 mt-8">Part II: Self Appraisal</h4>
-                                                <PartII formData={formData} addItem={() => {}} removeItem={() => {}} updateArrayField={() => {}} updateAssessment={() => {}} updateField={() => {}} readOnly={true} />
+                                                <PartII formData={formData} addItem={() => {}} removeItem={() => {}} updateArrayField={() => {}} updateArrayItem={() => {}} updateAssessment={() => {}} updateField={() => {}} readOnly={true} />
                                             </div>
                                             <div>
                                                 <h4 className="text-xl font-bold text-gray-900 border-b-2 border-indigo-200 pb-2 mb-6 mt-8">Part III: Research & Development</h4>

@@ -675,8 +675,8 @@ const personalSchema = z.object({
 
 // Teaching Validation
 const teachingSchema = z.object({
-  description_of_duties_department: z.string().optional(),
-  description_of_duties_admin: optionalString,
+  description_of_duties_department: z.array(z.object({ description: optionalString })).optional(),
+  description_of_duties_admin: z.array(z.object({ description: optionalString })).optional(),
   courses_taught: z.array(z.object({
     name_of_course: optionalString,
     course_code: optionalString,
@@ -716,9 +716,9 @@ const teachingSchema = z.object({
       seminars: optionalString
     }).optional()
   }).optional(),
-  teaching_methods: optionalString,
-  ict_tools: optionalString,
-  student_centric_methods: optionalString,
+  teaching_methods: z.array(z.object({ description: optionalString })).optional(),
+  ict_tools: z.array(z.object({ description: optionalString })).optional(),
+  student_centric_methods: z.array(z.object({ description: optionalString })).optional(),
   tutorials_tests: z.object({
     ug_odd: z.object({
       number_of_tests: optionalString,
@@ -737,7 +737,7 @@ const teachingSchema = z.object({
       assignment_checked: optionalString
     }).optional()
   }).optional(),
-  academic_planning: optionalString
+  academic_planning: z.array(z.object({ description: optionalString })).optional()
 });
 
 // Research Validation
@@ -947,6 +947,7 @@ const researchSchema = z.object({
     program_id: optionalString,
     program_title: optionalString,
     type_of_program: optionalString,
+    type_of_program_other: optionalString,
     level: optionalString,
     mode: optionalString,
     duration_days: optionalString,

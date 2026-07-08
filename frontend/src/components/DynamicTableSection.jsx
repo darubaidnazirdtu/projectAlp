@@ -580,11 +580,13 @@ export default function DynamicTableSection({
                                 <th scope="col" className="!text-left whitespace-nowrap w-16 px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider bg-gray-50/50">
                                     S.No.
                                 </th>
-                                {fields.map(f => (
+                                {fields.map(f => {
+                                    if (f.hideInTable) return null;
+                                    return (
                                     <th key={f.key} scope="col" className="!text-left whitespace-nowrap">
                                         {f.label} {f.required && <span className="text-red-500">*</span>}
                                     </th>
-                                ))}
+                                )})}
                                 <th scope="col" className="!text-right">
                                     Actions
                                 </th>
@@ -596,7 +598,9 @@ export default function DynamicTableSection({
                                     <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-500 font-medium">
                                         {idx + 1}
                                     </td>
-                                    {fields.map(f => (
+                                    {fields.map(f => {
+                                        if (f.hideInTable) return null;
+                                        return (
                                         <td key={f.key} className="px-4 py-4 whitespace-nowrap text-sm text-gray-700">
                                             {f.type === 'file' ? (
                                                 (item[f.key] || item.link) ? (
@@ -625,7 +629,7 @@ export default function DynamicTableSection({
                                                 <div className="truncate max-w-xs" title={item[f.key]}>{item[f.key]}</div>
                                             )}
                                         </td>
-                                    ))}
+                                    )})}
                                     <td className="px-4 py-4 whitespace-nowrap text-right text-sm font-medium">
                                         {!readOnly && (
                                             <div className="flex justify-end gap-2">
@@ -656,7 +660,10 @@ export default function DynamicTableSection({
                 <div className="form-card-body rounded-xl border border-indigo-100 bg-indigo-50/30 p-6">
                     <h4 className="text-md font-bold text-gray-800 mb-4">{editingIndex !== null ? 'Edit Entry' : 'Add New Entry'}</h4>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        {fields.map(f => (
+                        {fields.map(f => {
+                            const isVisible = typeof f.showIf === 'function' ? f.showIf(tempItem) : true;
+                            if (!isVisible) return null;
+                            return (
                             <div key={f.key} className={f.fullWidth ? "md:col-span-2" : ""}>
                                 <label className="block text-sm font-medium text-gray-700 mb-1">
                                     {f.label} {(f.required || (typeof f.requiredIf === 'function' && f.requiredIf(tempItem))) && <span className="text-red-600">*</span>}
@@ -902,7 +909,7 @@ export default function DynamicTableSection({
                                     <p className="text-xs text-red-600 mt-1 font-medium">{fieldErrors[f.key]}</p>
                                 )}
                             </div>
-                        ))}
+                        )})}
                     </div>
                     <div className="flex justify-end gap-3 mt-6">
                         <button onClick={handleCancel} className="px-4 py-2 bg-white border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50">Cancel</button>
