@@ -560,27 +560,55 @@ export default function PartIII({ formData, academicYear, addItem, removeItem, u
                 <div>
                     <label className="block text-md font-semibold text-gray-800 mb-2">3) Summer institutes, refresher or orientation courses</label>
                     <div className="space-y-4">
-                        <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-1">a) Attended</label>
-                            <textarea rows="3" disabled={readOnly} className="w-full border-gray-300 rounded-lg shadow-sm focus:ring-indigo-500 focus:border-indigo-500 p-4 disabled:bg-gray-50 disabled:text-gray-500 transition-colors" value={(formData.research && formData.research.summer_institutes_attended) || ''} onChange={(e) => updateField('research', 'summer_institutes_attended', e.target.value)}></textarea>
-                        </div>
-                        <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-1">b) Organized / Conducted</label>
-                            <textarea rows="3" disabled={readOnly} className="w-full border-gray-300 rounded-lg shadow-sm focus:ring-indigo-500 focus:border-indigo-500 p-4 disabled:bg-gray-50 disabled:text-gray-500 transition-colors" value={(formData.research && formData.research.summer_institutes_organized) || ''} onChange={(e) => updateField('research', 'summer_institutes_organized', e.target.value)}></textarea>
-                        </div>
+                        <DynamicTableSection
+                            title="a) Attended"
+                            data={formData.research.summer_institutes_attended || []}
+                            uniqueKey="description"
+                            {...createHandlers('summer_institutes_attended')}
+                            readOnly={readOnly}
+                            initialItem={{ description: '' }}
+                            fields={[{ label: 'Description', key: 'description', fullWidth: true, required: true, placeholder: 'Enter details' }]}
+                        />
+                        <DynamicTableSection
+                            title="b) Organized / Conducted"
+                            data={formData.research.summer_institutes_organized || []}
+                            uniqueKey="description"
+                            {...createHandlers('summer_institutes_organized')}
+                            readOnly={readOnly}
+                            initialItem={{ description: '' }}
+                            fields={[{ label: 'Description', key: 'description', fullWidth: true, required: true, placeholder: 'Enter details' }]}
+                        />
                     </div>
                 </div>
-                <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">4) Details of Guidance for: i) U.G. and P.G. Project Guidance</label>
-                    <textarea rows="3" disabled={readOnly} className="w-full border-gray-300 rounded-lg shadow-sm focus:ring-indigo-500 focus:border-indigo-500 p-4 disabled:bg-gray-50 disabled:text-gray-500 transition-colors" value={(formData.research && formData.research.ug_pg_guidance) || ''} onChange={(e) => updateField('research', 'ug_pg_guidance', e.target.value)}></textarea>
-                </div>
-                <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">ii) Ph.D Guidance</label>
-                    <textarea rows="3" disabled={readOnly} className="w-full border-gray-300 rounded-lg shadow-sm focus:ring-indigo-500 focus:border-indigo-500 p-4 disabled:bg-gray-50 disabled:text-gray-500 transition-colors" value={(formData.research && formData.research.phd_guidance_text) || ''} onChange={(e) => updateField('research', 'phd_guidance_text', e.target.value)}></textarea>
-                </div>
-                <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">iii) Research guidance</label>
-                    <textarea rows="3" disabled={readOnly} className="w-full border-gray-300 rounded-lg shadow-sm focus:ring-indigo-500 focus:border-indigo-500 p-4 disabled:bg-gray-50 disabled:text-gray-500 transition-colors" value={(formData.research && formData.research.research_guidance) || ''} onChange={(e) => updateField('research', 'research_guidance', e.target.value)}></textarea>
+                <div className="space-y-4">
+                    <label className="block text-md font-semibold text-gray-800 mb-2">4) Details of Guidance for:</label>
+                    <DynamicTableSection
+                        title="i) U.G. and P.G. Project Guidance"
+                        data={formData.research.ug_pg_guidance || []}
+                        uniqueKey="description"
+                        {...createHandlers('ug_pg_guidance')}
+                        readOnly={readOnly}
+                        initialItem={{ description: '' }}
+                        fields={[{ label: 'Description', key: 'description', fullWidth: true, required: true, placeholder: 'Enter details' }]}
+                    />
+                    <DynamicTableSection
+                        title="ii) Ph.D Guidance"
+                        data={formData.research.phd_guidance_text || []}
+                        uniqueKey="description"
+                        {...createHandlers('phd_guidance_text')}
+                        readOnly={readOnly}
+                        initialItem={{ description: '' }}
+                        fields={[{ label: 'Description', key: 'description', fullWidth: true, required: true, placeholder: 'Enter details' }]}
+                    />
+                    <DynamicTableSection
+                        title="iii) Research guidance"
+                        data={formData.research.research_guidance || []}
+                        uniqueKey="description"
+                        {...createHandlers('research_guidance')}
+                        readOnly={readOnly}
+                        initialItem={{ description: '' }}
+                        fields={[{ label: 'Description', key: 'description', fullWidth: true, required: true, placeholder: 'Enter details' }]}
+                    />
                 </div>
             </div>
 
@@ -590,8 +618,19 @@ export default function PartIII({ formData, academicYear, addItem, removeItem, u
                     <label className="block text-md font-semibold text-gray-800 mb-2">5) Details of industrial interaction/professional consultancy/patent obtained or applied for</label>
 
                     <div className="mb-6">
-                        <label className="block text-sm font-medium text-gray-700 mb-1">General Description</label>
-                        <textarea rows="3" disabled={readOnly} className="w-full border-gray-300 rounded-lg shadow-sm focus:ring-indigo-500 focus:border-indigo-500 p-4 disabled:bg-gray-50 disabled:text-gray-500 transition-colors" value={(formData.research && formData.research.industry_interaction) || ''} onChange={(e) => updateField('research', 'industry_interaction', e.target.value)}></textarea>
+                        <DynamicTableSection
+                            title="General Description"
+                            data={formData.research.industry_interaction || []}
+                            uniqueKey="description"
+                            {...createHandlers('industry_interaction')}
+                            readOnly={readOnly}
+                            initialItem={{
+                                description: ''
+                            }}
+                            fields={[
+                                { label: 'Description', key: 'description', fullWidth: true, required: true, placeholder: 'Enter general description' }
+                            ]}
+                        />
                     </div>
 
                     <DynamicTableSection
@@ -683,15 +722,25 @@ export default function PartIII({ formData, academicYear, addItem, removeItem, u
 
             {/* 6 & 7 Textareas */}
             <div className="space-y-6 pt-6 border-t border-gray-100">
-                <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">6) Membership or fellowship of professional/academic Bodies, Societies etc. give details</label>
-                    <textarea rows="3" disabled={readOnly} className="w-full border-gray-300 rounded-lg shadow-sm focus:ring-indigo-500 focus:border-indigo-500 p-4 disabled:bg-gray-50 disabled:text-gray-500 transition-colors" value={(formData.research && formData.research.memberships_text) || ''} onChange={(e) => updateField('research', 'memberships_text', e.target.value)}></textarea>
-                </div>
+                <DynamicTableSection
+                    title="6) Membership or fellowship of professional/academic Bodies, Societies etc. give details"
+                    data={formData.research.memberships_text || []}
+                    uniqueKey="description"
+                    {...createHandlers('memberships_text')}
+                    readOnly={readOnly}
+                    initialItem={{ description: '' }}
+                    fields={[{ label: 'Description', key: 'description', fullWidth: true, required: true, placeholder: 'Enter details' }]}
+                />
 
-                <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">7) Any other information regarding academic activities not covered</label>
-                    <textarea rows="3" disabled={readOnly} className="w-full border-gray-300 rounded-lg shadow-sm focus:ring-indigo-500 focus:border-indigo-500 p-4 disabled:bg-gray-50 disabled:text-gray-500 transition-colors" value={(formData.research && formData.research.other_activities) || ''} onChange={(e) => updateField('research', 'other_activities', e.target.value)}></textarea>
-                </div>
+                <DynamicTableSection
+                    title="7) Any other information regarding academic activities not covered"
+                    data={formData.research.other_activities || []}
+                    uniqueKey="description"
+                    {...createHandlers('other_activities')}
+                    readOnly={readOnly}
+                    initialItem={{ description: '' }}
+                    fields={[{ label: 'Description', key: 'description', fullWidth: true, required: true, placeholder: 'Enter details' }]}
+                />
             </div>
         </div >
     );

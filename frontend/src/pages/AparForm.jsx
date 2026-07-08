@@ -98,8 +98,8 @@ const getCourseValidationIssues = (coursesTaught = []) => coursesTaught.flatMap(
         .map((field) => ({
             ...field,
             index,
-            message: `Please fill ${field.label} in Course ${index + 1}.`,
-            submitMessage: `Course ${index + 1}: ${field.label} is required`
+            message: `Please fill ${field.label} at S.No. ${index + 1}.`,
+            submitMessage: `S.No. ${index + 1}: ${field.label} is required`
         }));
 
     if (missingIssues.length > 0) return missingIssues;
@@ -113,8 +113,8 @@ const getCourseValidationIssues = (coursesTaught = []) => coursesTaught.flatMap(
         .map((field) => ({
             ...field,
             index,
-            message: `${field.engagedLabel} cannot exceed ${field.scheduledLabel} in Course ${index + 1}.`,
-            submitMessage: `Course ${index + 1}: ${field.engagedLabel} cannot exceed ${field.scheduledLabel}`
+            message: `${field.engagedLabel} cannot exceed ${field.scheduledLabel} at S.No. ${index + 1}.`,
+            submitMessage: `S.No. ${index + 1}: ${field.engagedLabel} cannot exceed ${field.scheduledLabel}`
         }));
 
     if (exceededIssues.length > 0) return exceededIssues;
@@ -125,8 +125,8 @@ const getCourseValidationIssues = (coursesTaught = []) => coursesTaught.flatMap(
             label: 'Reasons for not engaging all scheduled classes',
             idPrefix: 'reasons',
             index,
-            message: `Please fill reasons for not engaging all scheduled classes in Course ${index + 1}.`,
-            submitMessage: `Course ${index + 1}: Reasons for not engaging all scheduled classes is required`
+            message: `Please fill reasons for not engaging all scheduled classes at S.No. ${index + 1}.`,
+            submitMessage: `S.No. ${index + 1}: Reasons for not engaging all scheduled classes is required`
         }];
     }
 
@@ -843,14 +843,14 @@ export default function AparForm() {
             collaborations: [],
             faculty_visits: [],
             memberships: [],
-            summer_institutes_attended: '',
-            summer_institutes_organized: '',
-            ug_pg_guidance: '',
-            phd_guidance_text: 'See PhD Supervision table above', 
-            research_guidance: '',
-            industry_interaction: '',
-            memberships_text: '',
-            other_activities: ''
+            summer_institutes_attended: [],
+            summer_institutes_organized: [],
+            ug_pg_guidance: [],
+            phd_guidance_text: [], 
+            research_guidance: [],
+            industry_interaction: [],
+            memberships_text: [],
+            other_activities: []
         },
         corporate: {
             curriculum_development: '',

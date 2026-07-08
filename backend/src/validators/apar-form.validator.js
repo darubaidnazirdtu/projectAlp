@@ -358,14 +358,14 @@
 //     academic_year: optionalString,
 //     department_id: optionalString
 //   })).optional(),
-//   summer_institutes_attended: optionalString,
-//   summer_institutes_organized: optionalString,
-//   ug_pg_guidance: optionalString,
-//   phd_guidance_text: optionalString,
-//   research_guidance: optionalString,
-//   industry_interaction: optionalString,
-//   memberships_text: optionalString,
-//   other_activities: optionalString
+//   summer_institutes_attended: z.array(z.object({ description: optionalString })).optional(),
+//   summer_institutes_organized: z.array(z.object({ description: optionalString })).optional(),
+//   ug_pg_guidance: z.array(z.object({ description: optionalString })).optional(),
+//   phd_guidance_text: z.array(z.object({ description: optionalString })).optional(),
+//   research_guidance: z.array(z.object({ description: optionalString })).optional(),
+//   industry_interaction: z.array(z.object({ description: optionalString })).optional(),
+//   memberships_text: z.array(z.object({ description: optionalString })).optional(),
+//   other_activities: z.array(z.object({ description: optionalString })).optional()
 // });
 
 // // Corporate Life Validation
@@ -962,14 +962,14 @@ const researchSchema = z.object({
     academic_year: optionalString,
     department_id: optionalString
   })).optional(),
-  summer_institutes_attended: optionalString,
-  summer_institutes_organized: optionalString,
-  ug_pg_guidance: optionalString,
-  phd_guidance_text: optionalString,
-  research_guidance: optionalString,
-  industry_interaction: optionalString,
-  memberships_text: optionalString,
-  other_activities: optionalString
+  summer_institutes_attended: z.array(z.object({ description: optionalString })).optional(),
+  summer_institutes_organized: z.array(z.object({ description: optionalString })).optional(),
+  ug_pg_guidance: z.array(z.object({ description: optionalString })).optional(),
+  phd_guidance_text: z.array(z.object({ description: optionalString })).optional(),
+  research_guidance: z.array(z.object({ description: optionalString })).optional(),
+  industry_interaction: z.array(z.object({ description: optionalString })).optional(),
+  memberships_text: z.array(z.object({ description: optionalString })).optional(),
+  other_activities: z.array(z.object({ description: optionalString })).optional()
 });
 
 // Corporate Life Validation

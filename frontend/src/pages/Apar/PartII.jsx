@@ -1037,6 +1037,7 @@ export default function PartII({ formData, addItem, removeItem, updateArrayField
                                     <table className="w-full text-sm text-left">
                                         <thead className="bg-gray-50 text-gray-700">
                                             <tr>
+                                                <th className="px-4 py-3 border-b text-center w-16">S.No.</th>
                                                 <th className="px-4 py-3 border-b">Course Name</th>
                                                 <th className="px-4 py-3 border-b">Course Code</th>
                                                 <th className="px-4 py-3 border-b">Type</th>
@@ -1049,13 +1050,14 @@ export default function PartII({ formData, addItem, removeItem, updateArrayField
                                         <tbody>
                                             {coursesTaught.length === 0 ? (
                                                 <tr>
-                                                    <td colSpan={!readOnly ? 6 : 5} className="px-4 py-8 text-center text-gray-500">
+                                                    <td colSpan={!readOnly ? 8 : 7} className="px-4 py-8 text-center text-gray-500">
                                                         No courses added yet.
                                                     </td>
                                                 </tr>
                                             ) : (
                                                 coursesTaught.map((course, idx) => (
                                                     <tr key={idx} className="border-b hover:bg-gray-50 transition-colors">
+                                                        <td className="px-4 py-3 text-center">{idx + 1}</td>
                                                         <td className="px-4 py-3 font-medium text-gray-900">{course.name_of_course || '-'}</td>
                                                         <td className="px-4 py-3 font-medium text-gray-900">{course.course_code || '-'}</td>
                                                         <td className="px-4 py-3">{course.degree_type || 'UG'}</td>

@@ -381,14 +381,16 @@ const AparFormSchema = new mongoose.Schema({
         memberships: [],
 
         // Text fields
-        summer_institutes_attended: String,
-        summer_institutes_organized: String,
-        ug_pg_guidance: String,
-        phd_guidance_text: String,
-        research_guidance: String,
-        industry_interaction: String,
-        memberships_text: String,
-        other_activities: String
+        summer_institutes_attended: [{ description: String }],
+        summer_institutes_organized: [{ description: String }],
+        ug_pg_guidance: [{ description: String }],
+        phd_guidance_text: [{ description: String }],
+        research_guidance: [{ description: String }],
+        industry_interaction: [{
+            description: String
+        }],
+        memberships_text: [{ description: String }],
+        other_activities: [{ description: String }]
     },
 
     // Step 4: Corporate Life

@@ -577,6 +577,9 @@ export default function DynamicTableSection({
                     <table className="data-table text-left">
                         <thead>
                             <tr>
+                                <th scope="col" className="!text-left whitespace-nowrap w-16 px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider bg-gray-50/50">
+                                    S.No.
+                                </th>
                                 {fields.map(f => (
                                     <th key={f.key} scope="col" className="!text-left whitespace-nowrap">
                                         {f.label} {f.required && <span className="text-red-500">*</span>}
@@ -590,6 +593,9 @@ export default function DynamicTableSection({
                         <tbody>
                             {data.map((item, idx) => (
                                 <tr key={idx}>
+                                    <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-500 font-medium">
+                                        {idx + 1}
+                                    </td>
                                     {fields.map(f => (
                                         <td key={f.key} className="px-4 py-4 whitespace-nowrap text-sm text-gray-700">
                                             {f.type === 'file' ? (
@@ -634,7 +640,7 @@ export default function DynamicTableSection({
                             ))}
                             {data.length === 0 && (
                                 <tr>
-                                    <td colSpan={fields.length + 1} className="px-4 py-8 text-center text-gray-500 italic">
+                                    <td colSpan={fields.length + 2} className="px-4 py-8 text-center text-gray-500 italic">
                                         No entries found.
                                     </td>
                                 </tr>
