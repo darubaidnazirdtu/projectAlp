@@ -2138,6 +2138,39 @@ export default function AparForm() {
                                             : "Please review all the information provided. All data entered corresponds to the institutional IQAC standards."}
                                     </p>
 
+                                    <div className="bg-gray-50 border border-gray-200 rounded-lg p-6 mb-8 max-h-[60vh] overflow-y-auto shadow-inner">
+                                        <div className="space-y-12 pointer-events-none">
+                                            <div>
+                                                <h4 className="text-xl font-bold text-gray-900 border-b-2 border-indigo-200 pb-2 mb-6">Part I: Personal Data</h4>
+                                                <PartIPersonal personal={formData.personal} onChange={() => {}} readOnly={true} departments={departments} qualifications={formData.profileQualifications} />
+                                            </div>
+                                            <div>
+                                                <h4 className="text-xl font-bold text-gray-900 border-b-2 border-indigo-200 pb-2 mb-6 mt-8">Part II: Self Appraisal</h4>
+                                                <PartII formData={formData} addItem={() => {}} removeItem={() => {}} updateArrayField={() => {}} updateAssessment={() => {}} updateField={() => {}} readOnly={true} />
+                                            </div>
+                                            <div>
+                                                <h4 className="text-xl font-bold text-gray-900 border-b-2 border-indigo-200 pb-2 mb-6 mt-8">Part III: Research & Development</h4>
+                                                <PartIII formData={formData} academicYear={activeAparAcademicYear} addItem={() => {}} removeItem={() => {}} updateArrayField={() => {}} updateArrayItem={() => {}} updateField={() => {}} readOnly={true} onSaveMonthly={() => {}} />
+                                            </div>
+                                            <div>
+                                                <h4 className="text-xl font-bold text-gray-900 border-b-2 border-indigo-200 pb-2 mb-6 mt-8">Part IV: Corporate Life</h4>
+                                                <PartIV formData={formData} addItem={() => {}} removeItem={() => {}} updateArrayField={() => {}} updateField={() => {}} readOnly={true} />
+                                            </div>
+                                            {(activeRole === 'Reporting Officer' || activeRole === 'Reviewing Officer') && (
+                                                <div>
+                                                    <h4 className="text-xl font-bold text-gray-900 border-b-2 border-indigo-200 pb-2 mb-6 mt-8">Part V: Assessment</h4>
+                                                    <PartV formData={formData} updateAssessment={() => {}} activeRole={activeRole} formStatus={formStatus} readOnly={true} />
+                                                </div>
+                                            )}
+                                            {activeRole === 'Reviewing Officer' && (
+                                                <div>
+                                                    <h4 className="text-xl font-bold text-gray-900 border-b-2 border-indigo-200 pb-2 mb-6 mt-8">Part VI: Remarks</h4>
+                                                    <PartVIRemarks formData={formData} updateRemarks={() => {}} formStatus={formStatus} readOnly={true} />
+                                                </div>
+                                            )}
+                                        </div>
+                                    </div>
+
                                     <div className="mt-8 pt-4 border-t border-gray-100">
                                         <div className="flex bg-gray-50 p-4 rounded-md">
                                             <input
@@ -2228,7 +2261,13 @@ export default function AparForm() {
                                                     <button
                                                         type="button"
                                                         className="px-8 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 flex items-center"
-                                                        onClick={() => requestSubmitConfirmation('officer')}
+                                                        onClick={() => {
+                                                            if (!certified) {
+                                                                toast.error('Please certify the form before submitting.');
+                                                                return;
+                                                            }
+                                                            requestSubmitConfirmation('officer');
+                                                        }}
                                                     >
                                                         <FiCheck className="mr-2" /> Submit APAR
                                                     </button>
