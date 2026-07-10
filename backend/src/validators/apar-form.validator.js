@@ -690,7 +690,9 @@ const teachingSchema = z.object({
     labs_engaged: optionalString,
     extra_labs_engaged: optionalString,
     reasons_not_engaged: optionalString,
-    degree_type: z.preprocess(nullToUndefined, z.union([z.enum(['UG', 'PG']), z.literal('')]).optional())
+    degree_type: z.preprocess(nullToUndefined, z.union([z.enum(['UG', 'PG']), z.literal('')]).optional()),
+    semester: z.preprocess(nullToUndefined, z.union([z.enum(['Odd', 'Even']), z.literal('')]).optional()),
+    course_type: z.preprocess(nullToUndefined, z.union([z.enum(['Theory', 'Practical']), z.literal('')]).optional())
   })).optional(),
   time_table: z.object({
     provided: z.object({

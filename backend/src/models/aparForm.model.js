@@ -71,7 +71,9 @@ const AparFormSchema = new mongoose.Schema({
             labs_engaged: String,
             extra_labs_engaged: String,
             reasons_not_engaged: String,
-            degree_type: String
+            degree_type: String,
+            semester: String,
+            course_type: String
         }],
         time_table: {
             provided: { odd_semester: String, even_semester: String },

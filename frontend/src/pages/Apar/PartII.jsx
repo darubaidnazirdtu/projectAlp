@@ -798,7 +798,7 @@ export default function PartII({ formData, addItem, removeItem, updateArrayField
     };
     const handleStartAddCourse = () => {
         setEditingCourseIndex(-1);
-        setTempCourse({ name_of_course: '', course_code: '', total_lectures_scheduled: '', total_lectures_engaged: '', extra_lectures_engaged: '', tutorials_scheduled: '', tutorials_engaged: '', extra_tutorials_engaged: '', labs_scheduled: '', labs_engaged: '', extra_labs_engaged: '', reasons_not_engaged: '', degree_type: 'UG' });
+        setTempCourse({ name_of_course: '', course_code: '', semester: 'Odd', course_type: 'Theory', total_lectures_scheduled: '', total_lectures_engaged: '', extra_lectures_engaged: '', tutorials_scheduled: '', tutorials_engaged: '', extra_tutorials_engaged: '', labs_scheduled: '', labs_engaged: '', extra_labs_engaged: '', reasons_not_engaged: '', degree_type: 'UG' });
     };
 
     const handleStartEditCourse = (idx) => {
@@ -1058,7 +1058,9 @@ export default function PartII({ formData, addItem, removeItem, updateArrayField
                                                 <th className="px-4 py-3 border-b text-center w-16">S.No.</th>
                                                 <th className="px-4 py-3 border-b">Course Name</th>
                                                 <th className="px-4 py-3 border-b">Course Code</th>
-                                                <th className="px-4 py-3 border-b">Type</th>
+                                                <th className="px-4 py-3 border-b">Degree Type</th>
+                                                <th className="px-4 py-3 border-b">Semester</th>
+                                                <th className="px-4 py-3 border-b">Course Type</th>
                                                 <th className="px-4 py-3 border-b text-center">Lectures (Sch/Eng/Ext)</th>
                                                 <th className="px-4 py-3 border-b text-center">Tutorials (Sch/Eng/Ext)</th>
                                                 <th className="px-4 py-3 border-b text-center">Labs (Sch/Eng/Ext)</th>
@@ -1079,6 +1081,8 @@ export default function PartII({ formData, addItem, removeItem, updateArrayField
                                                         <td className="px-4 py-3 font-medium text-gray-900">{course.name_of_course || '-'}</td>
                                                         <td className="px-4 py-3 font-medium text-gray-900">{course.course_code || '-'}</td>
                                                         <td className="px-4 py-3">{course.degree_type || 'UG'}</td>
+                                                        <td className="px-4 py-3">{course.semester || 'Odd'}</td>
+                                                        <td className="px-4 py-3">{course.course_type || 'Theory'}</td>
                                                         <td className="px-4 py-3 text-center">{course.total_lectures_scheduled || 0} / {course.total_lectures_engaged || 0} / {course.extra_lectures_engaged || 0}</td>
                                                         <td className="px-4 py-3 text-center">{course.tutorials_scheduled || 0} / {course.tutorials_engaged || 0} / {course.extra_tutorials_engaged || 0}</td>
                                                         <td className="px-4 py-3 text-center">{course.labs_scheduled || 0} / {course.labs_engaged || 0} / {course.extra_labs_engaged || 0}</td>
@@ -1119,6 +1123,20 @@ export default function PartII({ formData, addItem, removeItem, updateArrayField
                                         <select id="degree-type-temp" required disabled={readOnly} value={tempCourse.degree_type || 'UG'} onChange={(e) => setTempCourse(prev => ({ ...prev, degree_type: e.target.value }))} className="w-full border border-gray-300 rounded-lg shadow-sm focus:ring-indigo-500 focus:border-indigo-500 px-4 py-2.5 bg-white">
                                             <option>UG</option>
                                             <option>PG</option>
+                                        </select>
+                                    </div>
+                                    <div>
+                                        <label htmlFor="semester-temp" className="block text-sm font-medium text-gray-700 mb-1">Semester <span className="text-red-500">*</span></label>
+                                        <select id="semester-temp" required disabled={readOnly} value={tempCourse.semester || 'Odd'} onChange={(e) => setTempCourse(prev => ({ ...prev, semester: e.target.value }))} className="w-full border border-gray-300 rounded-lg shadow-sm focus:ring-indigo-500 focus:border-indigo-500 px-4 py-2.5 bg-white">
+                                            <option value="Odd">Odd Semester</option>
+                                            <option value="Even">Even Semester</option>
+                                        </select>
+                                    </div>
+                                    <div>
+                                        <label htmlFor="course-type-temp" className="block text-sm font-medium text-gray-700 mb-1">Course Type <span className="text-red-500">*</span></label>
+                                        <select id="course-type-temp" required disabled={readOnly} value={tempCourse.course_type || 'Theory'} onChange={(e) => setTempCourse(prev => ({ ...prev, course_type: e.target.value }))} className="w-full border border-gray-300 rounded-lg shadow-sm focus:ring-indigo-500 focus:border-indigo-500 px-4 py-2.5 bg-white">
+                                            <option value="Theory">Theory</option>
+                                            <option value="Practical">Practical</option>
                                         </select>
                                     </div>
                                     <div>
