@@ -706,9 +706,10 @@ export default function DynamicTableSection({
                                     <div>
                                         <FileUpload
                                             value={tempItem[f.key] || ''}
-                                            onChange={(url) => handleChange(f.key, sanitizeForResearchKey(f.key, url, 'url'))}
+                                            onChange={(url) => handleChange(f.key, typeof url === 'object' ? url : sanitizeForResearchKey(f.key, url, 'url'))}
                                             disabled={f.disabled || f.readOnly || readOnly}
                                             required={f.required || (typeof f.requiredIf === 'function' && f.requiredIf(tempItem))}
+                                            temporaryPdf
                                         />
                                         {f.description && (
                                             <p className="text-xs text-gray-500 mt-1 italic">{f.description}</p>

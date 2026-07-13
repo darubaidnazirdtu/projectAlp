@@ -180,6 +180,9 @@ export default function OfficerDashboard() {
     console.log('APAR Dashboard Debug:', { history, currentAY });
 
     const computedExternalImage = (name) => `https://dtu.ac.in/modules/facilities/people/faculty/userimages/${String(name || '').replace(/^(Dr\.|Dr|Professor|Prof\.|Prof|Mr\.|Mr|Ms\.|Ms|Mrs\.|Mrs)\s+/i, '').toLowerCase().replace(/\s+/g, '')}.jpg`;
+    const avatarSrc = user?.avatar?.startsWith('profilepicture/')
+        ? `${new Api().client.defaults.baseURL}/apar/mongo/document?path=${encodeURIComponent(user.avatar)}`
+        : user?.avatar || computedExternalImage(user?.name);
 
     const handleAvatarSelected = async (e) => {
         const file = e?.target?.files?.[0];
@@ -286,12 +289,12 @@ export default function OfficerDashboard() {
                     <div className="flex flex-col sm:flex-row items-center justify-center gap-6 mb-8 bg-white p-6 rounded-xl shadow-sm border border-gray-100">
                         <div className="relative">
                             <img
-                                src={user?.avatar || computedExternalImage(user?.name)}
+                                src={avatarSrc}
                                 alt={user.name}
                                 className="h-32 w-32 rounded-lg object-cover object-top shadow-md border border-gray-200"
                                 onError={(e) => {
                                     try {
-                                        if (user?.avatar && e.target.src === user.avatar) {
+                                        if (user?.avatar) {
                                             e.target.onerror = null;
                                             e.target.src = computedExternalImage(user?.name);
                                             return;

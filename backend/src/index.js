@@ -3,6 +3,7 @@ import { connectDB } from './db/index.js'
 import { app } from './app.js'
 import { createServer } from 'http'
 import { initializeSocket } from './config/socket.js'
+import { ensureAparBucket } from './services/minio.service.js'
 
 dotenv.config();
 
@@ -18,6 +19,10 @@ connectDB()
     .catch((err) => {
         console.error("MONGO db connection failed !!! ", err);
     })
+
+ensureAparBucket().catch((err) => {
+    console.error('MinIO bucket initialization failed:', err.message);
+});
 
 httpServer.listen(port, () => {
     // // console.log(`✅ Server started on port ${port}`)

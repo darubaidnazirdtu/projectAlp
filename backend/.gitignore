@@ -27,6 +27,8 @@ out/
 .vscode/
 .idea/
 *.swp
+.windsurf
+.agents
 
 # Coverage reports
 coverage/
@@ -36,3 +38,4 @@ coverage/
 *.tgz
 
 public/uploads/
+storage/

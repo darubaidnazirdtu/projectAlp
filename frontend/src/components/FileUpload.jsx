@@ -3,7 +3,7 @@ import { Api } from '../api/Api';
 import { FiUpload, FiEye, FiTrash2, FiLoader } from 'react-icons/fi';
 import { toast } from 'sonner';
 
-const FileUpload = ({ value, onChange, disabled, required = false }) => {
+const FileUpload = ({ value, onChange, disabled, required = false, temporaryPdf = false }) => {
     const [uploading, setUploading] = useState(false);
     const fileInputRef = useRef(null);
     const api = new Api(); // Use default base URL
@@ -12,16 +12,30 @@ const FileUpload = ({ value, onChange, disabled, required = false }) => {
         const file = e.target.files[0];
         if (!file) return;
 
+        if (temporaryPdf && (file.type !== 'application/pdf' || !file.name.toLowerCase().endsWith('.pdf'))) {
+            toast.error('Only PDF files are allowed');
+            e.target.value = '';
+            return;
+        }
+        if (temporaryPdf && file.size > 50 * 1024 * 1024) {
+            toast.error('PDF must be 50 MB or smaller');
+            e.target.value = '';
+            return;
+        }
+
         setUploading(true);
         const formData = new FormData();
         formData.append('file', file);
 
         try {
             // Use Api.post and let axios set the multipart boundary header
-            const result = await api.post('/upload', formData, { 'Content-Type': undefined });
+            const result = await api.post(temporaryPdf ? '/apar/mongo/documents/temp' : '/upload', formData, { 'Content-Type': undefined });
 
             // Api.post unwraps the response to `data` so `result` should be the controller's `data`
-            if (result && result.url) {
+            if (temporaryPdf && result?.tempId) {
+                onChange(result);
+                toast.success('PDF attached. It will upload when you save the entry.');
+            } else if (result && result.url) {
                 onChange(result.url);
                 toast.success('File uploaded successfully');
             } else {
@@ -38,9 +52,22 @@ const FileUpload = ({ value, onChange, disabled, required = false }) => {
         }
     };
 
-    const handleRemove = () => {
+    const handleRemove = async () => {
+        if (temporaryPdf && value?.tempId) {
+            try {
+                await api.delete(`/apar/mongo/documents/temp?tempId=${encodeURIComponent(value.tempId)}`);
+            } catch (error) {
+                console.warn('Temporary PDF cleanup failed:', error);
+            }
+        }
         onChange('');
     };
+
+    const isTemporary = Boolean(value && typeof value === 'object' && value.tempId);
+    const displayName = isTemporary ? value.originalName || 'Selected PDF' : null;
+    const viewUrl = typeof value === 'string' && /^(document|profilepicture)\//.test(value)
+        ? `${api.client.defaults.baseURL}/apar/mongo/document?path=${encodeURIComponent(value)}`
+        : value;
 
     return (
         <div className="flex items-center space-x-2">
@@ -61,6 +88,7 @@ const FileUpload = ({ value, onChange, disabled, required = false }) => {
                 ref={fileInputRef}
                 onChange={handleFileChange}
                 className="hidden"
+                accept={temporaryPdf ? 'application/pdf,.pdf' : undefined}
                 disabled={disabled || uploading}
             />
 
@@ -78,15 +106,19 @@ const FileUpload = ({ value, onChange, disabled, required = false }) => {
 
             {value && (
                 <div className="flex items-center space-x-2">
-                    <a
-                        href={value}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="flex items-center px-3 py-2 bg-green-600 text-white rounded hover:bg-green-700 text-sm transition-colors"
-                    >
-                        <FiEye className="mr-2" />
-                        Click here to view
-                    </a>
+                    {isTemporary ? (
+                        <span className="flex items-center px-3 py-2 bg-amber-100 text-amber-800 rounded text-sm">{displayName} (pending save)</span>
+                    ) : (
+                        <a
+                            href={viewUrl}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="flex items-center px-3 py-2 bg-green-600 text-white rounded hover:bg-green-700 text-sm transition-colors"
+                        >
+                            <FiEye className="mr-2" />
+                            Click here to view
+                        </a>
+                    )}
 
                     {!disabled && (
                         <button

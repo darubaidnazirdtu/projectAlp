@@ -24,6 +24,7 @@ Once the Docker containers are successfully up and running, you can access the a
 
 - **Frontend Application**: [http://localhost:3000](http://localhost:3000)
 - **Backend API**: [http://localhost:8000](http://localhost:8000)
+- **MinIO Console**: [http://localhost:9001](http://localhost:9001) (Username: `minioadmin` / Password: `minioadmin`)
 
 ## Useful Docker Commands
 

@@ -20,6 +20,14 @@ import { FacultyProfile } from "../models/facultyProfile.model.js";
 import { createNotification, notifyHeads } from "./notification.controller.js";
 import { v4 as uuidv4 } from 'uuid'; // Assuming uuid is available or use generic ID generator
 import { normalizeQualifications } from '../utils/qualification.util.js';
+import { createDocumentPath, deleteObject, isAparObjectPath, uploadLocalFile } from '../services/minio.service.js';
+import {
+    getCompletedTemporaryDocument,
+    getTemporaryDocument,
+    recordCompletedTemporaryDocument,
+    removeTemporaryDocument,
+    discardTemporaryDocument
+} from '../services/apar-temp-document.service.js';
 
 const generateId = (prefix) => `${prefix}-${Date.now()}-${uuidv4()}`;
 
@@ -733,6 +741,7 @@ const deleteForm = asyncHandler(async (req, res) => {
     }
 
     await AparForm.deleteOne({ _id: form._id });
+    await Promise.allSettled([...collectAparObjectPaths(form.research)].map(objectPath => deleteObject(objectPath)));
 
     return res.status(200).json(new ApiResponse(200, { faculty_id, ay }, "APAR form deleted permanently"));
 });
@@ -851,6 +860,64 @@ const checkDraftDuplicates = (data) => {
     }
 };
 
+const documentFieldNames = new Set([
+    'link', 'link_to_paper', 'link_to_publication', 'evidence_link',
+    'certificate_link', 'link_to_patent'
+]);
+
+const collectAparObjectPaths = (value, result = new Set()) => {
+    if (typeof value === 'string') {
+        if (isAparObjectPath(value)) result.add(value);
+        return result;
+    }
+    if (Array.isArray(value)) value.forEach(item => collectAparObjectPaths(item, result));
+    else if (value && typeof value === 'object') Object.values(value).forEach(item => collectAparObjectPaths(item, result));
+    return result;
+};
+
+const resolveAparDocuments = async (research, { ownerId, facultyName, academicYear }) => {
+    const uploadedPaths = [];
+    const temporaryIds = [];
+    const resolved = structuredClone(research || {});
+
+    const visit = async (value, key = '') => {
+        if (Array.isArray(value)) {
+            for (let index = 0; index < value.length; index += 1) value[index] = await visit(value[index]);
+            return value;
+        }
+        if (!value || typeof value !== 'object') return value;
+
+        if (documentFieldNames.has(key) && value.tempId) {
+            const completedPath = getCompletedTemporaryDocument(value.tempId, ownerId);
+            if (completedPath) return completedPath;
+
+            const temporary = getTemporaryDocument(value.tempId, ownerId);
+            if (!temporary) throw new ApiError(400, 'The selected PDF has expired. Please select it again.');
+
+            const objectPath = createDocumentPath(facultyName, academicYear);
+            temporaryIds.push(value.tempId);
+            await uploadLocalFile({
+                filePath: temporary.filePath,
+                objectPath,
+                contentType: value.mimeType || 'application/pdf'
+            });
+            uploadedPaths.push(objectPath);
+            return objectPath;
+        }
+
+        for (const [childKey, childValue] of Object.entries(value)) value[childKey] = await visit(childValue, childKey);
+        return value;
+    };
+
+    try {
+        return { research: await visit(resolved), uploadedPaths, temporaryIds };
+    } catch (error) {
+        await Promise.allSettled(uploadedPaths.map(objectPath => deleteObject(objectPath)));
+        await Promise.allSettled(temporaryIds.map(tempId => discardTemporaryDocument(tempId)));
+        throw error;
+    }
+};
+
 const saveForm = asyncHandler(async (req, res) => {
     let ay = req.body.ay || req.user?.academicYear;
     if (ay) ay = normalizeAY(ay);
@@ -894,8 +961,21 @@ const saveForm = asyncHandler(async (req, res) => {
         }
     }
 
+    const faculty = await Faculty.findOne({ faculty_id }).lean();
+    const facultyName = faculty?.name || formData?.personal?.name || faculty_id;
+    let uploadedPaths = [];
+    let temporaryIds = [];
     let form;
     try {
+        const documents = await resolveAparDocuments(formData.research, {
+            ownerId: req.user.id,
+            facultyName,
+            academicYear: ay
+        });
+        formData.research = documents.research;
+        uploadedPaths = documents.uploadedPaths;
+        temporaryIds = documents.temporaryIds;
+
         form = await AparForm.findOneAndUpdate(
             { faculty_id, ay },
             {
@@ -919,9 +999,22 @@ const saveForm = asyncHandler(async (req, res) => {
             await form.save();
         }
     } catch (dbError) {
+        await Promise.allSettled(uploadedPaths.map(objectPath => deleteObject(objectPath)));
+        await Promise.allSettled(temporaryIds.map(tempId => discardTemporaryDocument(tempId)));
         console.error("Save Draft DB Error:", dbError);
         throw new ApiError(400, `Failed to save draft: ${dbError.message}`);
     }
+
+    for (const tempId of temporaryIds) {
+        // The upload path is retained in a receipt so repeated auto-saves remain idempotent.
+        const matchingPath = uploadedPaths.shift();
+        if (matchingPath) recordCompletedTemporaryDocument(tempId, req.user.id, matchingPath);
+        await removeTemporaryDocument(tempId);
+    }
+
+    const oldPaths = collectAparObjectPaths(existing?.research);
+    const currentPaths = collectAparObjectPaths(form.research);
+    await Promise.allSettled([...oldPaths].filter(objectPath => !currentPaths.has(objectPath)).map(objectPath => deleteObject(objectPath)));
 
     // Sync with Faculty model
     try {

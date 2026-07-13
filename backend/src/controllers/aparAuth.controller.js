@@ -18,9 +18,8 @@ import {
 import { findById as findFacultyById, findByEmail as findFacultyByEmail } from '../data-access/faculty.data-access.js';
 import { normalizeRoleValue, ROLES } from '../config/aparRoles.js';
 import { validatePasswordPolicy } from '../utils/password-policy.js';
-import { uploadOnCloudinary, deleteFromCloudinary } from '../utils/cloudinary.js';
-import fs from 'fs';
-import path from 'path';
+import { createProfilePicturePath, deleteObject, uploadLocalFile } from '../services/minio.service.js';
+import { unlink } from 'node:fs/promises';
 
 const SESSION_TTL_MS = Number(process.env.SESSION_TTL_MS || 1000 * 60 * 60 * 12); // 12 hours
 const DEFAULT_INITIAL_PASSWORD = process.env.DEFAULT_INITIAL_PASSWORD || '';
@@ -389,84 +388,35 @@ export const aparUploadAvatar = asyncHandler(async (req, res) => {
 
   const allowedMimes = ['image/jpeg', 'image/png', 'image/webp'];
   if (!allowedMimes.includes(file.mimetype)) {
-    try { if (file.path && fs.existsSync(file.path)) fs.unlinkSync(file.path); } catch (e) {}
+    await unlink(file.path).catch(() => {});
     throw new ApiError(400, 'Unsupported file type. Allowed: jpeg, png, webp');
   }
 
   const MAX_BYTES = Number(process.env.MAX_AVATAR_UPLOAD_BYTES || 2 * 1024 * 1024);
   if (file.size && file.size > MAX_BYTES) {
-    try { if (file.path && fs.existsSync(file.path)) fs.unlinkSync(file.path); } catch (e) {}
+    await unlink(file.path).catch(() => {});
     throw new ApiError(400, `File too large. Maximum ${MAX_BYTES} bytes allowed.`);
   }
 
-  let uploadResp;
-  // If Cloudinary is configured, use it. Otherwise fallback to local public/uploads storage for dev.
-  if (process.env.CLOUDINARY_CLOUD_NAME && process.env.CLOUDINARY_API_KEY && process.env.CLOUDINARY_API_SECRET) {
-    try {
-      uploadResp = await uploadOnCloudinary(file.path);
-    } catch (err) {
-      console.error('[aparUploadAvatar] cloudinary upload error:', err?.message || err, err?.stack || 'no-stack');
-      try { if (file.path && fs.existsSync(file.path)) fs.unlinkSync(file.path); } catch (e) {}
-      if (err instanceof ApiError) throw err;
-      throw new ApiError(500, `Failed to upload avatar: ${err?.message || String(err)}`);
-    }
+  const existing = await findUserById(req.user.id);
+  const faculty = existing?.userId ? await findFacultyById(existing.userId) : null;
+  const objectPath = createProfilePicturePath(faculty?.name || existing?.name || req.user.id, file.originalname);
 
-    if (!uploadResp || !uploadResp.secure_url) {
-      throw new ApiError(500, 'Failed to upload file to cloud');
-    }
-  } else {
-    // Local fallback: move file into public/uploads and serve from there
-    try {
-      const uploadsDir = path.join(process.cwd(), 'public', 'uploads');
-      if (!fs.existsSync(uploadsDir)) fs.mkdirSync(uploadsDir, { recursive: true });
-
-      const ext = path.extname(file.originalname || file.filename || '') || '';
-      const destName = `avatar-${req.user.id}-${Date.now()}${ext}`;
-      const destPath = path.join(uploadsDir, destName);
-
-      fs.renameSync(file.path, destPath);
-
-      const host = req.get('host') || 'localhost:8000';
-      const proto = req.protocol || 'http';
-      const relativeUrl = `/uploads/${destName}`;
-      uploadResp = { secure_url: `${proto}://${host}${relativeUrl}` };
-    } catch (err) {
-      console.error('[aparUploadAvatar] local fallback error:', err?.message || err, err?.stack || 'no-stack');
-      try { if (file.path && fs.existsSync(file.path)) fs.unlinkSync(file.path); } catch (e) {}
-      throw new ApiError(500, `Failed to save avatar locally: ${err?.message || String(err)}`);
-    }
-  }
-
-  const avatarUrl = uploadResp.secure_url;
-
-  // Try to delete previous avatar from cloud if available (best-effort)
   try {
-    const existing = await findUserById(req.user.id);
-    if (existing?.avatar) {
-      // If avatar is stored in local uploads folder, remove the file from disk
-      try {
-        const avatarUrl = String(existing.avatar);
-        const uploadsSegment = '/uploads/';
-        const idx = avatarUrl.indexOf(uploadsSegment);
-        if (idx !== -1) {
-          const filename = avatarUrl.substring(idx + uploadsSegment.length);
-          const localPath = path.join(process.cwd(), 'public', 'uploads', filename);
-          if (fs.existsSync(localPath)) {
-            try { fs.unlinkSync(localPath); } catch (e) { /* ignore */ }
-          }
-        } else {
-          // Otherwise attempt to delete from Cloudinary (best-effort)
-          try { await deleteFromCloudinary(existing.avatar); } catch (e) { /* ignore */ }
-        }
-      } catch (e) {
-        // ignore deletion errors
-      }
-    }
-  } catch (e) {
-    // ignore
+    await uploadLocalFile({ filePath: file.path, objectPath, contentType: file.mimetype });
+    await updateUserAttributes({ id: req.user.id, avatar: objectPath });
+  } catch (error) {
+    await deleteObject(objectPath).catch(() => {});
+    throw new ApiError(503, `Failed to store profile picture: ${error.message || String(error)}`);
+  } finally {
+    await unlink(file.path).catch(() => {});
   }
 
-  await updateUserAttributes({ id: req.user.id, avatar: avatarUrl });
+  if (existing?.avatar?.startsWith('profilepicture/')) {
+    await deleteObject(existing.avatar).catch((error) => console.error('Previous avatar cleanup failed:', error.message));
+  }
+
+  const avatarUrl = objectPath;
 
   const updatedUser = await findUserById(req.user.id);
   let facultyMember = null;
