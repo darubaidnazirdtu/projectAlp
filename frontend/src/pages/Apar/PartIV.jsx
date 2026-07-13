@@ -39,7 +39,7 @@ export default function PartIV({ formData, addItem, removeItem, updateArrayItem,
                 />
 
                 <DynamicTableSection
-                    title="1) b) Courses Development"
+                    title="1) b) Course Development OR Courses Developed"
                     data={corporate.course_development_details || []}
                     uniqueKey="description"
                     {...createHandlers('corporate', 'course_development_details')}

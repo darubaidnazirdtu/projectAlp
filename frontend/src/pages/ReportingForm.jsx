@@ -257,7 +257,7 @@ export default function Form_({ Token }) {
 
                             <fieldset>
                                 <label style={{ marginBottom: '0.5rem', width: 'fit-content', fontSize: "1rem !important", color: "#00005B", fontWeight: "550" }} className="label">
-                                    ii) Total of hours/ periods provided in the time table for
+                                    ii) Total Number of hours/ periods provided in the time table for
                                 </label>
                                 <label style={{ marginBottom: '0.5rem', width: 'fit-content', fontSize: "1rem !important", fontWeight: "550" }} className="label">
 

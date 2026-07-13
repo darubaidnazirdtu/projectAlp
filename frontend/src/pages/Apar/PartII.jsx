@@ -78,7 +78,7 @@
 
 //                 {/* ii) Total of hours/periods provided in time table vs actually taken */}
 //                 <div>
-//                     <h4 className="text-md font-semibold text-gray-800 mb-2">ii) Total of hours/ periods provided in the time table for</h4>
+//                     <h4 className="text-md font-semibold text-gray-800 mb-2">ii) Total Number of hours/ periods provided in the time table for</h4>
 //                     <div className="bg-gray-50 border border-gray-200 rounded-lg p-6 mb-4">
 //                         <div className="font-semibold mb-2">a) Lectures, Tutorials, Practical, Seminars/ Discussions in the academic year</div>
 //                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -431,7 +431,7 @@
 
 //                 {/* ii) Total of hours/periods provided in time table vs actually taken */}
 //                 <div>
-//                     <h4 className="text-md font-semibold text-gray-800 mb-2">ii) Total of hours/ periods provided in the time table</h4>
+//                     <h4 className="text-md font-semibold text-gray-800 mb-2">ii) Total Number of hours/ periods provided in the time table</h4>
 //                     <div className="bg-gray-50 border border-gray-200 rounded-lg p-6 mb-4">
 //                         <div className="font-semibold mb-2">a) Provided in the academic year</div>
 //                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -1197,7 +1197,7 @@ export default function PartII({ formData, addItem, removeItem, updateArrayField
 
                 {/* ii) Total of hours/periods provided in time table vs actually taken */}
                 <div>
-                    <h4 className="text-md font-semibold text-gray-800 mb-2">ii) Total of hours/ periods provided in the time table</h4>
+                    <h4 className="text-md font-semibold text-gray-800 mb-2">ii) Total Number of hours/ periods provided in the time table</h4>
                     <div className="bg-gray-50 border border-gray-200 rounded-lg p-6 mb-4">
                         <div className="font-semibold mb-2">a) Provided in the academic year</div>
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
