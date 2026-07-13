@@ -969,31 +969,54 @@ const submitForm = asyncHandler(async (req, res) => {
         "timeline.submitted_at": new Date()
     };
 
+    let reportingOfficerId = null;
+    let reviewingOfficerId = null;
+
     if (user) {
+        // 1. Direct Assignment for Reporting Officer
         if (user.reporting_officer_id) {
-            setObj.reporting_officer_id = user.reporting_officer_id;
+            reportingOfficerId = user.reporting_officer_id;
         } else if (user.department_id) {
+            // 2. Same Department Search
             const reportingOfficer = await User.findOne({ department_id: user.department_id, apar_role: 'Reporting Officer' });
             if (reportingOfficer) {
-                setObj.reporting_officer_id = reportingOfficer.user_id;
+                reportingOfficerId = reportingOfficer.user_id;
+            } else {
+                // 3. Global Search
+                const globalReportingOfficer = await User.findOne({ apar_role: 'Reporting Officer' });
+                if (globalReportingOfficer) {
+                    reportingOfficerId = globalReportingOfficer.user_id;
+                }
             }
         }
 
+        // 1. Direct Assignment for Reviewing Officer
         if (user.reviewing_officer_id) {
-            setObj.reviewing_officer_id = user.reviewing_officer_id;
+            reviewingOfficerId = user.reviewing_officer_id;
         } else if (user.department_id) {
-            let reviewingOfficer = await User.findOne({ department_id: user.department_id, apar_role: 'Reviewing Officer' });
-            if (!reviewingOfficer) {
-                reviewingOfficer = await User.findOne({ apar_role: 'Reviewing Officer' });
-            }
-            if (!reviewingOfficer) {
-                reviewingOfficer = await User.findOne({ apar_role: 'Dean' });
-            }
+            // 2. Same Department Search
+            const reviewingOfficer = await User.findOne({ department_id: user.department_id, apar_role: 'Reviewing Officer' });
             if (reviewingOfficer) {
-                setObj.reviewing_officer_id = reviewingOfficer.user_id;
+                reviewingOfficerId = reviewingOfficer.user_id;
+            } else {
+                // 3. Global Search
+                let globalReviewingOfficer = await User.findOne({ apar_role: 'Reviewing Officer' });
+                if (!globalReviewingOfficer) {
+                    globalReviewingOfficer = await User.findOne({ apar_role: 'Dean' });
+                }
+                if (globalReviewingOfficer) {
+                    reviewingOfficerId = globalReviewingOfficer.user_id;
+                }
             }
         }
     }
+
+    if (!reportingOfficerId || !reviewingOfficerId) {
+        throw new ApiError(400, "Contact office to add receiving and reporting officer");
+    }
+
+    setObj.reporting_officer_id = reportingOfficerId;
+    setObj.reviewing_officer_id = reviewingOfficerId;
 
     const form = await AparForm.findOneAndUpdate(
         { faculty_id, ay },
