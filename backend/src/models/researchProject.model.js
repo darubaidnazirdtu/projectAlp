@@ -28,6 +28,7 @@ const ResearchProjectSchema = new mongoose.Schema({
     // Common fields
     // -------------------------------------------------------------------------
     title: String, // Generic title field used by all types
+    role: String,
     start_date: Date,
     end_date: Date,
     status: String,

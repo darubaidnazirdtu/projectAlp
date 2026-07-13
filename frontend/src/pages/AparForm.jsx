@@ -707,10 +707,21 @@ export default function AparForm() {
         return obj;
     };
 
-    const confirmDelete = () => {
+    const collectAparDocumentPaths = (value, paths = new Set()) => {
+        if (typeof value === 'string') {
+            if (/^document\//.test(value)) paths.add(value);
+            return paths;
+        }
+        if (Array.isArray(value)) value.forEach(item => collectAparDocumentPaths(item, paths));
+        else if (value && typeof value === 'object') Object.values(value).forEach(item => collectAparDocumentPaths(item, paths));
+        return paths;
+    };
+
+    const confirmDelete = async () => {
         if (deleteModal.section && deleteModal.field && deleteModal.index !== null) {
-            removeItem(deleteModal.section, deleteModal.field, deleteModal.index);
-            toast.success("Item deleted");
+            const deleted = await removeItem(deleteModal.section, deleteModal.field, deleteModal.index);
+            if (deleted) toast.success("Item and its PDF, if any, were deleted");
+            else toast.error("The entry was not deleted because the APAR draft could not be saved");
         }
         setDeleteModal({ open: false, section: null, field: null, index: null });
     };
@@ -1211,17 +1222,21 @@ export default function AparForm() {
 
         const dataToSave = customFormData || formData;
 
-        // Validate Personal Data when saving draft
-        if (currentStep === 1 && !validatePersonalDataStep(dataToSave)) {
-            return false;
-        }
+        // Table edits use silent autosave. They must not be blocked by unrelated,
+        // still-incomplete fields in Parts I/II; otherwise a removed/replaced PDF
+        // remains in storage while the row appears changed in the browser.
+        if (!silent) {
+            if (currentStep === 1 && !validatePersonalDataStep(dataToSave)) {
+                return false;
+            }
 
-        if (!validateCoursesTaught(dataToSave, { navigateToPart: true })) {
-            return false;
-        }
+            if (!validateCoursesTaught(dataToSave, { navigateToPart: true })) {
+                return false;
+            }
 
-        if (!validateTimeTable(dataToSave, { navigateToPart: true })) {
-            return false;
+            if (!validateTimeTable(dataToSave, { navigateToPart: true })) {
+                return false;
+            }
         }
 
         setIsSavingDraft(true);
@@ -1649,18 +1664,33 @@ export default function AparForm() {
         });
     };
 
-    const removeItem = (section, field, index) => {
-        setFormData(prev => {
-            const next = {
-                ...prev,
-                [section]: {
-                    ...prev[section],
-                    [field]: prev[section][field].filter((_, i) => i !== index)
-                }
-            };
-            handleSaveDraft(true, next);
-            return next;
-        });
+    const removeItem = async (section, field, index) => {
+        const itemToRemove = formData?.[section]?.[field]?.[index];
+        const documentPaths = [...collectAparDocumentPaths(itemToRemove)];
+
+        try {
+            // Delete the row's files first. The endpoint also clears the stored
+            // APAR references, so deleting a row cannot leave orphan PDFs.
+            await Promise.all(documentPaths.map(path => AparFormGradedService.deleteDocument(path)));
+        } catch (error) {
+            console.error('Row PDF deletion failed:', error);
+            toast.error('Could not delete the row PDF. The row was kept unchanged.');
+            return false;
+        }
+
+        const next = {
+            ...formData,
+            [section]: {
+                ...formData[section],
+                [field]: (formData[section][field] || []).filter((_, i) => i !== index)
+            }
+        };
+
+        // Persist first: saveForm compares old and new document paths and removes
+        // the file from object storage only after the row deletion succeeds.
+        const saved = await handleSaveDraft(true, next);
+        if (saved) setFormData(next);
+        return saved;
     };
 
     const updateArrayField = (section, field, index, key, value) => {

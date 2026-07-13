@@ -8,6 +8,10 @@ const FileUpload = ({ value, onChange, disabled, required = false, temporaryPdf 
     const fileInputRef = useRef(null);
     const api = new Api(); // Use default base URL
 
+    const deleteSavedPdf = async (path) => {
+        await api.delete(`/apar/mongo/documents?path=${encodeURIComponent(path)}`);
+    };
+
     const handleFileChange = async (e) => {
         const file = e.target.files[0];
         if (!file) return;
@@ -28,12 +32,30 @@ const FileUpload = ({ value, onChange, disabled, required = false, temporaryPdf 
         formData.append('file', file);
 
         try {
+            // A persisted PDF is removed before its replacement is uploaded. The
+            // API clears the APAR reference and deletes the object as one action.
+            if (temporaryPdf && typeof value === 'string' && /^document\//.test(value)) {
+                await deleteSavedPdf(value);
+                onChange('');
+            }
+
             // Use Api.post and let axios set the multipart boundary header
             const result = await api.post(temporaryPdf ? '/apar/mongo/documents/temp' : '/upload', formData, { 'Content-Type': undefined });
 
             // Api.post unwraps the response to `data` so `result` should be the controller's `data`
             if (temporaryPdf && result?.tempId) {
+                // Keep an already-saved document available until the parent entry
+                // saves the replacement. Only a previous *temporary* selection can
+                // be discarded here.
+                const previousTempId = value?.tempId;
                 onChange(result);
+                if (previousTempId && previousTempId !== result.tempId) {
+                    try {
+                        await api.delete(`/apar/mongo/documents/temp?tempId=${encodeURIComponent(previousTempId)}`);
+                    } catch (cleanupError) {
+                        console.warn('Previous temporary PDF cleanup failed:', cleanupError);
+                    }
+                }
                 toast.success('PDF attached. It will upload when you save the entry.');
             } else if (result && result.url) {
                 onChange(result.url);
@@ -59,8 +81,17 @@ const FileUpload = ({ value, onChange, disabled, required = false, temporaryPdf 
             } catch (error) {
                 console.warn('Temporary PDF cleanup failed:', error);
             }
+        } else if (temporaryPdf && typeof value === 'string' && /^document\//.test(value)) {
+            try {
+                await deleteSavedPdf(value);
+            } catch (error) {
+                console.error('Saved PDF deletion failed:', error);
+                toast.error('Could not delete the PDF');
+                return;
+            }
         }
         onChange('');
+        if (temporaryPdf) toast.success('PDF deleted');
     };
 
     const isTemporary = Boolean(value && typeof value === 'object' && value.tempId);
@@ -121,14 +152,27 @@ const FileUpload = ({ value, onChange, disabled, required = false, temporaryPdf 
                     )}
 
                     {!disabled && (
-                        <button
-                            type="button"
-                            onClick={handleRemove}
-                            className="p-2 text-red-600 hover:text-red-800 transition-colors"
-                            title="Remove file"
-                        >
-                            <FiTrash2 />
-                        </button>
+                        <>
+                            {temporaryPdf && (
+                                <button
+                                    type="button"
+                                    onClick={() => fileInputRef.current?.click()}
+                                    disabled={uploading}
+                                    className="flex items-center px-3 py-2 bg-indigo-600 text-white rounded hover:bg-indigo-700 disabled:bg-gray-400 text-sm transition-colors"
+                                >
+                                    {uploading ? <FiLoader className="animate-spin mr-2" /> : <FiUpload className="mr-2" />}
+                                    {uploading ? 'Uploading...' : 'Replace PDF'}
+                                </button>
+                            )}
+                            <button
+                                type="button"
+                                onClick={handleRemove}
+                                className="p-2 text-red-600 hover:text-red-800 transition-colors"
+                                title="Remove file"
+                            >
+                                <FiTrash2 />
+                            </button>
+                        </>
                     )}
                 </div>
             )}

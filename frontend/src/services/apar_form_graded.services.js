@@ -33,6 +33,10 @@ class AparFormGradedServices {
         return await this.api.delete(`/apar/mongo/form?${params.toString()}`)
     }
 
+    async deleteDocument(path) {
+        return await this.api.delete(`/apar/mongo/documents?path=${encodeURIComponent(path)}`)
+    }
+
     async getFacultyInfo() {
         return await this.api.get('/apar/mongo/info')
     }

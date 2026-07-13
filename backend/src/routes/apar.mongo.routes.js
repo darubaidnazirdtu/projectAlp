@@ -20,7 +20,7 @@ import { authenticate } from '../middlewares/auth.middleware.js';
 import { validate } from '../middlewares/validate.middleware.js';
 import { aparDraftSchema, aparFormSchema, aparAssessmentSchema, aparReviewingSchema } from '../validators/apar-form.validator.js';
 import { uploadAparTemporaryDocument } from '../middlewares/apar-document-upload.middleware.js';
-import { deleteTemporaryDocument, streamDocument, uploadTemporaryDocument } from '../controllers/apar-document.controller.js';
+import { deleteSavedDocument, deleteTemporaryDocument, streamDocument, uploadTemporaryDocument } from '../controllers/apar-document.controller.js';
 
 const router = Router();
 
@@ -28,6 +28,7 @@ router.route("/form").get(authenticate, getForm);
 router.route("/form").delete(authenticate, deleteForm);
 router.route('/documents/temp').post(authenticate, uploadAparTemporaryDocument.single('file'), uploadTemporaryDocument);
 router.route('/documents/temp').delete(authenticate, deleteTemporaryDocument);
+router.route('/documents').delete(authenticate, deleteSavedDocument);
 router.route('/document').get(authenticate, streamDocument);
 router.route("/save").post(authenticate, validate(aparDraftSchema), saveForm);
 router.route("/save-to-monthly").post(authenticate, saveToMonthly);

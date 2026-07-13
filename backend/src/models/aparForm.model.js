@@ -172,6 +172,7 @@ const AparFormSchema = new mongoose.Schema({
             funding_id: String,
             title_research: String,
             title: String, // Generic title
+            role: String,
             type_of_project: String,
             funding_agency_name: String,
             funding_type: String,
@@ -183,6 +184,7 @@ const AparFormSchema = new mongoose.Schema({
             status: String,
             outcome: String,
             remarks: String,
+            link: String,
             academic_year: String,
             department_id: String,
             faculty_involved: [],
@@ -281,9 +283,14 @@ const AparFormSchema = new mongoose.Schema({
             start_date: Date,
             end_date: Date,
             link: String,
+            link_to_publication: String,
+            same_institute_affiliation: String,
             academic_year: String,
             department_id: String,
-            faculty_id: String
+            faculty_id: String,
+            faculty_ids: [],
+            student_ids: [],
+            external_contributors: []
         }],
 
         // 10. Collaboration / Participation -> Collaboration (type: 'activity')

@@ -1014,7 +1014,15 @@ const saveForm = asyncHandler(async (req, res) => {
 
     const oldPaths = collectAparObjectPaths(existing?.research);
     const currentPaths = collectAparObjectPaths(form.research);
-    await Promise.allSettled([...oldPaths].filter(objectPath => !currentPaths.has(objectPath)).map(objectPath => deleteObject(objectPath)));
+    const stalePaths = [...oldPaths].filter(objectPath => !currentPaths.has(objectPath));
+    // Row/file actions delete their PDFs explicitly. Keep the normal draft save
+    // successful if an old legacy object is already missing from storage.
+    const cleanupResults = await Promise.allSettled(stalePaths.map(objectPath => deleteObject(objectPath)));
+    cleanupResults.forEach((result, index) => {
+        if (result.status === 'rejected') {
+            console.error(`[APAR DOCUMENT CLEANUP] Could not delete ${stalePaths[index]}:`, result.reason);
+        }
+    });
 
     // Sync with Faculty model
     try {
@@ -1341,6 +1349,7 @@ const saveToMonthly = asyncHandler(async (req, res) => {
             type: 'funding',
             title: item.title || item.title_research,
             title_research: item.title_research,
+            role: item.role,
             type_of_project: item.type_of_project,
             funding_agency_name: item.funding_agency_name,
             agency_name: item.funding_agency_name,
