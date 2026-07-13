@@ -430,6 +430,8 @@ export default function AparForm() {
 
     React.useEffect(() => {
         if (!aparUser) return;
+        const role = aparRole || loginData?.role;
+        if (role === 'Reporting Officer' || role === 'Reviewing Officer') return; // Do not fetch officer's profile for the form
         (async () => {
             try {
                 const profile = await facultyProfileService.getSelf();
@@ -946,7 +948,8 @@ export default function AparForm() {
                     assessment: { ...prev.assessment, ...(mongoData.assessment || {}) },
                     remarks: { ...prev.remarks, ...(mongoData.remarks || {}) },
                     reporting_query: mongoData.reporting_query,
-                    reviewing_query: mongoData.reviewing_query
+                    reviewing_query: mongoData.reviewing_query,
+                    profileQualifications: mongoData.profileQualifications || prev.profileQualifications || []
                 }))
                 console.log('✅ Form overlaid with MongoDB data');
             } 

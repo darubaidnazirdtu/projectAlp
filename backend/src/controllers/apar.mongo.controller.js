@@ -16,6 +16,7 @@ import { Collaboration } from "../models/collaboration.model.js";
 import { Department } from "../models/department.model.js";
 import { User } from "../models/user.model.js";
 import { Faculty } from "../models/faculty.model.js";
+import { FacultyProfile } from "../models/facultyProfile.model.js";
 import { createNotification, notifyHeads } from "./notification.controller.js";
 import { v4 as uuidv4 } from 'uuid'; // Assuming uuid is available or use generic ID generator
 import { normalizeQualifications } from '../utils/qualification.util.js';
@@ -631,8 +632,18 @@ const getForm = asyncHandler(async (req, res) => {
         form = await AparForm.findOne({ faculty_id }).sort({ ay: -1, updatedAt: -1 });
     }
 
+    let formObj = form ? form.toObject() : {};
+    
+    // Inject educational qualifications from profile if viewing
+    if (form) {
+        const facProfile = await FacultyProfile.findOne({ faculty_id: new RegExp(`^${faculty_id}$`, 'i') }).lean();
+        if (facProfile && facProfile.educational_qualifications) {
+            formObj.profileQualifications = facProfile.educational_qualifications;
+        }
+    }
+
     return res.status(200).json(
-        new ApiResponse(200, form ? form.toObject() : {}, "Form fetched successfully")
+        new ApiResponse(200, formObj, "Form fetched successfully")
     );
 });
 

@@ -146,7 +146,7 @@ export const createManagedUser = asyncHandler(async (req, res) => {
 
   const existingByUserId = await findUserByUserId(normalizedUserId);
   if (existingByUserId) {
-    throw new ApiError(409, 'A user account already exists for this faculty member');
+    throw new ApiError(409, 'Employee ID is already registered');
   }
 
   const existingByEmail = await findUserByEmail(emailToUse);
@@ -157,7 +157,7 @@ export const createManagedUser = asyncHandler(async (req, res) => {
   if (shouldCreateFaculty) {
     const existingFacultyById = await findFacultyById(normalizedUserId);
     if (existingFacultyById) {
-      throw new ApiError(409, 'A faculty profile already exists for this user ID');
+      throw new ApiError(409, 'A faculty profile already exists for this Employee ID');
     }
 
     const existingFacultyByEmail = await findFacultyByEmail(emailToUse);
@@ -175,6 +175,8 @@ export const createManagedUser = asyncHandler(async (req, res) => {
     name: name?.trim() || null,
     designation: designation?.trim() || null,
     aparRole,
+    ...(aparRole === APAR_ROLES.REPORTING_OFFICER ? { reportingOfficerId: normalizedUserId } : {}),
+    ...(aparRole === APAR_ROLES.REVIEWING_OFFICER ? { reviewingOfficerId: normalizedUserId } : {}),
     departmentId: normalizedDepartmentId
   });
 
@@ -276,7 +278,9 @@ export const updateManagedUser = asyncHandler(async (req, res) => {
     name: existingUser.name,
     designation: existingUser.designation,
     departmentId: departmentId === undefined ? existingUser.departmentId : departmentId,
-    aparRole: nextAparRole
+    aparRole: nextAparRole,
+    ...(nextAparRole === APAR_ROLES.REPORTING_OFFICER ? { reportingOfficerId: existingUser.userId } : {}),
+    ...(nextAparRole === APAR_ROLES.REVIEWING_OFFICER ? { reviewingOfficerId: existingUser.userId } : {})
   });
 
   // If admin provided a new password, hash and update it
