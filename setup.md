@@ -26,6 +26,29 @@ Once the Docker containers are successfully up and running, you can access the a
 - **Backend API**: [http://localhost:8000](http://localhost:8000)
 - **MinIO Console**: [http://localhost:9001](http://localhost:9001) (Username: `minioadmin` / Password: `minioadmin`)
 
+## MongoDB Access
+
+The MongoDB container is exposed on port 27017, so you can connect from your host machine with:
+
+```text
+mongodb://localhost:27017
+```
+
+If you are connecting from another container in the same Docker network, use:
+
+```text
+mongodb://mongodb:27017
+```
+## docker compose exec backend node src/scripts/seedUser.js
+
+You can use either URL in MongoDB Compass, mongosh, or your app environment. The application automatically appends `/apar` to the URI, so you should not include `/apar` in the base connection string.
+
+Example:
+
+```bash
+mongosh "mongodb://localhost:27017"
+```
+
 ## Useful Docker Commands
 
 - **Stop the application:**
