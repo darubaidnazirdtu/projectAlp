@@ -1162,8 +1162,9 @@ export default function AparForm() {
         }
     };
 
-    const validateCoursesTaught = ({ focus = true, navigateToPart = false } = {}) => {
-        const issues = getCourseValidationIssues(formData?.teaching?.courses_taught || []);
+    const validateCoursesTaught = (customFormData = null, { focus = true, navigateToPart = false } = {}) => {
+        const data = customFormData || formData;
+        const issues = getCourseValidationIssues(data?.teaching?.courses_taught || []);
         if (issues.length === 0) return true;
 
         const firstIssue = issues[0];
@@ -1179,8 +1180,9 @@ export default function AparForm() {
         return false;
     };
 
-    const validateTimeTable = ({ focus = true, navigateToPart = false } = {}) => {
-        const issues = getTimeTableValidationIssues(formData?.teaching?.time_table || {});
+    const validateTimeTable = (customFormData = null, { focus = true, navigateToPart = false } = {}) => {
+        const data = customFormData || formData;
+        const issues = getTimeTableValidationIssues(data?.teaching?.time_table || {});
         if (issues.length === 0) return true;
 
         const firstIssue = issues[0];
@@ -1204,27 +1206,29 @@ export default function AparForm() {
         return false;
     };
 
-    const handleSaveDraft = async (silent = false) => {
+    const handleSaveDraft = async (silent = false, customFormData = null) => {
         if (isReadOnlyMode()) return true;
 
+        const dataToSave = customFormData || formData;
+
         // Validate Personal Data when saving draft
-        if (currentStep === 1 && !validatePersonalDataStep()) {
+        if (currentStep === 1 && !validatePersonalDataStep(dataToSave)) {
             return false;
         }
 
-        if (!validateCoursesTaught({ navigateToPart: true })) {
+        if (!validateCoursesTaught(dataToSave, { navigateToPart: true })) {
             return false;
         }
 
-        if (!validateTimeTable({ navigateToPart: true })) {
+        if (!validateTimeTable(dataToSave, { navigateToPart: true })) {
             return false;
         }
 
         setIsSavingDraft(true);
         try {
             const ay = reduxAy || loginData.academic_year || (location.state?.ay) || (() => {
-                const start = formData.personal.report_start_date
-                const end = formData.personal.report_end_date
+                const start = dataToSave.personal.report_start_date
+                const end = dataToSave.personal.report_end_date
                 return getAcademicYearFromDates(start, end)
             })()
 
@@ -1239,7 +1243,7 @@ export default function AparForm() {
             const payload = {
                 ay: ay,
                 faculty_id: facultyId,
-                formData: formData
+                formData: dataToSave
             };
 
             await AparFormGradedService.saveDraft(payload);
@@ -1316,8 +1320,9 @@ export default function AparForm() {
      * Validate Personal Data specific business rules
      * Checks DOB and Joining Date validations
      */
-    const validatePersonalDataStep = () => {
-        const personal = formData.personal || {};
+    const validatePersonalDataStep = (customFormData = null) => {
+        const data = customFormData || formData;
+        const personal = data.personal || {};
         const validation = validatePersonalData(personal);
 
         if (!validation.valid) {
@@ -1642,49 +1647,65 @@ export default function AparForm() {
     };
 
     const addItem = (section, field, initialItem) => {
-        setFormData(prev => ({
-            ...prev,
-            [section]: {
-                ...prev[section],
-                [field]: [...prev[section][field], initialItem]
-            }
-        }));
+        setFormData(prev => {
+            const next = {
+                ...prev,
+                [section]: {
+                    ...prev[section],
+                    [field]: [...prev[section][field], initialItem]
+                }
+            };
+            handleSaveDraft(true, next);
+            return next;
+        });
     };
 
     const removeItem = (section, field, index) => {
-        setFormData(prev => ({
-            ...prev,
-            [section]: {
-                ...prev[section],
-                [field]: prev[section][field].filter((_, i) => i !== index)
-            }
-        }));
+        setFormData(prev => {
+            const next = {
+                ...prev,
+                [section]: {
+                    ...prev[section],
+                    [field]: prev[section][field].filter((_, i) => i !== index)
+                }
+            };
+            handleSaveDraft(true, next);
+            return next;
+        });
     };
 
     const updateArrayField = (section, field, index, key, value) => {
-        const updatedArray = [...formData[section][field]];
-        const sanitized = sanitizeForApar(value, `${section}.${field}.${key}`);
-        updatedArray[index] = { ...updatedArray[index], [key]: sanitized };
-        setFormData(prev => ({
-            ...prev,
-            [section]: {
-                ...prev[section],
-                [field]: updatedArray
-            }
-        }));
+        setFormData(prev => {
+            const updatedArray = [...prev[section][field]];
+            const sanitized = sanitizeForApar(value, `${section}.${field}.${key}`);
+            updatedArray[index] = { ...updatedArray[index], [key]: sanitized };
+            const next = {
+                ...prev,
+                [section]: {
+                    ...prev[section],
+                    [field]: updatedArray
+                }
+            };
+            handleSaveDraft(true, next);
+            return next;
+        });
     };
 
     const updateArrayItem = (section, field, index, newItem) => {
-        const updatedArray = [...formData[section][field]];
-        const sanitizedItem = sanitizeDeep(newItem, `${section}.${field}`);
-        updatedArray[index] = sanitizedItem;
-        setFormData(prev => ({
-            ...prev,
-            [section]: {
-                ...prev[section],
-                [field]: updatedArray
-            }
-        }));
+        setFormData(prev => {
+            const updatedArray = [...prev[section][field]];
+            const sanitizedItem = sanitizeDeep(newItem, `${section}.${field}`);
+            updatedArray[index] = sanitizedItem;
+            const next = {
+                ...prev,
+                [section]: {
+                    ...prev[section],
+                    [field]: updatedArray
+                }
+            };
+            handleSaveDraft(true, next);
+            return next;
+        });
     };
 
     const updateAssessment = (section, key, value) => {
