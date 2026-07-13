@@ -2169,7 +2169,7 @@ export default function AparForm() {
                                     </p>
 
                                     <div className="bg-gray-50 border border-gray-200 rounded-lg p-6 mb-8 max-h-[60vh] overflow-y-auto shadow-inner">
-                                        <div className="space-y-12 pointer-events-none">
+                                        <div className="space-y-12">
                                             <div>
                                                 <h4 className="text-xl font-bold text-gray-900 border-b-2 border-indigo-200 pb-2 mb-6">Part I: Personal Data</h4>
                                                 <PartIPersonal personal={formData.personal} onChange={() => {}} readOnly={true} departments={departments} qualifications={formData.profileQualifications} />
