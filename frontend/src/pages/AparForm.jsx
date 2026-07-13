@@ -2231,7 +2231,7 @@ export default function AparForm() {
 
                                         {currentStep === totalSteps ? (
                                             <>
-                                                {activeRole === 'Reporting Officer' && formStatus !== 'Forwarded by Reporting officer' && (
+                                                {activeRole === 'Reporting Officer' && formStatus === 'Submitted' && (
                                                     <div className="flex gap-4">
                                                         <button
                                                             type="button"
@@ -2250,7 +2250,7 @@ export default function AparForm() {
                                                     </div>
                                                 )}
 
-                                                {activeRole === 'Reviewing Officer' && formStatus !== 'Accepted by Reviewing officer' && (
+                                                {activeRole === 'Reviewing Officer' && formStatus === 'Forwarded by Reporting officer' && (
                                                     <div className="flex gap-4">
                                                         <button
                                                             type="button"

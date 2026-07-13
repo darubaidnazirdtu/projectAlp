@@ -1,10 +1,8 @@
 import React from 'react';
 
 export default function PartVAssessment({ formData, updateAssessment, activeRole, formStatus }) {
-  const isRO_Forwarded = (activeRole === 'Reporting Officer' && formStatus === 'Forwarded by Reporting officer');
-  const isReviewing = activeRole === 'Reviewing Officer';
-  const isDisabled = isRO_Forwarded || isReviewing;
-  const requiresAssessment = activeRole === 'Reporting Officer' && !isDisabled;
+  const isDisabled = activeRole !== 'Reporting Officer' || formStatus !== 'Submitted';
+  const requiresAssessment = !isDisabled;
   const requiredProps = requiresAssessment ? { required: true, 'aria-required': 'true' } : {};
 
   const validateScore = (value) => {
@@ -23,7 +21,7 @@ export default function PartVAssessment({ formData, updateAssessment, activeRole
   return (
     <div className="bg-white border border-gray-200 rounded-xl p-8 shadow-sm space-y-8">
       <div className="border-b border-gray-100 pb-4">
-        <h3 className="text-xl font-bold text-gray-800">Part V – NUMERICAL ASSESSMENT ({isReviewing ? 'review' : 'fill'})</h3>
+        <h3 className="text-xl font-bold text-gray-800">Part V – NUMERICAL ASSESSMENT ({activeRole === 'Reviewing Officer' ? 'review' : 'fill'})</h3>
         <p className="text-sm text-gray-500 mt-1">Numerical grading is to be awarded on a scale of 1-10 (1: Lowest, 10: Highest).</p>
       </div>
 

@@ -1,8 +1,8 @@
 import React from 'react';
 
 export default function PartVI_Remarks({ formData, updateRemarks, formStatus }) {
-    const isForwarded = formStatus === 'Accepted by Reviewing officer';
-    const requiredProps = !isForwarded ? { required: true, 'aria-required': 'true' } : {};
+    const isDisabled = formStatus !== 'Forwarded by Reporting officer';
+    const requiredProps = !isDisabled ? { required: true, 'aria-required': 'true' } : {};
 
     return (
         <div className="bg-white border border-gray-200 rounded-xl p-8 shadow-sm space-y-8">
@@ -10,7 +10,7 @@ export default function PartVI_Remarks({ formData, updateRemarks, formStatus }) 
                 <h3 className="text-xl font-bold text-gray-800">Part VII – REMARKS OF THE REVIEWING OFFICER</h3>
             </div>
 
-            <fieldset disabled={isForwarded}>
+            <fieldset disabled={isDisabled}>
                 <div className="space-y-6">
                     <div>
                         <label className="block text-sm font-medium text-gray-700 mb-2">1. Length of service under the Reviewing Officer</label>
