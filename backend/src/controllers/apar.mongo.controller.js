@@ -870,8 +870,15 @@ const collectAparObjectPaths = (value, result = new Set()) => {
         if (isAparObjectPath(value)) result.add(value);
         return result;
     }
+    // Mongoose subdocuments retain circular parent references. Convert them to
+    // plain data before recursively scanning for stored document paths.
+    if (value && typeof value === 'object' && typeof value.toObject === 'function') {
+        return collectAparObjectPaths(value.toObject(), result);
+    }
     if (Array.isArray(value)) value.forEach(item => collectAparObjectPaths(item, result));
-    else if (value && typeof value === 'object') Object.values(value).forEach(item => collectAparObjectPaths(item, result));
+    else if (value && typeof value === 'object' && !value._bsontype && !(value instanceof Date)) {
+        Object.values(value).forEach(item => collectAparObjectPaths(item, result));
+    }
     return result;
 };
 

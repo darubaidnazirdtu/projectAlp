@@ -1265,7 +1265,7 @@ export default function AparForm() {
             if (!silent) toast.success('Progress saved and synced to profile');
             return true;
         } catch (e) {
-            console.error('Save draft failed:', e);
+            console.error('Save draft failed:', e.response?.data || e);
             if (!silent) {
                 const msg = e.response?.data?.message || 'Failed to auto-save progress';
                 toast.error(msg);
