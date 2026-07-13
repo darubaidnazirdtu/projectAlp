@@ -332,16 +332,7 @@ const NotificationBell = () => {
                                                     <p className="text-[10px] text-gray-400 mt-1 uppercase font-medium tracking-wider">
                                                         {formatDistanceToNow(new Date(n.createdAt), { addSuffix: true })}
                                                     </p>
-                                                    {n.link && (
-                                                        <button
-                                                            type="button"
-                                                            onClick={(event) => handleOpenLink(n, event)}
-                                                            className="mt-2 inline-flex items-center gap-1 rounded-md bg-indigo-50 px-2 py-1 text-xs font-semibold text-indigo-700 hover:bg-indigo-100"
-                                                        >
-                                                            Open
-                                                            <FiExternalLink className="h-3 w-3" />
-                                                        </button>
-                                                    )}
+
                                                 </div>
                                             </div>
 

@@ -1888,6 +1888,7 @@ export default function AparForm() {
                     date_of_birth: mongoData.personal?.date_of_birth ? mongoData.personal.date_of_birth.substring(0, 10) : prev.personal.date_of_birth,
                     joining_date: mongoData.personal?.joining_date ? mongoData.personal.joining_date.substring(0, 10) : prev.personal.joining_date,
                 },
+                profileQualifications: mongoData.profileQualifications || prev.profileQualifications || [],
                 teaching: { ...prev.teaching, ...(mongoData.teaching || {}) },
                 research: { ...prev.research, ...(mongoData.research || {}) },
                 corporate: { ...prev.corporate, ...(mongoData.corporate || {}) },
@@ -1981,14 +1982,6 @@ export default function AparForm() {
                     >
                         <FiArrowLeft className="mr-2" /> Back to Dashboard
                     </button>
-                    {(activeRole === 'Reporting Officer' || activeRole === 'Reviewing Officer') && viewMode === 'form' && (
-                        <button
-                            onClick={() => setViewMode('list')}
-                            className="flex items-center text-indigo-600 hover:text-indigo-900 ml-4 font-semibold"
-                        >
-                            Dashboard
-                        </button>
-                    )}
                     <div className="flex items-center space-x-3">
                         <NotificationBell />
                         <button
