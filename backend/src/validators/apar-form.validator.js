@@ -640,14 +640,6 @@ const personalSchema = z.object({
   absence_period: optionalString,
   grade: requiredString('Grade')
 }).superRefine((data, ctx) => {
-  if (!hasRequiredGraduation(data)) {
-    ctx.addIssue({
-      code: z.ZodIssueCode.custom,
-      message: 'Graduation qualification is required',
-      path: ['qualification_undergraduate'],
-    });
-  }
-
   if (data.absence_taken === 'Yes') {
     if (!data.absence_period?.trim()) {
       ctx.addIssue({

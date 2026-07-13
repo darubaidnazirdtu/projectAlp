@@ -947,17 +947,47 @@ const submitForm = asyncHandler(async (req, res) => {
         throw new ApiError(400, "Please use 'Save as Monthly' in Part III before submitting the APAR form.");
     }
 
+    const user = await User.findOne({ user_id: faculty_id });
+
+    const setObj = {
+        personal: formData.personal,
+        teaching: formData.teaching,
+        research: formData.research,
+        corporate: formData.corporate,
+        status: "Submitted",
+        "timeline.submitted_at": new Date()
+    };
+
+    if (user) {
+        if (user.reporting_officer_id) {
+            setObj.reporting_officer_id = user.reporting_officer_id;
+        } else if (user.department_id) {
+            const reportingOfficer = await User.findOne({ department_id: user.department_id, apar_role: 'Reporting Officer' });
+            if (reportingOfficer) {
+                setObj.reporting_officer_id = reportingOfficer.user_id;
+            }
+        }
+
+        if (user.reviewing_officer_id) {
+            setObj.reviewing_officer_id = user.reviewing_officer_id;
+        } else if (user.department_id) {
+            let reviewingOfficer = await User.findOne({ department_id: user.department_id, apar_role: 'Reviewing Officer' });
+            if (!reviewingOfficer) {
+                reviewingOfficer = await User.findOne({ apar_role: 'Reviewing Officer' });
+            }
+            if (!reviewingOfficer) {
+                reviewingOfficer = await User.findOne({ apar_role: 'Dean' });
+            }
+            if (reviewingOfficer) {
+                setObj.reviewing_officer_id = reviewingOfficer.user_id;
+            }
+        }
+    }
+
     const form = await AparForm.findOneAndUpdate(
         { faculty_id, ay },
         {
-            $set: {
-                personal: formData.personal,
-                teaching: formData.teaching,
-                research: formData.research,
-                corporate: formData.corporate,
-                status: "Submitted",
-                "timeline.submitted_at": new Date()
-            },
+            $set: setObj,
             $push: {
                 history: {
                     action: "Submitted",
@@ -979,7 +1009,6 @@ const submitForm = asyncHandler(async (req, res) => {
 
     // Notifications
     try {
-        const user = await User.findOne({ user_id: faculty_id });
         if (user && user.reporting_officer_id) {
             // await createNotification({
             //     recipient: user.reporting_officer_id,
@@ -1617,31 +1646,20 @@ const getPendingReporting = asyncHandler(async (req, res) => {
     if (req.user?.id && req.user.id !== reportingOfficerId) possibleOfficerIds.push(req.user.id);
     if (req.user?.sub && req.user.sub !== reportingOfficerId) possibleOfficerIds.push(req.user.sub);
 
-    // console.log(`[REPORTING VIEW] Checking assignments for Officer IDs: ${possibleOfficerIds.join(', ')}`);
-
-    // Direct query to User model instead of helper to support multiple IDs
     const assignedUsers = await User.find({ reporting_officer_id: { $in: possibleOfficerIds } });
     const assignedUserIds = assignedUsers.map(u => u.user_id);
-    // console.log(`[REPORTING VIEW] Found ${assignedUsers.length} assigned users: ${assignedUserIds.join(', ')}`);
-
-
-    if (!assignedUserIds.length) {
-        console.log(`[REPORTING VIEW] No assigned officers found for ${reportingOfficerId}`);
-        return res.status(200).json(new ApiResponse(200, [], "No assigned officers found"));
-    }
 
     const query = {
-        faculty_id: { $in: assignedUserIds }
+        $or: [
+            { faculty_id: { $in: assignedUserIds } },
+            { reporting_officer_id: { $in: possibleOfficerIds } }
+        ]
     };
 
     if (req.query.archive === 'true') {
         // Archive: Show all forms regardless of status (or maybe just completed ones?)
         // User said: "make it availabel to him as archive and only in view form"
         // Let's show everything for now, or maybe filter out 'Draft' if we want strictly submitted history.
-        // But typically archive implies past/completed.
-        // Let's include everything except maybe 'Draft' if they haven't submitted?
-        // Actually, if it's assigned, they should see what's submitted.
-        query.status = { $ne: 'Draft' };
     } else {
         // Pending Action: Only forms needing attention
         query.status = { $in: ['Submitted', 'Query Raised', 'Query Raised by Reviewing officer'] };
@@ -1802,12 +1820,11 @@ const getPendingReviewing = asyncHandler(async (req, res) => {
     // console.log(`[REVIEWING VIEW] Found ${assignedUsers.length} assigned users: ${assignedUserIds.join(', ')}`);
 
 
-    if (!assignedUserIds.length) {
-        return res.status(200).json(new ApiResponse(200, [], "No assigned officers found for review"));
-    }
-
     const query = {
-        faculty_id: { $in: assignedUserIds }
+        $or: [
+            { faculty_id: { $in: assignedUserIds } },
+            { reviewing_officer_id: { $in: possibleOfficerIds } }
+        ]
     };
 
     if (req.query.archive === 'true') {

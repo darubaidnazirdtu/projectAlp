@@ -617,9 +617,6 @@ export default function AparForm() {
             ['professional_info.present_grade','Present Grade']
         ];
         req.forEach(([path,label]) => { if (!isFilled(getByPath(profile, path))) issues.push(`${label} is required in Profile`); });
-        if (!hasGraduationIn(profile?.educational_qualifications)) {
-            issues.push("Add at least one 'Graduation' degree in Educational Qualifications");
-        }
         return issues;
     };
     const recheckProfile = async () => {
@@ -1438,7 +1435,6 @@ export default function AparForm() {
         if (!isFilled(personal.department_id)) errors.push('Department is required');
         if (!isFilled(personal.designation)) errors.push('Designation is required');
         if (!personal.date_of_birth) errors.push('Date of birth is required');
-        if (!hasRequiredGraduation(personal)) errors.push('Graduation qualification is required');
         if (!isFilled(personal.sc_st_status)) errors.push('Caste category is required');
         if (!personal.joining_date) errors.push('Joining date is required');
         if (!personal.grade || !personal.grade.trim()) errors.push('Grade is required');
@@ -1578,16 +1574,6 @@ export default function AparForm() {
             const validationErrors = validateFormData();
             if (validationErrors.length > 0) {
                 toast.error(`Validation errors: ${validationErrors.slice(0, 5).join(', ')}${validationErrors.length > 5 ? '...' : ''}`);
-                return;
-            }
-
-            // Check for graduation qualification in profile
-            const hasGraduation = (formData.profileQualifications || []).some(q => {
-                const degree = (q.degree || '').toLowerCase();
-                return degree.includes('graduation') || degree.includes('bachelor') || degree.includes('b.');
-            });
-            if (!hasGraduation) {
-                toast.error('Please add at least a Graduation qualification in your Profile section before submitting the APAR form.');
                 return;
             }
 

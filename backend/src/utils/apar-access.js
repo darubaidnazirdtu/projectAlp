@@ -6,6 +6,8 @@ const normalizeId = (value) => value ? String(value).trim() : null;
 
 export const getCurrentFacultyId = (user) => normalizeId(user?.userId || user?.faculty_id || user?.id);
 
+import { AparForm } from '../models/aparForm.model.js';
+
 export const getOfficerAccessQuery = async (user, type) => {
   const officerId = getCurrentFacultyId(user);
   if (!officerId) {
@@ -17,8 +19,16 @@ export const getOfficerAccessQuery = async (user, type) => {
   if (user?.sub && !possibleOfficerIds.includes(user.sub)) possibleOfficerIds.push(user.sub);
 
   const field = type === 'reviewing' ? 'reviewing_officer_id' : 'reporting_officer_id';
+  
   const assignedUsers = await User.find({ [field]: { $in: possibleOfficerIds } }).select('user_id').lean();
-  return assignedUsers.map((assignedUser) => assignedUser.user_id).filter(Boolean);
+  const assignedForms = await AparForm.find({ [field]: { $in: possibleOfficerIds } }).select('faculty_id').lean();
+  
+  const allIds = new Set([
+      ...assignedUsers.map((u) => String(u.user_id).toLowerCase()),
+      ...assignedForms.map((f) => String(f.faculty_id).toLowerCase())
+  ]);
+  
+  return Array.from(allIds).filter(Boolean);
 };
 
 export const assertFacultyAccess = async (user, facultyId) => {
@@ -28,8 +38,7 @@ export const assertFacultyAccess = async (user, facultyId) => {
   }
 
   const currentFacultyId = getCurrentFacultyId(user);
-  const role = normalizeRoleValue(user?.role);
-
+  
   // Allow IQAC users to access any faculty profile
   const normalizedRole = String(user?.role || '').toLowerCase();
   if (normalizedRole.includes('iqac') || normalizedRole.includes('dean')) {
@@ -37,17 +46,17 @@ export const assertFacultyAccess = async (user, facultyId) => {
   }
 
   // Always allow users to access their own record regardless of role
-  if (currentFacultyId === normalizedFacultyId) {
+  if (currentFacultyId && currentFacultyId.toLowerCase() === normalizedFacultyId.toLowerCase()) {
     return true;
   }
 
   const reportingFacultyIds = await getOfficerAccessQuery(user, 'reporting');
-  if (reportingFacultyIds.includes(normalizedFacultyId)) {
+  if (reportingFacultyIds.includes(normalizedFacultyId.toLowerCase())) {
     return true;
   }
 
   const reviewingFacultyIds = await getOfficerAccessQuery(user, 'reviewing');
-  if (reviewingFacultyIds.includes(normalizedFacultyId)) {
+  if (reviewingFacultyIds.includes(normalizedFacultyId.toLowerCase())) {
     return true;
   }
 

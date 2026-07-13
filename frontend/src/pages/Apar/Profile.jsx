@@ -477,20 +477,6 @@ export default function Profile() {
     try {
       setSaving(true);
       setSaveStatus('saving');
-      // Ensure at least one 'Graduation' qualification is present (UX parity with backend requirement)
-      const hasGraduation = (profile.educational_qualifications || []).some(
-        (q) => String(q?.degree || '').trim().toLowerCase() === 'graduation'
-      );
-      if (!hasGraduation) {
-        console.warn('[Profile] Blocking save: missing required Graduation qualification');
-        setSaving(false);
-        setSaveStatus('error');
-        toast.error("Please add at least one 'Graduation' qualification");
-        setEducationError("Please add at least one 'Graduation' qualification in Educational Qualifications.");
-        try { eduSectionRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' }); } catch (_) {}
-        setTimeout(() => setSaveStatus('idle'), 3000);
-        return;
-      }
       console.info('[Profile] Submitting profile payload', profile);
       const saved = await facultyProfileService.upsertSelf(profile);
       console.info('[Profile] Save success response', saved);
@@ -886,7 +872,7 @@ export default function Profile() {
             
             {educationError && (
               <div className="mb-4 rounded-md border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
-                {educationError} (Tip: At least one qualification must have Degree set to <strong>Graduation</strong>)
+                {educationError}
               </div>
             )}
 
@@ -925,7 +911,7 @@ export default function Profile() {
 
             {!showEduForm && (!profile.educational_qualifications || profile.educational_qualifications.length === 0) && (
               <div className="text-center py-8 text-gray-500 border-2 border-dashed border-gray-200 rounded-lg">
-                No educational qualifications added yet. Graduation is mandatory.
+                No educational qualifications added yet.
               </div>
             )}
 

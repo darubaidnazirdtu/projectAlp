@@ -59,10 +59,7 @@ export const upsertProfileSchema = z.object({
       office_contact_number: nullableString
     }),
     educational_qualifications: z.array(qualificationSchema)
-      .min(1, 'At least one qualification is required')
-      .refine((list) => Array.isArray(list) && list.some((q) => typeof q?.degree === 'string' && q.degree.trim().toLowerCase() === 'graduation'), {
-        message: "At least one 'Graduation' qualification is required"
-      }),
+      .min(1, 'At least one qualification is required'),
     social_links: z.object({
       linkedin_profile: nullableString,
       personal_website: nullableString,
