@@ -107,6 +107,15 @@ export default function DynamicTableSection({
         return match ? `${match[2]}-${match[1]}` : '';
     };
 
+    // MongoDB dates arrive as ISO timestamps, while a native date input only
+    // accepts YYYY-MM-DD. Supplying the timestamp causes repeated browser
+    // warnings and leaves the displayed value invalid.
+    const getDateInputValue = (value) => {
+        if (!value) return '';
+        const match = String(value).match(/^(\d{4}-\d{2}-\d{2})/);
+        return match ? match[1] : '';
+    };
+
     const formatInputMonthToMonthYear = (value) => {
         const match = String(value || '').match(/^(\d{4})-(\d{2})$/);
         return match ? `${match[2]}-${match[1]}` : '';
@@ -799,7 +808,7 @@ export default function DynamicTableSection({
                                                                 ) : (
                                                                     <input
                                                                         type={subF.type === 'year' ? 'text' : subF.type === 'monthYear' ? 'month' : subF.type || 'text'}
-                                                                        value={subF.type === 'monthYear' ? getMonthInputValue(subDefaults[subF.key]) : subDefaults[subF.key] || ''}
+                                                                        value={subF.type === 'monthYear' ? getMonthInputValue(subDefaults[subF.key]) : subF.type === 'date' ? getDateInputValue(subDefaults[subF.key]) : subDefaults[subF.key] || ''}
                                                                         onChange={(e) => {
                                                                             let inputValue = e.target.value;
                                                                             if (subF.type === 'monthYear') {
@@ -850,7 +859,7 @@ export default function DynamicTableSection({
                                     <>
                                         <input
                                             type={f.type === 'year' ? 'text' : f.type === 'monthYear' ? 'month' : f.type || 'text'}
-                                            value={f.type === 'monthYear' ? getMonthInputValue(tempItem[f.key]) : tempItem[f.key] || ''}
+                                            value={f.type === 'monthYear' ? getMonthInputValue(tempItem[f.key]) : f.type === 'date' ? getDateInputValue(tempItem[f.key]) : tempItem[f.key] || ''}
                                             onChange={(e) => {
                                                 let inputValue = e.target.value;
                                                 if (f.type === 'monthYear') {

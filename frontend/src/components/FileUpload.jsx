@@ -53,7 +53,11 @@ const FileUpload = ({ value, onChange, disabled, required = false, temporaryPdf 
                     try {
                         await api.delete(`/apar/mongo/documents/temp?tempId=${encodeURIComponent(previousTempId)}`);
                     } catch (cleanupError) {
-                        console.warn('Previous temporary PDF cleanup failed:', cleanupError);
+                        // A save may already have consumed and removed this temp
+                        // file. A 404 is therefore an expected no-op.
+                        if (cleanupError?.response?.status !== 404) {
+                            console.warn('Previous temporary PDF cleanup failed:', cleanupError);
+                        }
                     }
                 }
                 toast.success('PDF attached. It will upload when you save the entry.');
@@ -79,7 +83,9 @@ const FileUpload = ({ value, onChange, disabled, required = false, temporaryPdf 
             try {
                 await api.delete(`/apar/mongo/documents/temp?tempId=${encodeURIComponent(value.tempId)}`);
             } catch (error) {
-                console.warn('Temporary PDF cleanup failed:', error);
+                if (error?.response?.status !== 404) {
+                    console.warn('Temporary PDF cleanup failed:', error);
+                }
             }
         } else if (temporaryPdf && typeof value === 'string' && /^document\//.test(value)) {
             try {

@@ -496,8 +496,6 @@ export default function AparForm() {
     const [formStatus, setFormStatus] = useState('Draft');
     const [departments, setDepartments] = useState([]);
 
-    console.log("Hello DTU!!!")
-
     React.useEffect(() => {
         (async () => {
             try {
