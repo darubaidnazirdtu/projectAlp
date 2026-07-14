@@ -996,9 +996,9 @@ export default function PartII({ formData, addItem, removeItem, updateArrayField
             </div>
                 </div>
 
-                {/* i) Courses taught at various levels */}
+                {/* 1.1 Courses taught at various levels */}
                 <div>
-                    <h4 className="text-md font-semibold text-gray-800 mb-2">i) Courses taught at various levels</h4>
+                    <h4 className="text-md font-semibold text-gray-800 mb-2">1.1 Courses taught at various levels</h4>
                     <div className="space-y-4">
                         {editingCourseIndex === null ? (
                             <div className="bg-white border border-gray-200 rounded-lg overflow-hidden">
@@ -1146,9 +1146,9 @@ export default function PartII({ formData, addItem, removeItem, updateArrayField
                     </div>
                 </div>
 
-                {/* ii) Total of hours/periods provided in time table vs actually taken */}
+                {/* 1.2 Total of hours/periods provided in time table vs actually taken */}
                 <div>
-                    <h4 className="text-md font-semibold text-gray-800 mb-2">ii) Total Number of hours/ periods provided in the time table</h4>
+                    <h4 className="text-md font-semibold text-gray-800 mb-2">1.2 Total Number of hours/ periods provided in the time table</h4>
                     <div className="bg-gray-50 border border-gray-200 rounded-lg p-6 mb-4">
                         <div className="font-semibold mb-2">a) Provided in the academic year</div>
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -1176,9 +1176,9 @@ export default function PartII({ formData, addItem, removeItem, updateArrayField
                     </div>
                 </div>
 
-                {/* iii) Work load per week */}
+                {/* 1.3 Work load per week */}
                 <div>
-                    <h4 className="text-md font-semibold text-gray-800 mb-2">iii) Work load per week</h4>
+                    <h4 className="text-md font-semibold text-gray-800 mb-2">1.3 Work load per week</h4>
                     <div className="bg-gray-50 border border-gray-200 rounded-lg p-6 mb-4">
                         <div className="font-semibold mb-2 text-indigo-800">For odd semester</div>
                         <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
@@ -1269,9 +1269,9 @@ export default function PartII({ formData, addItem, removeItem, updateArrayField
                     fields={[{ label: 'Description', key: 'description', fullWidth: true, required: true, placeholder: 'Enter student centric method details' }]}
                 />
 
-                {/* 4 a) Details of Tutorials/tests held */}
+                {/* 4.1 Details of Tutorials/tests held */}
                 <div>
-                    <h4 className="text-md font-semibold text-gray-800 mb-2">4) a) Details of Tutorials/ tests held during the academic year</h4>
+                    <h4 className="text-md font-semibold text-gray-800 mb-2">4.1 Details of Tutorials/ tests held during the academic year</h4>
                     <div className="bg-gray-50 border border-gray-200 rounded-lg p-6 mb-4">
                         <div className="font-semibold mb-2">Under-graduate Courses (Odd Semester)</div>
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
@@ -1323,9 +1323,9 @@ export default function PartII({ formData, addItem, removeItem, updateArrayField
                     </div>
                 </div>
 
-                {/* 4 b) academic planning */}
+                {/* 4.2 academic planning */}
                 <DynamicTableSection
-                    title="b) Details of academic planning/ presentation of lectures during the session"
+                    title="4.2 Details of academic planning/ presentation of lectures during the session"
                     data={teachingData?.academic_planning || []}
                     uniqueKey="description"
                     {...createHandlers('teaching', 'academic_planning')}
