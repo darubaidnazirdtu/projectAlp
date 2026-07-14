@@ -575,14 +575,14 @@ export default function DynamicTableSection({
     };
 
     return (
-        <div className="space-y-4">
-            <div className="flex justify-between items-center mb-2">
-                <label className="block text-md font-semibold text-gray-800">{title}</label>
+        <div className="space-y-6 mb-8">
+            <div className="flex justify-between items-center mb-4">
+                <label className="block text-lg font-semibold text-gray-800">{title}</label>
             </div>
 
             {/* List View (Table) */}
             {!isAdding && (
-                <div className="data-table-wrapper">
+                <div className="data-table-wrapper shadow-md">
                     <div className="data-table-scroll">
                     <table className="data-table text-left">
                         <thead>
@@ -941,14 +941,16 @@ export default function DynamicTableSection({
             )}
 
             {!isAdding && !readOnly && (
-                <button
-                    type="button"
-                    onClick={handleStartAdd}
-                    className="flex items-center justify-center px-4 py-2 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700"
-                >
-                    <FiPlus className="mr-2" />
-                    Add Entry
-                </button>
+                <div className="mt-6">
+                    <button
+                        type="button"
+                        onClick={handleStartAdd}
+                        className="flex items-center justify-center px-4 py-2 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700"
+                    >
+                        <FiPlus className="mr-2" />
+                        Add Entry
+                    </button>
+                </div>
             )}
         </div>
     );
