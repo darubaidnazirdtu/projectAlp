@@ -1,6 +1,6 @@
 import React, { useState, useCallback } from 'react';
 import { FiArrowLeft, FiPrinter, FiCheck, FiAlertCircle, FiFileText, FiGrid } from 'react-icons/fi';
-import { Document, HeadingLevel, Packer, Paragraph, Table, TableCell, TableRow, TextRun, WidthType } from 'docx';
+import { Document, HeadingLevel, Packer, Paragraph, Table, TableCell, TableRow, TextRun, WidthType, BorderStyle, PageOrientation } from 'docx';
 import { saveAs } from 'file-saver';
 import * as XLSX from 'xlsx';
 import ProfileDropdown from '../components/ProfileDropdown.jsx';
@@ -325,8 +325,10 @@ const createAparExportTables = (formData) => {
 
 const createWordCell = (text, bold = false, width = 50) => new TableCell({
     width: { size: width, type: WidthType.PERCENTAGE },
+    margins: { top: 100, bottom: 100, left: 100, right: 100 },
     children: String(text ?? '').split('\n').map(line => new Paragraph({
-        children: [new TextRun({ text: line || ' ', bold })]
+        spacing: { after: 100 },
+        children: [new TextRun({ text: line || ' ', bold, size: 20 })]
     }))
 });
 
@@ -336,8 +338,17 @@ const createWordTable = (columns, rows) => {
     const width = Math.max(8, Math.floor(100 / safeColumns.length));
     return new Table({
         width: { size: 100, type: WidthType.PERCENTAGE },
+        borders: {
+            top: { style: BorderStyle.SINGLE, size: 1, color: "000000" },
+            bottom: { style: BorderStyle.SINGLE, size: 1, color: "000000" },
+            left: { style: BorderStyle.SINGLE, size: 1, color: "000000" },
+            right: { style: BorderStyle.SINGLE, size: 1, color: "000000" },
+            insideHorizontal: { style: BorderStyle.SINGLE, size: 1, color: "000000" },
+            insideVertical: { style: BorderStyle.SINGLE, size: 1, color: "000000" }
+        },
         rows: [
             new TableRow({
+                tableHeader: true,
                 children: safeColumns.map(column => createWordCell(column, true, width))
             }),
             ...safeRows.map(row => new TableRow({
@@ -1145,7 +1156,24 @@ export default function AparForm() {
                 );
             });
 
-            const document = new Document({ sections: [{ children }] });
+            const document = new Document({ 
+                sections: [{ 
+                    properties: {
+                        page: {
+                            size: {
+                                orientation: PageOrientation.LANDSCAPE,
+                            },
+                            margin: {
+                                top: 720,
+                                bottom: 720,
+                                left: 720,
+                                right: 720,
+                            }
+                        }
+                    },
+                    children 
+                }] 
+            });
             const blob = await Packer.toBlob(document);
             saveAs(blob, `${getExportFileBaseName()}.docx`);
             toast.success('Word file downloaded');
