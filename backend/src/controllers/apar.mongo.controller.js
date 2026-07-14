@@ -641,7 +641,7 @@ const getForm = asyncHandler(async (req, res) => {
     }
 
     let formObj = form ? form.toObject() : {};
-    
+
     // Inject educational qualifications from profile if viewing
     if (form) {
         const facProfile = await FacultyProfile.findOne({ faculty_id: new RegExp(`^${faculty_id}$`, 'i') }).lean();
@@ -1217,9 +1217,37 @@ const saveToMonthly = asyncHandler(async (req, res) => {
     checkDraftDuplicates({ research });
     formData = { ...formData, research };
 
+    const faculty = await Faculty.findOne({ faculty_id }).lean();
+    const facultyName = faculty?.name || formData?.personal?.name || faculty_id;
+    let uploadedPaths = [];
+    let temporaryIds = [];
+
+    try {
+        const documents = await resolveAparDocuments(formData, {
+            ownerId: req.user.id,
+            facultyName,
+            academicYear: ay
+        });
+        formData = documents.formData;
+        uploadedPaths = documents.uploadedPaths;
+        temporaryIds = documents.temporaryIds;
+        research = formData.research || {};
+    } catch (dbError) {
+        await Promise.allSettled(uploadedPaths.map(objectPath => deleteObject(objectPath)));
+        await Promise.allSettled(temporaryIds.map(tempId => discardTemporaryDocument(tempId)));
+        throw new ApiError(400, `Failed to resolve documents: ${dbError.message}`);
+    }
+
+    for (const tempId of temporaryIds) {
+        const matchingPath = uploadedPaths.shift();
+        if (matchingPath) recordCompletedTemporaryDocument(tempId, req.user.id, matchingPath);
+        await removeTemporaryDocument(tempId);
+    }
+
     const deptIdFallback = formData?.personal?.department_id || req.user?.departmentId || undefined;
-    
+
     const toBool = (v) => (typeof v === 'boolean') ? v : (String(v || '').toLowerCase() === 'yes' || String(v || '').toLowerCase() === 'true');
+    const extractLink = (val) => typeof val === 'string' ? val : null;
     const upserts = [];
     const trackUpsert = (item, idField, promise, itemField = idField) => {
         upserts.push(promise.then(doc => {
@@ -1254,8 +1282,8 @@ const saveToMonthly = asyncHandler(async (req, res) => {
             impact_factor: item.impact_factor,
             citation_count: parseNumber(item.citation_count),
             is_ugc_care_listed: toBool(item.is_ugc_care_listed),
-            link: item.link,
-            link_to_paper: item.link_to_paper,
+            link: extractLink(item.link),
+            link_to_paper: extractLink(item.link_to_paper),
             academic_year: item.academic_year || ay,
             faculty_members: Array.isArray(item.faculty_members) ? item.faculty_members.map(f => ({ faculty_id: f.faculty_id || f })) : [],
             students: Array.isArray(item.students) ? item.students.map(s => ({ student_id: s.student_id || s })) : [],
@@ -1299,8 +1327,8 @@ const saveToMonthly = asyncHandler(async (req, res) => {
             year_of_publication: normalizeMonthYear(item.year_of_publication),
             doi: item.doi,
             indexing: item.indexing,
-            link: item.link,
-            link_to_paper: item.link_to_paper,
+            link: extractLink(item.link),
+            link_to_paper: extractLink(item.link_to_paper),
             academic_year: item.academic_year || ay,
             faculty_members: Array.isArray(item.faculty_members) ? item.faculty_members.map(f => ({ faculty_id: f.faculty_id || f })) : [],
             students: Array.isArray(item.students) ? item.students.map(s => ({ student_id: s.student_id || s })) : [],
@@ -1340,8 +1368,8 @@ const saveToMonthly = asyncHandler(async (req, res) => {
             name_of_publisher: item.name_of_publisher,
             publisher_type: item.publisher_type,
             same_institute_affiliation: toBool(item.same_institute_affiliation),
-            link: item.link,
-            link_to_publication: item.link_to_publication,
+            link: extractLink(item.link),
+            link_to_publication: extractLink(item.link_to_publication),
             doi: item.doi,
             indexing: item.indexing,
             academic_year: item.academic_year || ay,
@@ -1392,7 +1420,7 @@ const saveToMonthly = asyncHandler(async (req, res) => {
             status: item.status,
             outcome: item.outcome,
             remarks: item.remarks,
-            link: item.link,
+            link: extractLink(item.link),
             academic_year: item.academic_year || ay,
             faculty_involved: Array.isArray(item.faculty_involved) ? item.faculty_involved.map(f => ({ faculty_id: f.faculty_id || f.faculty || f, role: f.role })) : [],
             students_involved: Array.isArray(item.students_involved) ? item.students_involved.map(s => ({ student_id: s.student_id || s, role: s.role })) : [],
@@ -1432,7 +1460,7 @@ const saveToMonthly = asyncHandler(async (req, res) => {
             consultancy_id: item.consultancy_id,
             year_of_consultancy: normalizeMonthYear(item.year_of_consultancy),
             remarks: item.remarks,
-            link: item.link,
+            link: extractLink(item.link),
             academic_year: item.academic_year || ay,
             faculty_involved: Array.isArray(item.faculty_involved) ? item.faculty_involved.map(f => ({ faculty_id: f.faculty_id || f.faculty_id || f, role: f.role })) : [],
             students_involved: Array.isArray(item.students_involved) ? item.students_involved.map(s => ({ student_id: s.student_id || s.student_id || s, role: s.role })) : [],
@@ -1468,7 +1496,7 @@ const saveToMonthly = asyncHandler(async (req, res) => {
             date_of_filing: parseDate(item.date_of_filing),
             date_of_award: parseDate(item.date_of_award),
             patent_awarding_agency: item.patent_awarding_agency,
-            link_to_patent: item.link_to_patent,
+            link_to_patent: extractLink(item.link_to_patent),
             academic_year: item.academic_year || ay,
             faculty_members: Array.isArray(item.faculty_members) ? item.faculty_members.map(f => ({ faculty_id: f.faculty_id || f })) : [],
             students: Array.isArray(item.students) ? item.students.map(s => ({ student_id: s.student_id || s })) : [],
@@ -1501,8 +1529,8 @@ const saveToMonthly = asyncHandler(async (req, res) => {
             date_of_award: parseDate(item.date_of_award),
             monetary_value: parseNumber(item.monetary_value),
             year: normalizeMonthYear(item.year),
-            link: item.link,
-            evidence_link: item.evidence_link,
+            link: extractLink(item.link),
+            evidence_link: extractLink(item.evidence_link),
             academic_year: item.academic_year || ay,
             faculty_recipients: Array.isArray(item.faculty_recipients) ? item.faculty_recipients.map(f => ({ faculty_id: f.faculty_id || f })) : [],
             student_recipients: Array.isArray(item.student_recipients) ? item.student_recipients.map(s => ({ student_id: s.student_id || s })) : [],
@@ -1541,7 +1569,7 @@ const saveToMonthly = asyncHandler(async (req, res) => {
             target_audience: item.target_audience,
             duration_hours: parseNumber(item.duration_hours),
             learning_outcome: item.learning_outcome,
-            link: item.link,
+            link: extractLink(item.link),
             metadata: { created_by: faculty_id, change_log: [{ action: 'updated', user_id: faculty_id, changes: 'Synced from APAR monthly save' }] }
         });
         const filter = buildUpsertFilter('activity_id', item.econtent_id, activity_id, {
@@ -1573,7 +1601,7 @@ const saveToMonthly = asyncHandler(async (req, res) => {
             location: item.location,
             start_date: parseDate(item.start_date),
             end_date: parseDate(item.end_date),
-            link: item.link,
+            link: extractLink(item.link),
             faculty_participants: Array.isArray(item.faculty_participants) && item.faculty_participants.length
                 ? item.faculty_participants.map(f => ({ faculty_id: f.faculty_id || f }))
                 : (Array.isArray(item.faculty_ids) ? item.faculty_ids.map(fid => ({ faculty_id: fid.faculty_id || fid })) : []),
@@ -1618,8 +1646,8 @@ const saveToMonthly = asyncHandler(async (req, res) => {
             end_date: parseDate(item.end_date),
             outcome: item.outcome,
             remarks: item.remarks,
-            certificate_link: item.certificate_link,
-            link: item.link,
+            certificate_link: extractLink(item.certificate_link),
+            link: extractLink(item.link),
             faculty_participants: Array.isArray(item.faculty_participants) ? item.faculty_participants.map(f => ({ faculty_id: f.faculty_id || f })) : [],
             external_participants: Array.isArray(item.external_participants) ? item.external_participants : [],
             metadata: { created_by: faculty_id, change_log: [{ action: 'updated', user_id: faculty_id, changes: 'Synced from APAR monthly save' }] }
@@ -1661,7 +1689,7 @@ const saveToMonthly = asyncHandler(async (req, res) => {
             academic_year: item.academic_year || ay,
             outcome: item.outcome,
             remarks: item.remarks,
-            link: item.link,
+            link: extractLink(item.link),
             faculty_associations: (Array.isArray(item.faculty_associations) && item.faculty_associations.length)
                 ? item.faculty_associations.map(f => ({ faculty_id: f.faculty_id || f.faculty || f, role: f.role }))
                 : (Array.isArray(item.faculty_involved) ? item.faculty_involved.map(f => ({ faculty_id: f.faculty_id || f.faculty || f, role: f.role })) : []),
@@ -1705,7 +1733,7 @@ const saveToMonthly = asyncHandler(async (req, res) => {
             end_date: parseDate(item.end_date),
             level: item.level,
             academic_year: item.academic_year || ay,
-            link: item.link,
+            link: extractLink(item.link),
             faculty_associations: (Array.isArray(item.faculty_associations) && item.faculty_associations.length)
                 ? item.faculty_associations.map(f => ({ faculty_id: f.faculty_id || f.faculty || f, role: f.role }))
                 : (Array.isArray(item.faculty_involved) ? item.faculty_involved.map(f => ({ faculty_id: f.faculty_id || f.faculty || f, role: f.role })) : []),
@@ -1754,7 +1782,7 @@ const saveToMonthly = asyncHandler(async (req, res) => {
             registration_year: normalizeMonthYear(item.registration_year),
             academic_year: item.academic_year || ay,
             remarks: item.remarks,
-            link: item.link,
+            link: extractLink(item.link),
             co_supervisors: Array.isArray(item.co_supervisors) ? item.co_supervisors.map(cs => ({
                 affiliation_type: cs.affiliation_type || (cs.external_name ? 'External' : 'Internal'),
                 co_supervisor_id: cs.co_supervisor_id || cs.faculty_id,
@@ -1776,7 +1804,7 @@ const saveToMonthly = asyncHandler(async (req, res) => {
     }
 
     await Promise.all(upserts);
-    
+
     const formUpdate = {
         research,
         monthly_saved_at: new Date()
