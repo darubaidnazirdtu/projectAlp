@@ -794,230 +794,7 @@ import { toast } from 'sonner';
 import { useIqacFilter } from '../context/IqacFilterContext.jsx';
 import { iqacApprovalService } from '../services/iqacApproval.service.js';
 
-console.log("dtu college")
-
-// 🚀 FIX 1: Upgraded InputField with Number Validation & Min/Max bounds
-const InputField = ({ label, name, type = 'text', placeholder, value, onChange, required, min, max }) => {
-    // Prevent typing 'e', '+', '-' in number fields
-    const handleKeyDown = (e) => {
-        if (type === 'number' && ['e', 'E', '+', '-'].includes(e.key)) {
-            e.preventDefault();
-        }
-    };
-
-    return (
-        <div>
-            {label && (
-                <label className="block text-sm font-semibold mb-2 text-gray-700">
-                    {label}
-                    {required && <span className="text-red-500 ml-1">*</span>}
-                </label>
-            )}
-            <input
-                name={name}
-                type={type}
-                placeholder={placeholder}
-                value={value}
-                onChange={onChange}
-                onKeyDown={handleKeyDown}
-                required={required}
-                min={min}
-                max={max}
-                className="w-full h-12 px-4 bg-gray-100 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
-            />
-        </div>
-    );
-};
-
-const ListField = ({ label, name, values, onChange }) => {
-    const handleAddItem = () => {
-        onChange({ target: { name, value: [...(values || []), ''] } });
-    };
-
-    const handleRemoveItem = (index) => {
-        const newValues = [...values];
-        newValues.splice(index, 1);
-        onChange({ target: { name, value: newValues } });
-    };
-
-    const handleItemChange = (index, value) => {
-        const newValues = [...values];
-        newValues[index] = value;
-        onChange({ target: { name, value: newValues } });
-    };
-
-    return (
-        <div>
-            <label className="block text-sm font-semibold mb-2 text-gray-700">{label}</label>
-            {(values || []).map((item, index) => (
-                <div key={index} className="flex items-center mb-2">
-                    <input
-                        type="text"
-                        value={item}
-                        onChange={(e) => handleItemChange(index, e.target.value)}
-                        className="w-full h-12 px-4 bg-gray-100 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
-                    />
-                    <button type="button" onClick={() => handleRemoveItem(index)} className="ml-2 text-red-500">Remove</button>
-                </div>
-            ))}
-            <button type="button" onClick={handleAddItem} className="text-indigo-600">Add Item</button>
-        </div>
-    );
-};
-
-const ObjectListField = ({ label, name, values = [], subFields = [], onChange }) => {
-
-    const emptyItem = subFields.reduce((acc, field) => {
-        acc[field.accessor] = '';
-        return acc;
-    }, {});
-
-    // Helper: check if an item with the same entitySelect values already exists
-    const isDuplicateEntity = (newItem, existingItems, skipIndex = -1) => {
-        const entityFields = subFields.filter(f => f.type === 'entitySelect');
-        if (entityFields.length === 0) return false;
-        return existingItems.some((existing, idx) => {
-            if (idx === skipIndex) return false;
-            return entityFields.some(ef => {
-                const newVal = (newItem[ef.accessor] || '').toString().trim();
-                const existingVal = (existing[ef.accessor] || '').toString().trim();
-                return newVal !== '' && existingVal !== '' && newVal === existingVal;
-            });
-        });
-    };
-
-    const handleAddItem = () => {
-        onChange({ target: { name, value: [...values, emptyItem] } });
-    };
-
-    const handleRemoveItem = (index) => {
-        const newValues = [...values];
-        newValues.splice(index, 1);
-        onChange({ target: { name, value: newValues } });
-    };
-
-    const handleItemChange = (index, subAccessor, subValue) => {
-        const newValues = [...values];
-        const updatedItem = {
-            ...newValues[index],
-            [subAccessor]: subValue
-        };
-
-        // Check for duplicate entity on entitySelect field change
-        const changedField = subFields.find(f => f.accessor === subAccessor);
-        if (changedField && changedField.type === 'entitySelect' && subValue) {
-            if (isDuplicateEntity(updatedItem, newValues, index)) {
-                toast.error(`This ${changedField.header || 'entity'} has already been added. Duplicates are not allowed.`);
-                return;
-            }
-        }
-
-        newValues[index] = updatedItem;
-        onChange({ target: { name, value: newValues } });
-    };
-
-    return (
-        <div className="border border-gray-200 p-4 rounded-lg col-span-1 md:col-span-2">
-            <div className="flex items-center justify-between mb-4">
-                <label className="text-lg font-semibold text-gray-800">
-                    {label}
-                    {subFields.some(f => f.required) && <span className="text-red-500 ml-1">*</span>}
-                </label>
-                <button
-                    type="button"
-                    onClick={handleAddItem}
-                    className="flex items-center space-x-2 px-3 py-1 bg-green-600 text-white rounded text-sm"
-                >
-                    <span>+ Add Item</span>
-                </button>
-            </div>
-
-            {values.length === 0 && <div className="text-gray-500 mb-4 text-sm">No items added.</div>}
-
-            <div className="space-y-4">
-                {values.map((item, index) => (
-                    <div key={index} className="flex flex-wrap gap-4 p-4 bg-gray-50 border border-gray-200 rounded-lg items-start relative pr-10 shadow-sm">
-                        {/* Remove Button */}
-                        <button
-                            type="button"
-                            onClick={() => handleRemoveItem(index)}
-                            className="absolute top-2 right-2 text-red-500 hover:bg-red-100 hover:text-red-700 p-1.5 rounded transition-colors"
-                            title="Remove Item"
-                        >
-                            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                            </svg>
-                        </button>
-
-                        {subFields.map(field => {
-                            const isVisible = typeof field.showIf === 'function' ? field.showIf(item) : !field.showIf || field.showIf === true;
-                            if (!isVisible) return null;
-
-                            if (field.type === 'select') {
-                                return (
-                                    <div key={field.accessor} className="flex-1 min-w-[200px]">
-                                        <label className="block text-sm font-semibold mb-1 text-gray-700">{field.header}</label>
-                                        <select
-                                            value={item[field.accessor] || ''}
-                                            onChange={(e) => handleItemChange(index, field.accessor, e.target.value)}
-                                            required={field.required}
-                                            className="w-full h-11 px-3 bg-white border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm"
-                                        >
-                                            {/* 🚀 FIX 2: Added disabled to placeholder option */}
-                                            <option value="" disabled>{field.placeholder || 'Select...'}</option>
-                                            {field.options?.map(option => (
-                                                <option key={option.value || option} value={option.value || option}>
-                                                    {option.label || option}
-                                                </option>
-                                            ))}
-                                        </select>
-                                    </div>
-                                );
-                            }
-
-                            if (field.type === 'entitySelect') {
-                                // Collect already-selected values for this field from other rows
-                                const alreadySelected = values
-                                    .filter((_, idx) => idx !== index)
-                                    .map(v => v[field.accessor])
-                                    .filter(Boolean);
-                                return (
-                                    <div key={field.accessor} className="flex-1 min-w-[200px]">
-                                        <label className="block text-sm font-semibold mb-1 text-gray-700">{field.header}</label>
-                                        <div className="bg-white border-gray-300 rounded-md">
-                                            <SearchableSelect
-                                                entityType={field.entityType}
-                                                value={item[field.accessor] || ''}
-                                                onChange={(value) => handleItemChange(index, field.accessor, value)}
-                                                label={null}
-                                                required={field.required}
-                                                excludeValues={alreadySelected}
-                                            />
-                                        </div>
-                                    </div>
-                                );
-                            }
-
-                            return (
-                                <div key={field.accessor} className="flex-1 min-w-[200px]">
-                                    <label className="block text-sm font-semibold mb-1 text-gray-700">{field.header}</label>
-                                    <input
-                                        className="w-full h-11 px-3 bg-white border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm"
-                                        name={`${name}_${index}_${field.accessor}`}
-                                        type={field.type || 'text'}
-                                        placeholder={field.placeholder || ''}
-                                        value={item[field.accessor] || ''}
-                                        onChange={(e) => handleItemChange(index, field.accessor, e.target.value)}
-                                    />
-                                </div>
-                            );
-                        })}
-                    </div>
-                ))}
-            </div>
-        </div>
-    );
-};
+import DynamicForm from './DynamicForm';
 
 const getInitialFormData = (resource) => {
     return resource.columns
@@ -1237,12 +1014,30 @@ const AddPage = () => {
             const hasFiles = Object.values(files).some(file => file);
             const useFormData = payloadType === 'formData' || (payloadType === 'auto' && hasFiles);
 
-            if (useFormData) {
-                const data = new FormData();
+            let wasSentForApproval = false;
 
+            const hasFacultyIds = (data) => {
+                const FACULTY_ID_KEYS = new Set([
+                    'faculty_id', 'supervisor_id', 'co_supervisor_id', 'faculty_ids',
+                    'faculty_members', 'faculty_associations', 'faculty_involved'
+                ]);
+                for (const key of Object.keys(data)) {
+                    if (FACULTY_ID_KEYS.has(key)) {
+                        if (Array.isArray(data[key]) && data[key].length > 0) return true;
+                        if (!Array.isArray(data[key]) && !!data[key]) return true;
+                    }
+                }
+                return false;
+            };
+
+            const isIqacCreatorRole = role === ROLES.IQAC_HEAD || role === ROLES.DEPARTMENT_HOD || role === 'IQAC Head' || role === 'Department HOD';
+            const requiresApproval = !editMode && isIqacCreatorRole && hasFacultyIds(processedData);
+
+            let data;
+            if (useFormData) {
+                data = new FormData();
                 if (jsonPayloadKey) {
                     data.append(jsonPayloadKey, JSON.stringify(processedData));
-
                     for (const key in files) {
                         if (files[key]) {
                             const column = resource.columns.find(c => c.accessor === key);
@@ -1250,12 +1045,9 @@ const AddPage = () => {
                             data.append(formFileKey, files[key]);
                         }
                     }
-
                 } else {
                     for (const key in processedData) {
                         if (processedData[key] !== null && processedData[key] !== undefined) {
-                            
-                            // 🚀 FIX 3: Object/Array Handling for FormData
                             if (Array.isArray(processedData[key]) || typeof processedData[key] === 'object') {
                                 data.append(key, JSON.stringify(processedData[key]));
                             } else if (typeof processedData[key] === 'boolean') {
@@ -1265,7 +1057,6 @@ const AddPage = () => {
                             }
                         }
                     }
-
                     for (const key in files) {
                         if (files[key]) {
                             const column = resource.columns.find(c => c.accessor === key);
@@ -1274,83 +1065,63 @@ const AddPage = () => {
                         }
                     }
                 }
-                
-                const hasFacultyIds = (data) => {
-                    const FACULTY_ID_KEYS = new Set([
-                        'faculty_id', 'supervisor_id', 'co_supervisor_id', 'faculty_ids',
-                        'faculty_members', 'faculty_associations', 'faculty_involved'
-                    ]);
-                    for (const key of Object.keys(data)) {
-                        if (FACULTY_ID_KEYS.has(key)) {
-                            if (Array.isArray(data[key]) && data[key].length > 0) return true;
-                            if (!Array.isArray(data[key]) && !!data[key]) return true;
-                        }
-                    }
-                    return false;
-                };
+            }
 
-                const isIqacCreatorRole = role === ROLES.IQAC_HEAD || role === ROLES.DEPARTMENT_HOD || role === 'IQAC Head' || role === 'Department HOD';
-                const requiresApproval = !editMode && isIqacCreatorRole && hasFacultyIds(processedData);
-
-                let wasSentForApproval = false;
-
-                if (requiresApproval) {
-                    try {
-                        response = await iqacApprovalService.createApprovalRequest(resourceId, processedData, files);
-                        wasSentForApproval = true;
-                    } catch (approvalErr) {
-                        // Fallback if resource is not configured for approval
-                        if (approvalErr.response?.data?.message?.includes('Faculty approval is not configured')) {
-                            console.warn(`Approval not configured for ${resourceId}, falling back to direct creation`);
-                            if (useFormData) {
-                                if (signature === 'formDataWithHeaders') {
-                                    response = await service[targetFunction](data, { 'Content-Type': 'multipart/form-data' });
-                                } else if (signature === 'payloadAndFile') {
-                                    const fileAccessor = Object.keys(files)[0];
-                                    const file = files[fileAccessor];
-                                    const { [fileAccessor]: _, ...payload } = processedData;
-                                    response = await service[targetFunction](payload, file);
-                                } else {
-                                    response = await service[targetFunction](data);
-                                }
+            if (requiresApproval) {
+                try {
+                    response = await iqacApprovalService.createApprovalRequest(resourceId, processedData, files);
+                    wasSentForApproval = true;
+                } catch (approvalErr) {
+                    // Fallback if resource is not configured for approval
+                    if (approvalErr.response?.data?.message?.includes('Faculty approval is not configured')) {
+                        console.warn(`Approval not configured for ${resourceId}, falling back to direct creation`);
+                        if (useFormData) {
+                            if (signature === 'formDataWithHeaders') {
+                                response = await service[targetFunction](data, { 'Content-Type': 'multipart/form-data' });
+                            } else if (signature === 'payloadAndFile') {
+                                const fileAccessor = Object.keys(files)[0];
+                                const file = files[fileAccessor];
+                                const { [fileAccessor]: _, ...payload } = processedData;
+                                response = await service[targetFunction](payload, file);
                             } else {
-                                response = await service[targetFunction](processedData);
+                                response = await service[targetFunction](data);
                             }
                         } else {
-                            throw approvalErr;
-                        }
-                    }
-                } else if (useFormData) {
-                    if (signature === 'formDataWithHeaders') {
-                        if (editMode) {
-                            response = await service[targetFunction](editId, data, { 'Content-Type': 'multipart/form-data' });
-                        } else {
-                            response = await service[targetFunction](data, { 'Content-Type': 'multipart/form-data' });
-                        }
-                    } else if (signature === 'payloadAndFile') {
-                        const fileAccessor = Object.keys(files)[0];
-                        const file = files[fileAccessor];
-                        const { [fileAccessor]: _, ...payload } = processedData;
-                        
-                        if (editMode) {
-                            response = await service[targetFunction](editId, payload, file);
-                        } else {
-                            response = await service[targetFunction](payload, file);
+                            response = await service[targetFunction](processedData);
                         }
                     } else {
-                        if (editMode) {
-                            response = await service[targetFunction](editId, data);
-                        } else {
-                            response = await service[targetFunction](data);
-                        }
+                        throw approvalErr;
                     }
-
+                }
+            } else if (useFormData) {
+                if (signature === 'formDataWithHeaders') {
+                    if (editMode) {
+                        response = await service[targetFunction](editId, data, { 'Content-Type': 'multipart/form-data' });
+                    } else {
+                        response = await service[targetFunction](data, { 'Content-Type': 'multipart/form-data' });
+                    }
+                } else if (signature === 'payloadAndFile') {
+                    const fileAccessor = Object.keys(files)[0];
+                    const file = files[fileAccessor];
+                    const { [fileAccessor]: _, ...payload } = processedData;
+                    
+                    if (editMode) {
+                        response = await service[targetFunction](editId, payload, file);
+                    } else {
+                        response = await service[targetFunction](payload, file);
+                    }
                 } else {
                     if (editMode) {
-                        response = await service[targetFunction](editId, processedData);
+                        response = await service[targetFunction](editId, data);
                     } else {
-                        response = await service[targetFunction](processedData);
+                        response = await service[targetFunction](data);
                     }
+                }
+            } else {
+                if (editMode) {
+                    response = await service[targetFunction](editId, processedData);
+                } else {
+                    response = await service[targetFunction](processedData);
                 }
             }
 
@@ -1378,181 +1149,7 @@ const AddPage = () => {
         }
     };
 
-    // 🚀 FIX 4: Helper function to get academic year date bounds
-    const getDateBounds = () => {
-        const ay = formData.academic_year;
-        if (!ay) return { min: undefined, max: undefined };
-        
-        // Formats: "2024-2025" or "2024-25" -> Extracts "2024"
-        const startYear = parseInt(ay.substring(0, 4));
-        return { 
-            min: `${startYear}-07-01`, 
-            max: `${startYear + 1}-06-30` 
-        };
-    };
 
-    const renderField = (col) => {
-        const isDisabled = false; // All fields are always editable (department_id is pre-filled for HODs but editable)
-        const dateBounds = col.type === 'date' ? getDateBounds() : {}; // Fetch bounds if date field
-
-        const commonProps = {
-            name: col.accessor,
-            onChange: handleChange,
-            placeholder: col.placeholder || '',
-            required: col.required || false,
-            disabled: isDisabled
-        };
-
-        switch (col.type) {
-            case 'boolean':
-                return (
-                    <div>
-                        <label className="block text-sm font-semibold mb-2 text-gray-700">
-                            {col.header}
-                            {col.required && <span className="text-red-500 ml-1">*</span>}
-                        </label>
-                        <div className={`flex items-center h-12 px-4 bg-gray-100 rounded-lg ${isDisabled ? 'opacity-50 pointer-events-none' : ''}`}>
-                            <input
-                                type="checkbox"
-                                name={col.accessor}
-                                id={col.accessor}
-                                checked={formData[col.accessor] || false}
-                                onChange={handleChange}
-                                disabled={isDisabled}
-                                className="h-5 w-5 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded cursor-pointer"
-                            />
-                            <label htmlFor={col.accessor} className="ml-3 text-sm text-gray-700 cursor-pointer select-none">
-                                Yes
-                            </label>
-                        </div>
-                    </div>
-                );
-            case 'select':
-                return (
-                    <div>
-                        <label className="block text-sm font-semibold mb-2 text-gray-700">
-                            {col.header}
-                            {col.required && <span className="text-red-500 ml-1">*</span>}
-                        </label>
-                        <select {...commonProps} value={formData[col.accessor] || ''} className="w-full h-12 px-4 bg-gray-100 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 disabled:opacity-50 disabled:bg-gray-200">
-                            {/* 🚀 FIX 5: Disabled the default select option */}
-                            <option value="" disabled>{col.placeholder || 'Select...'}</option>
-                            {col.options?.map(option => (
-                                <option key={option.value || option} value={option.value || option}>
-                                    {option.label || option}
-                                </option>
-                            ))}
-                        </select>
-                    </div>
-                );
-            case 'textarea':
-                return (
-                    <div>
-                        <label className="block text-sm font-semibold mb-2 text-gray-700">
-                            {col.header}
-                            {col.required && <span className="text-red-500 ml-1">*</span>}
-                        </label>
-                        <textarea
-                            {...commonProps}
-                            value={formData[col.accessor] || ''}
-                            rows={col.rows || 3}
-                            className="w-full px-4 py-2 bg-gray-100 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 disabled:opacity-50 disabled:bg-gray-200"
-                        />
-                    </div>
-                );
-            case 'hyperlink':
-                if (col.fileKey) {
-                    return (
-                        <div>
-                            <label className="block text-sm font-semibold mb-2 text-gray-700">
-                                {col.header}
-                                {col.required && <span className="text-red-500 ml-1">*</span>}
-                            </label>
-                            {col.description && (
-                                <p className="text-xs text-gray-500 mb-2 italic">
-                                    {col.description}
-                                </p>
-                            )}
-                            <input
-                                type="file"
-                                name={col.accessor}
-                                onChange={handleFileChange}
-                                disabled={isDisabled}
-                                className="w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100 disabled:opacity-50"
-                            />
-                            {files[col.accessor] ? (
-                                <div className="mt-2 text-sm text-gray-700">{files[col.accessor].name}</div>
-                            ) : formData[col.accessor] ? (
-                                <div className="mt-2 text-sm">
-                                    <span className="text-gray-600 mr-2">Current File:</span>
-                                    <a
-                                        href={formData[col.accessor]}
-                                        target="_blank"
-                                        rel="noopener noreferrer"
-                                        className="text-indigo-600 hover:underline"
-                                    >
-                                        View Uploaded Document
-                                    </a>
-                                </div>
-                            ) : null}
-                        </div>
-                    );
-                }
-                return (
-                    <InputField
-                        label={col.header}
-                        type="url"
-                        value={formData[col.accessor] || ''}
-                        required={col.required}
-                        {...commonProps}
-                        className={`w-full h-12 px-4 bg-gray-100 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 ${isDisabled ? 'opacity-50 bg-gray-200 cursor-not-allowed' : ''}`}
-                    />
-                );
-            case 'list':
-                return (
-                    <ListField
-                        label={col.header}
-                        name={col.accessor}
-                        values={formData[col.accessor]}
-                        onChange={handleChange}
-                    />
-                );
-            case 'objectList':
-                return (
-                    <ObjectListField
-                        label={col.header}
-                        name={col.accessor}
-                        values={formData[col.accessor] || []}
-                        subFields={col.subFields || []}
-                        onChange={handleChange}
-                    />
-                );
-            case 'entitySelect':
-                return (
-                    <SearchableSelect
-                        entityType={col.entityType}
-                        value={formData[col.accessor] || ''}
-                        onChange={(value) => handleChange({ target: { name: col.accessor, value } })}
-                        required={col.required}
-                        label={col.header}
-                        disabled={isDisabled}
-                    />
-                );
-            default:
-                return (
-                    // 🚀 FIX 6: Injected bounds into the generic InputField
-                    <InputField
-                        label={col.header}
-                        type={col.type || 'text'}
-                        value={formData[col.accessor] || ''}
-                        required={col.required}
-                        min={col.type === 'date' ? dateBounds.min : (col.type === 'number' ? 0 : undefined)}
-                        max={col.type === 'date' ? dateBounds.max : undefined}
-                        {...commonProps}
-                    />
-                );
-        }
-    };
 
     return (
         <div>
@@ -1561,13 +1158,14 @@ const AddPage = () => {
                 {success && <div className="mb-6 p-4 bg-green-50 border border-green-200 text-green-800 rounded">{success}</div>}
                 {error && <div className="mb-6 p-4 bg-red-50 border border-red-200 text-red-800 rounded">{error}</div>}
                 <form onSubmit={handleSubmit}>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                        {resource.columns
-                            .filter(col => !col.hideInForm) // Exclude columns hidden from form
-                            .map(col => (
-                                col.accessor && <div key={col.accessor}>{renderField(col)}</div>
-                            ))}
-                    </div>
+                    <DynamicForm
+                        resource={resource}
+                        formData={formData}
+                        onChange={handleChange}
+                        files={files}
+                        onFileChange={handleFileChange}
+                        hideFileUploads={role === ROLES.IQAC_HEAD || role === ROLES.DEPARTMENT_HOD || role === 'IQAC Head' || role === 'Department HOD'}
+                    />
                     <div className="flex justify-end space-x-4 mt-8">
                         <Link
                             to={resource.tablePath}

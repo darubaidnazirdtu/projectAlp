@@ -27,6 +27,9 @@ const formatValue = (value) => {
   return String(value);
 };
 
+import { resourceMap } from '../../config/tableConfig.js';
+import DynamicForm from '../../components/DynamicForm.jsx';
+
 const hiddenPayloadFields = new Set(['metadata', 'external_contributors', 'external_authors', 'external_inventors', 'external_participants', 'external_recipients']);
 
 const detailRows = (payload = {}) => {
@@ -37,47 +40,6 @@ const detailRows = (payload = {}) => {
       label: key.replace(/_/g, ' ').replace(/\b\w/g, (char) => char.toUpperCase()),
       value: formatValue(value)
     }));
-};
-
-const payloadEntries = (payload = {}) => (
-  Object.entries(payload).filter(([key]) => !hiddenPayloadFields.has(key))
-);
-
-const fieldLabel = (key) => key.replace(/_/g, ' ').replace(/\b\w/g, (char) => char.toUpperCase());
-
-const stringifyEditableValue = (value) => {
-  if (value === null || value === undefined) return '';
-  if (typeof value === 'object') return JSON.stringify(value, null, 2);
-  return String(value);
-};
-
-const createPayloadDraft = (payload = {}) => Object.fromEntries(
-  payloadEntries(payload).map(([key, value]) => [key, stringifyEditableValue(value)])
-);
-
-const parseEditableValue = (raw, originalValue, label) => {
-  const text = String(raw ?? '').trim();
-  if (Array.isArray(originalValue) || (originalValue && typeof originalValue === 'object')) {
-    if (!text) return Array.isArray(originalValue) ? [] : {};
-    try {
-      return JSON.parse(text);
-    } catch {
-      throw new Error(`${label} must be valid JSON`);
-    }
-  }
-
-  if (typeof originalValue === 'boolean') {
-    return ['true', 'yes', '1', 'on'].includes(text.toLowerCase());
-  }
-
-  if (typeof originalValue === 'number') {
-    if (!text) return '';
-    const numeric = Number(text);
-    if (Number.isNaN(numeric)) throw new Error(`${label} must be a number`);
-    return numeric;
-  }
-
-  return raw ?? '';
 };
 
 const statusClass = (status) => {
@@ -128,11 +90,13 @@ export default function IqacApprovals() {
     setDecision({ approval, action });
     setComment('');
     setPayloadError('');
-    setPayloadDraft(action === 'approve' ? createPayloadDraft(approval.payload || {}) : {});
+    // Deep clone the payload so DynamicForm can edit it directly as an object
+    setPayloadDraft(action === 'approve' ? JSON.parse(JSON.stringify(approval.payload || {})) : {});
   };
 
-  const updatePayloadDraft = (field, value) => {
-    setPayloadDraft((prev) => ({ ...prev, [field]: value }));
+  const handlePayloadChange = (e) => {
+    const { name, value, type, checked } = e.target;
+    setPayloadDraft((prev) => ({ ...prev, [name]: type === 'checkbox' ? checked : value }));
     if (payloadError) setPayloadError('');
   };
 
@@ -145,16 +109,7 @@ export default function IqacApprovals() {
 
     let correctedPayload = null;
     if (decision.action === 'approve') {
-      try {
-        correctedPayload = { ...(decision.approval.payload || {}) };
-        payloadEntries(decision.approval.payload || {}).forEach(([key, originalValue]) => {
-          correctedPayload[key] = parseEditableValue(payloadDraft[key], originalValue, fieldLabel(key));
-        });
-      } catch (error) {
-        setPayloadError(error.message);
-        toast.error(error.message);
-        return;
-      }
+      correctedPayload = { ...payloadDraft };
     }
 
     try {
@@ -290,33 +245,19 @@ export default function IqacApprovals() {
                 : 'Rejecting will stop this entry from being saved permanently.'}
             </p>
             {decision.action === 'approve' && (
-              <div className="mt-4 max-h-[55vh] space-y-4 overflow-y-auto pr-1">
-                {payloadEntries(decision.approval.payload || {}).map(([key, originalValue]) => {
-                  const isComplex = Array.isArray(originalValue) || (originalValue && typeof originalValue === 'object');
-                  return (
-                    <div key={key}>
-                      <label className="mb-1 block text-xs font-bold uppercase tracking-wide text-gray-500">
-                        {fieldLabel(key)}
-                      </label>
-                      {isComplex ? (
-                        <textarea
-                          value={payloadDraft[key] ?? ''}
-                          onChange={(event) => updatePayloadDraft(key, event.target.value)}
-                          className="min-h-[110px] w-full rounded-xl border border-gray-300 p-3 font-mono text-xs focus:border-emerald-400 focus:outline-none focus:ring-2 focus:ring-emerald-100"
-                        />
-                      ) : (
-                        <input
-                          type="text"
-                          value={payloadDraft[key] ?? ''}
-                          onChange={(event) => updatePayloadDraft(key, event.target.value)}
-                          className="w-full rounded-xl border border-gray-300 p-3 text-sm focus:border-emerald-400 focus:outline-none focus:ring-2 focus:ring-emerald-100"
-                        />
-                      )}
-                    </div>
-                  );
-                })}
+              <div className="mt-4 max-h-[55vh] overflow-y-auto pr-1">
+                {resourceMap.get(decision.approval.resource_id) ? (
+                  <DynamicForm
+                    resource={resourceMap.get(decision.approval.resource_id)}
+                    formData={payloadDraft}
+                    onChange={handlePayloadChange}
+                    hideFileUploads={true}
+                  />
+                ) : (
+                  <p className="text-sm text-red-500">Resource configuration not found for this entry.</p>
+                )}
                 {payloadError && (
-                  <p className="rounded-lg bg-red-50 p-3 text-xs font-semibold text-red-700">
+                  <p className="mt-4 rounded-lg bg-red-50 p-3 text-xs font-semibold text-red-700">
                     {payloadError}
                   </p>
                 )}
