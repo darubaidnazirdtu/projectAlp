@@ -663,6 +663,21 @@ const getFacultyHistory = asyncHandler(async (req, res) => {
     if (!faculty_id) throw new ApiError(400, "Faculty ID is required");
 
     const forms = await AparForm.find({ faculty_id }).sort({ ay: -1 }).lean();
+
+    // Collect unique officer IDs
+    const officerIds = new Set();
+    forms.forEach(f => {
+        if (f.reporting_officer_id) officerIds.add(f.reporting_officer_id);
+        if (f.reviewing_officer_id) officerIds.add(f.reviewing_officer_id);
+    });
+
+    // Fetch officer names
+    const officers = await User.find({ user_id: { $in: Array.from(officerIds) } }, 'user_id name').lean();
+    const officerNameMap = {};
+    officers.forEach(o => {
+        officerNameMap[o.user_id] = o.name;
+    });
+
     const list = forms.map(f => ({
         faculty_id: f.faculty_id,
         ay: normalizeAY(f.ay), // Ensure output is normalized
@@ -672,6 +687,10 @@ const getFacultyHistory = asyncHandler(async (req, res) => {
         query_comment: f.query_comment || (f.remarks && f.remarks.query_comment),
         reporting_query: f.reporting_query,
         reviewing_query: f.reviewing_query,
+        reporting_officer_id: f.reporting_officer_id,
+        reviewing_officer_id: f.reviewing_officer_id,
+        reporting_officer_name: officerNameMap[f.reporting_officer_id] || null,
+        reviewing_officer_name: officerNameMap[f.reviewing_officer_id] || null,
         updatedAt: f.updatedAt
     }));
 

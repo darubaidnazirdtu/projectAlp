@@ -386,6 +386,12 @@ export default function OfficerDashboard() {
                                 <h3 className="text-xl font-bold text-gray-800 mb-2">
                                     Status: {currentYearForm.status || 'Draft'}
                                 </h3>
+                                {(currentYearForm.status && currentYearForm.status !== 'Draft') && (
+                                    <div className="text-sm text-gray-600 mb-4 font-medium flex flex-col items-center gap-1">
+                                        {currentYearForm.reporting_officer_name && <div>Reporting Officer: <span className="text-gray-800">{currentYearForm.reporting_officer_name}</span></div>}
+                                        {currentYearForm.reviewing_officer_name && <div>Reviewing Officer: <span className="text-gray-800">{currentYearForm.reviewing_officer_name}</span></div>}
+                                    </div>
+                                )}
                                 {(currentYearForm.status?.includes('Query') && (currentYearForm.reporting_query || currentYearForm.reviewing_query || currentYearForm.query_comment)) && (
                                     <div className="bg-yellow-50 border border-yellow-200 rounded-md p-3 mb-4 max-w-lg">
                                         <p className="text-sm text-yellow-800 font-medium">Comments from Officer:</p>
@@ -470,15 +476,23 @@ export default function OfficerDashboard() {
                                         <tr key={year} className="hover:bg-indigo-50/30 transition-colors duration-150">
                                             <td className="px-6 py-4 whitespace-nowrap font-bold text-gray-900">{year}</td>
                                             <td className="px-6 py-4 whitespace-nowrap">
-                                                <span className={`px-3 py-1 inline-flex text-xs leading-5 font-bold rounded-full border ${
-                                                    !form ? 'bg-gray-50 text-gray-600 border-gray-200' :
-                                                    form.status === 'Submitted' ? 'bg-blue-50 text-blue-700 border-blue-200' :
-                                                    form.status?.includes('Forwarded') || form.status === 'Verified' ? 'bg-emerald-50 text-emerald-700 border-emerald-200' :
-                                                    form.status?.includes('Query') ? 'bg-amber-50 text-amber-700 border-amber-200' :
-                                                    'bg-gray-50 text-gray-700 border-gray-200'
-                                                }`}>
-                                                    {form ? (form.status || 'Draft') : 'Not Filled'}
-                                                </span>
+                                                <div className="flex flex-col gap-2">
+                                                    <span className={`w-max px-3 py-1 inline-flex text-xs leading-5 font-bold rounded-full border ${
+                                                        !form ? 'bg-gray-50 text-gray-600 border-gray-200' :
+                                                        form.status === 'Submitted' ? 'bg-blue-50 text-blue-700 border-blue-200' :
+                                                        form.status?.includes('Forwarded') || form.status === 'Verified' ? 'bg-emerald-50 text-emerald-700 border-emerald-200' :
+                                                        form.status?.includes('Query') ? 'bg-amber-50 text-amber-700 border-amber-200' :
+                                                        'bg-gray-50 text-gray-700 border-gray-200'
+                                                    }`}>
+                                                        {form ? (form.status || 'Draft') : 'Not Filled'}
+                                                    </span>
+                                                    {form && form.status && form.status !== 'Draft' && (
+                                                        <div className="text-xs text-gray-500 font-medium">
+                                                            {form.reporting_officer_name && <div>Reporting: <span className="text-gray-700">{form.reporting_officer_name}</span></div>}
+                                                            {form.reviewing_officer_name && <div className="mt-0.5">Reviewing: <span className="text-gray-700">{form.reviewing_officer_name}</span></div>}
+                                                        </div>
+                                                    )}
+                                                </div>
                                             </td>
                                             <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-500">
                                                 {form ? new Date(form.updatedAt).toLocaleDateString() : '-'}
