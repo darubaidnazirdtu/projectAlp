@@ -4,6 +4,7 @@ import { toast } from 'sonner';
 import SearchableSelect from './SearchableSelect';
 import FileUpload from './FileUpload';
 import { StudentService } from '../services/student.services.js';
+import { Api } from '../api/Api.js';
 
 // ... (existing imports)
 
@@ -612,9 +613,18 @@ export default function DynamicTableSection({
                                         return (
                                         <td key={f.key} className="px-4 py-4 whitespace-nowrap text-sm text-gray-700">
                                             {f.type === 'file' ? (
-                                                (item[f.key] || item.link) ? (
-                                                    <a href={item[f.key] || item.link} target="_blank" rel="noreferrer" className="text-indigo-600 hover:underline">View File</a>
-                                                ) : <span className="text-gray-400">No file</span>
+                                                (() => {
+                                                    const fileVal = item[f.key] || item.link;
+                                                    if (!fileVal) return <span className="text-gray-400">No file</span>;
+                                                    const isTemporary = typeof fileVal === 'object' && fileVal.tempId;
+                                                    if (isTemporary) {
+                                                        return <span className="text-amber-600 text-xs truncate max-w-[100px] inline-block" title="Pending save">(Pending save)</span>;
+                                                    }
+                                                    const urlStr = typeof fileVal === 'string' ? fileVal : String(fileVal);
+                                                    const isSavedDoc = /^(document|profilepicture|additional documents)\//.test(urlStr);
+                                                    const viewUrl = isSavedDoc ? `${new Api().client.defaults.baseURL}/apar/mongo/document?path=${encodeURIComponent(urlStr)}` : urlStr;
+                                                    return <a href={viewUrl} target="_blank" rel="noreferrer" className="text-indigo-600 hover:underline">View File</a>;
+                                                })()
                                             ) : f.type === 'date' ? (
                                                 item[f.key] ? new Date(item[f.key]).toLocaleDateString() : ''
                                             ) : f.type === 'monthYear' ? (
