@@ -4,7 +4,7 @@ import { useDispatch, useSelector } from 'react-redux'
 import { aparFormReportingService } from '../../services/apar_form_reporting.service.js'
 import { DepartmentService } from '../../services/department.services.js'
 import { aparLogout } from '../../store/slices/aparAuthSlice.js'
-import { FiArchive, FiList } from 'react-icons/fi'
+import { FiArchive, FiList, FiSearch, FiFilter, FiInbox, FiLoader, FiEye, FiCheckCircle, FiEdit3, FiMessageCircle } from 'react-icons/fi'
 import AparShellHeader from '../../components/AparShellHeader.jsx'
 import { useSocket } from '../../context/SocketContext.jsx'
 
@@ -141,8 +141,15 @@ export default function ReportingDashboard() {
 
   /* ... render ... */
   return (
-    <div className="apar-page-bg min-h-screen py-8 px-4 sm:px-6 lg:px-8">
-      <div className="mx-auto max-w-7xl">
+    <div className="apar-page-bg min-h-screen py-10 px-4 sm:px-6 lg:px-8 relative overflow-hidden">
+      {/* Premium Decorative Background */}
+      <div className="absolute top-0 left-0 w-full h-full overflow-hidden pointer-events-none z-0">
+        <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-indigo-500/10 rounded-full blur-[120px]"></div>
+        <div className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-purple-500/10 rounded-full blur-[120px]"></div>
+        <div className="absolute top-[40%] right-[10%] w-[20%] h-[20%] bg-emerald-500/5 rounded-full blur-[100px]"></div>
+      </div>
+      
+      <div className="mx-auto max-w-7xl relative z-10">
         <AparShellHeader
           title={`${userRole} Dashboard`}
           subtitle="Manage APAR assessments and reviews"
@@ -152,7 +159,7 @@ export default function ReportingDashboard() {
               type="button"
               onClick={handleLogout}
               disabled={logoutLoading}
-              className="rounded-lg border border-emerald-200 bg-white px-4 py-2 text-sm font-semibold text-emerald-800 shadow-sm transition hover:bg-emerald-50 disabled:opacity-60"
+              className="rounded-xl border border-rose-200/60 bg-white/80 backdrop-blur-sm px-5 py-2.5 text-sm font-bold text-rose-600 shadow-[0_2px_10px_rgb(225,29,72,0.06)] transition-all hover:bg-rose-50 hover:shadow-md hover:-translate-y-0.5 active:scale-95 disabled:opacity-60"
             >
               {logoutLoading ? 'Logging out…' : 'Logout'}
             </button>
@@ -161,49 +168,55 @@ export default function ReportingDashboard() {
       </div>
 
       {/* Tabs */}
-      <div className="max-w-7xl mx-auto mb-6">
-        <div className="border-b border-gray-200">
-          <nav className="-mb-px flex space-x-8" aria-label="Tabs">
-            <button
-              onClick={() => setViewMode('pending')}
-              className={`${viewMode === 'pending'
-                ? 'border-emerald-500 text-emerald-700'
-                : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
-                } whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm flex items-center`}
-            >
-              <FiList className="mr-2" />
-              Pending Actions
-            </button>
-            <button
-              onClick={() => setViewMode('archive')}
-              className={`${viewMode === 'archive'
-                ? 'border-emerald-500 text-emerald-700'
-                : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
-                } whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm flex items-center`}
-            >
-              <FiArchive className="mr-2" />
-              Archive / History
-            </button>
-          </nav>
+      <div className="max-w-7xl mx-auto mb-6 relative z-10 px-0">
+        <div className="bg-white/80 backdrop-blur-xl border border-white/60 p-1.5 rounded-2xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] inline-flex overflow-x-auto max-w-full">
+          <button
+            onClick={() => setViewMode('pending')}
+            className={`flex items-center gap-2 px-6 py-2.5 rounded-xl text-sm font-semibold transition-all duration-300 whitespace-nowrap ${
+              viewMode === 'pending'
+                ? 'bg-gradient-to-r from-indigo-500 to-indigo-600 text-white shadow-md shadow-indigo-200'
+                : 'text-gray-600 hover:text-indigo-600 hover:bg-indigo-50/50'
+            }`}
+          >
+            <FiList className={viewMode === 'pending' ? 'text-white' : 'text-indigo-500'} />
+            Pending Actions
+          </button>
+          <button
+            onClick={() => setViewMode('archive')}
+            className={`flex items-center gap-2 px-6 py-2.5 rounded-xl text-sm font-semibold transition-all duration-300 whitespace-nowrap ${
+              viewMode === 'archive'
+                ? 'bg-gradient-to-r from-emerald-500 to-teal-500 text-white shadow-md shadow-emerald-200'
+                : 'text-gray-600 hover:text-emerald-600 hover:bg-emerald-50/50'
+            }`}
+          >
+            <FiArchive className={viewMode === 'archive' ? 'text-white' : 'text-emerald-500'} />
+            Archive / History
+          </button>
         </div>
       </div>
 
       {/* Filters */}
-      <div className="max-w-7xl mx-auto mb-6 grid grid-cols-1 md:grid-cols-3 gap-4">
-        <div className="relative">
+      <div className="max-w-7xl mx-auto mb-6 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 relative z-10">
+        <div className="relative group">
+          <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+            <FiSearch className="text-gray-400 group-focus-within:text-indigo-500 transition-colors" />
+          </div>
           <input
             type="text"
             placeholder="Search by name, designation..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="form-field-input-iqac"
+            className="w-full pl-11 pr-4 py-3 bg-white/80 backdrop-blur-xl border border-white/60 rounded-2xl focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-400 focus:bg-white transition-all duration-300 text-gray-800 shadow-[0_8px_30px_rgb(0,0,0,0.04)] placeholder:text-gray-400 font-medium text-sm"
           />
         </div>
-        <div>
+        <div className="relative group">
+          <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+            <FiFilter className="text-gray-400 group-focus-within:text-emerald-500 transition-colors" />
+          </div>
           <select
             value={selectedDept}
             onChange={(e) => setSelectedDept(e.target.value)}
-            className="form-field-input-iqac"
+            className="w-full pl-11 pr-4 py-3 bg-white/80 backdrop-blur-xl border border-white/60 rounded-2xl focus:ring-4 focus:ring-emerald-500/10 focus:border-emerald-400 focus:bg-white transition-all duration-300 text-gray-800 shadow-[0_8px_30px_rgb(0,0,0,0.04)] font-medium text-sm appearance-none"
           >
             <option value="">All Departments</option>
             {departments.map((dept) => (
@@ -215,80 +228,119 @@ export default function ReportingDashboard() {
         </div>
       </div>
 
-      <div className="mx-auto max-w-7xl overflow-hidden rounded-2xl border border-emerald-100 bg-white shadow-sm">
+      <div className="mx-auto max-w-7xl overflow-hidden rounded-3xl bg-white/90 backdrop-blur-xl border border-white/60 shadow-[0_8px_30px_rgb(0,0,0,0.06)] relative z-10 transition-all duration-300">
         {loading ? (
-          <div className="p-12 text-center text-gray-500">Loading data...</div>
+          <div className="p-16 flex flex-col items-center justify-center text-gray-500">
+            <FiLoader className="w-10 h-10 text-indigo-500 animate-spin mb-4" />
+            <p className="font-medium text-lg text-gray-700">Loading data...</p>
+            <p className="text-sm text-gray-500 mt-1">Please wait while we fetch the records</p>
+          </div>
         ) : filteredRows.length === 0 ? (
-          <div className="p-12 text-center text-gray-500">
-            {rows.length === 0
-              ? (viewMode === 'pending' ? 'No pending actions found.' : 'No archived records found.')
-              : 'No matching records found for the selected filters.'
-            }
+          <div className="p-16 flex flex-col items-center justify-center text-gray-500">
+            <div className="w-20 h-20 bg-gray-50 rounded-full flex items-center justify-center mb-4">
+              <FiInbox className="w-10 h-10 text-gray-400" />
+            </div>
+            <p className="font-semibold text-xl text-gray-700">
+              {rows.length === 0
+                ? (viewMode === 'pending' ? 'No pending actions found' : 'No archived records found')
+                : 'No matching records found'}
+            </p>
+            <p className="text-sm text-gray-500 mt-2 text-center max-w-md">
+              {rows.length === 0
+                ? 'When new APAR forms require your attention, they will appear here.'
+                : 'Try adjusting your search or filters to find what you are looking for.'}
+            </p>
           </div>
         ) : (
           <div className="data-table-wrapper">
             <div className="data-table-scroll">
-            <table className="data-table data-table-apar text-left">
+            <table className="w-full text-left border-collapse">
               <thead>
-                <tr>
-                  <th className="!text-left">Faculty Name</th>
-                  <th className="!text-left">AY</th>
-                  <th className="!text-left">Department</th>
-                  <th className="!text-left">Status</th>
-                  <th className="!text-left">Action</th>
+                <tr className="bg-gray-50/80 border-b border-gray-100">
+                  <th className="px-6 py-4 text-xs font-bold text-gray-500 uppercase tracking-wider">Faculty Details</th>
+                  <th className="px-6 py-4 text-xs font-bold text-gray-500 uppercase tracking-wider">Academic Year</th>
+                  <th className="px-6 py-4 text-xs font-bold text-gray-500 uppercase tracking-wider">Department</th>
+                  <th className="px-6 py-4 text-xs font-bold text-gray-500 uppercase tracking-wider">Status</th>
+                  <th className="px-6 py-4 text-xs font-bold text-gray-500 uppercase tracking-wider text-right">Action</th>
                 </tr>
               </thead>
-              <tbody>
+              <tbody className="divide-y divide-gray-100">
                 {filteredRows.map(f => (
-                  <tr key={f.id}>
-                    <td className="!text-left whitespace-nowrap">
-                      <div className="text-sm font-medium text-gray-900">{f.name}</div>
-                      <div className="text-xs text-gray-500">{f.designation}</div>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{f.ay}</td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{f.department}</td>
+                  <tr key={f.id} className="hover:bg-indigo-50/30 transition-colors group">
                     <td className="px-6 py-4 whitespace-nowrap">
-                      <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full 
-                            ${f.status === 'Submitted' ? 'bg-blue-100 text-blue-800' :
-                          (f.status === 'Verified' || f.status?.includes('Forwarded')) ? 'bg-purple-100 text-purple-800' :
-                            f.status === 'Reviewed' ? 'bg-green-100 text-green-800' :
-                              f.status?.includes('Query') ? 'bg-yellow-100 text-yellow-800' :
-                                'bg-gray-100 text-gray-800'}`}>
+                      <div className="flex flex-col">
+                        <span className="text-sm font-bold text-gray-900 group-hover:text-indigo-700 transition-colors">{f.name}</span>
+                        <span className="text-xs font-medium text-gray-500 mt-0.5">{f.designation}</span>
+                      </div>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <span className="inline-flex items-center px-2.5 py-1 rounded-lg text-xs font-medium bg-gray-100 text-gray-700 border border-gray-200/50">
+                        {f.ay}
+                      </span>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-600">
+                      {f.department}
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <span className={`px-3 py-1.5 inline-flex items-center gap-1.5 text-xs font-bold rounded-xl border
+                            ${f.status === 'Submitted' ? 'bg-blue-50 text-blue-700 border-blue-200/60 shadow-[0_2px_10px_rgb(59,130,246,0.1)]' :
+                          (f.status === 'Verified' || f.status?.includes('Forwarded')) ? 'bg-purple-50 text-purple-700 border-purple-200/60 shadow-[0_2px_10px_rgb(168,85,247,0.1)]' :
+                            f.status === 'Reviewed' ? 'bg-emerald-50 text-emerald-700 border-emerald-200/60 shadow-[0_2px_10px_rgb(16,185,129,0.1)]' :
+                              f.status?.includes('Query') ? 'bg-amber-50 text-amber-700 border-amber-200/60 shadow-[0_2px_10px_rgb(245,158,11,0.1)]' :
+                                'bg-gray-50 text-gray-700 border-gray-200/60'}`}>
+                        {f.status === 'Reviewed' && <FiCheckCircle className="w-3.5 h-3.5" />}
+                        {f.status?.includes('Query') && <FiMessageCircle className="w-3.5 h-3.5" />}
                         {f.status || 'Unknown'}
                       </span>
                       {f.status === 'Query Raised by Reviewing officer' && (
-                        <div className="mt-2 relative group inline-block">
-                          <button className="text-xs bg-red-100 text-red-700 px-2 py-1 rounded border border-red-200 hover:bg-red-200 transition-colors">
-                            View Query
+                        <div className="mt-2.5 relative group inline-block">
+                          <button className="text-[11px] font-bold bg-rose-50 text-rose-600 px-2.5 py-1 rounded-lg border border-rose-200/60 shadow-[0_2px_8px_rgb(225,29,72,0.08)] hover:bg-rose-100 hover:text-rose-700 transition-all flex items-center gap-1">
+                            <FiEye className="w-3 h-3" /> View Query
                           </button>
                           {/* Popover */}
-                          <div className="absolute left-0 bottom-full mb-2 w-64 bg-white border border-gray-200 shadow-xl rounded-lg p-3 z-50 hidden group-hover:block text-wrap">
-                            <p className="text-xs font-semibold text-gray-700 mb-1">Query from Reviewing Officer:</p>
-                            <p className="text-xs text-gray-600 italic">"{f.reviewing_query || f.query_comment || 'No details provided'}"</p>
-                            <div className="absolute left-4 -bottom-1 w-2 h-2 bg-white border-b border-r border-gray-200 transform rotate-45"></div>
+                          <div className="absolute left-0 bottom-full mb-3 w-72 bg-white/95 backdrop-blur-xl border border-white/80 shadow-[0_10px_40px_rgb(0,0,0,0.1)] rounded-2xl p-4 z-50 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 transform translate-y-2 group-hover:translate-y-0 text-wrap pointer-events-none">
+                            <div className="flex items-center gap-2 mb-2">
+                              <div className="p-1.5 bg-rose-50 rounded-lg">
+                                <FiMessageCircle className="w-3.5 h-3.5 text-rose-500" />
+                              </div>
+                              <p className="text-xs font-bold text-gray-800">Query from Reviewing Officer</p>
+                            </div>
+                            <p className="text-[13px] text-gray-600 leading-relaxed italic bg-gray-50/50 p-2.5 rounded-xl border border-gray-100">
+                              "{f.reviewing_query || f.query_comment || 'No details provided'}"
+                            </p>
+                            <div className="absolute left-6 -bottom-1.5 w-3 h-3 bg-white border-b border-r border-gray-200/50 transform rotate-45"></div>
                           </div>
                         </div>
                       )}
                       {/* Show other query comments normally or hidden if redundant */}
                       {(f.status?.includes('Query') && f.status !== 'Query Raised by Reviewing officer' && f.query_comment) && (
-                        <div className="mt-1 text-xs text-red-600 bg-red-50 p-1 rounded border border-red-100 italic" title={f.query_comment}>
-                          "{f.query_comment.length > 50 ? f.query_comment.substring(0, 50) + '...' : f.query_comment}"
+                        <div className="mt-2 text-[11px] font-medium text-amber-700 bg-amber-50 px-2.5 py-1.5 rounded-lg border border-amber-200/50 italic flex items-start gap-1.5 shadow-[0_2px_8px_rgb(245,158,11,0.05)]" title={f.query_comment}>
+                          <FiMessageCircle className="w-3 h-3 mt-0.5 shrink-0" />
+                          <span className="truncate max-w-[200px]">
+                            {f.query_comment}
+                          </span>
                         </div>
                       )}
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                    <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                       {viewMode === 'archive' ? (
-                        <button onClick={() => handleReview(f, 'view')} className="text-indigo-600 hover:text-indigo-900 bg-indigo-50 px-3 py-1 rounded-md border border-indigo-200">View</button>
+                        <button onClick={() => handleReview(f, 'view')} className="inline-flex items-center gap-1.5 px-4 py-2 bg-indigo-50 text-indigo-700 text-sm font-bold rounded-xl shadow-sm hover:bg-indigo-100 hover:-translate-y-0.5 active:scale-95 transition-all">
+                          <FiEye className="w-4 h-4" /> View
+                        </button>
                       ) : (
                         <>
                           {/* Reporting Officer Actions */}
                           {userRole === 'Reporting Officer' && (f.status === 'Submitted' || f.status === 'Query Raised' || f.status === 'Query Raised by Reviewing officer') && f.status !== 'Query Raised by Reporting officer' && (
-                            <button onClick={() => handleReview(f, 'edit')} className="text-white bg-indigo-600 hover:bg-indigo-700 px-4 py-1 rounded-md shadow-sm">Review & Verify</button>
+                            <button onClick={() => handleReview(f, 'edit')} className="inline-flex items-center gap-1.5 px-4 py-2 bg-gradient-to-r from-indigo-600 to-purple-600 text-white text-sm font-bold rounded-xl shadow-md shadow-indigo-200 hover:shadow-lg hover:-translate-y-0.5 active:scale-95 transition-all">
+                              <FiEdit3 className="w-4 h-4" /> Review & Verify
+                            </button>
                           )}
 
                           {/* Reviewing Officer Actions */}
                           {userRole === 'Reviewing Officer' && f.status === 'Forwarded by Reporting officer' && (
-                            <button onClick={() => handleReview(f, 'edit')} className="text-white bg-indigo-600 hover:bg-indigo-700 px-4 py-1 rounded-md shadow-sm">Review & Assess</button>
+                            <button onClick={() => handleReview(f, 'edit')} className="inline-flex items-center gap-1.5 px-4 py-2 bg-gradient-to-r from-indigo-600 to-purple-600 text-white text-sm font-bold rounded-xl shadow-md shadow-indigo-200 hover:shadow-lg hover:-translate-y-0.5 active:scale-95 transition-all">
+                              <FiEdit3 className="w-4 h-4" /> Review & Assess
+                            </button>
                           )}
 
                           {/* Fallback View
