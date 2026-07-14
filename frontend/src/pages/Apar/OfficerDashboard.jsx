@@ -517,51 +517,72 @@ export default function OfficerDashboard() {
 
                 {/* History Modal */}
                 {showStatusModal && currentYearForm && (
-                    <div className="fixed inset-0 bg-gray-900/40 backdrop-blur-sm overflow-y-auto h-full w-full flex items-center justify-center z-50 transition-all duration-300">
-                        <div className="relative bg-white/95 backdrop-blur-xl rounded-2xl shadow-2xl max-w-lg w-full m-4 overflow-hidden transform transition-all h-[500px] flex flex-col border border-white/20">
-                            {/* Header */}
-                            <div className="bg-gradient-to-r from-indigo-600 to-indigo-800 px-6 py-5 flex items-center justify-between shrink-0 shadow-sm">
-                                <h3 className="text-xl font-bold text-white flex items-center tracking-wide">
-                                    <FiClock className="mr-2" /> Application Journey
-                                </h3>
-                                <button onClick={() => setShowStatusModal(false)} className="text-indigo-200 hover:text-white transition-colors p-1 hover:bg-white/10 rounded-lg">
-                                    <span className="text-2xl">&times;</span>
+                    <div className="fixed inset-0 bg-gray-900/40 backdrop-blur-md overflow-y-auto h-full w-full flex items-center justify-center z-50 transition-all duration-300">
+                        <div className="relative bg-white/90 backdrop-blur-2xl rounded-[2rem] shadow-[0_20px_60px_-15px_rgba(0,0,0,0.2)] max-w-lg w-full m-4 overflow-hidden transform transition-all h-[550px] flex flex-col border border-white/60">
+                            {/* Premium Header */}
+                            <div className="bg-gradient-to-r from-indigo-500 via-purple-500 to-indigo-600 px-8 py-6 flex items-center justify-between shrink-0 shadow-md relative overflow-hidden">
+                                <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] opacity-10 mix-blend-overlay pointer-events-none"></div>
+                                <div className="relative z-10 flex items-center gap-3">
+                                    <div className="p-2 bg-white/20 rounded-xl backdrop-blur-sm shadow-inner">
+                                        <FiClock className="w-6 h-6 text-white" />
+                                    </div>
+                                    <div>
+                                        <h3 className="text-xl font-bold text-white tracking-wide">Application Journey</h3>
+                                        <p className="text-indigo-100 text-xs mt-0.5 font-medium">Timeline of your APAR progress</p>
+                                    </div>
+                                </div>
+                                <button onClick={() => setShowStatusModal(false)} className="relative z-10 text-white/70 hover:text-white transition-all p-2 hover:bg-white/20 rounded-xl hover:rotate-90 duration-300">
+                                    <span className="text-2xl leading-none">&times;</span>
                                 </button>
                             </div>
 
                             {/* Body */}
-                            <div className="p-6 overflow-y-auto flex-1">
+                            <div className="p-8 overflow-y-auto flex-1 bg-gradient-to-b from-gray-50/50 to-white">
                                 {!currentYearForm.history || currentYearForm.history.length === 0 ? (
-                                    <div className="text-center text-gray-500 py-8">
-                                        No tracking history available yet.
+                                    <div className="flex flex-col items-center justify-center h-full text-gray-500 opacity-80">
+                                        <FiClock className="w-12 h-12 mb-4 text-gray-300" />
+                                        <p className="font-medium text-lg">No history available</p>
+                                        <p className="text-sm">Tracking will start once actions are taken.</p>
                                     </div>
                                 ) : (
-                                    <div className="flow-root">
+                                    <div className="flow-root mt-2">
                                         <ul role="list" className="-mb-8">
                                             {currentYearForm.history.slice().reverse().map((event, eventIdx) => (
                                                 <li key={eventIdx}>
-                                                    <div className="relative pb-8">
+                                                    <div className="relative pb-10">
                                                         {eventIdx !== currentYearForm.history.length - 1 ? (
-                                                            <span className="absolute top-4 left-4 -ml-px h-full w-0.5 bg-gray-200" aria-hidden="true"></span>
+                                                            <span className="absolute top-5 left-5 -ml-px h-full w-0.5 bg-gradient-to-b from-indigo-200 to-transparent" aria-hidden="true"></span>
                                                         ) : null}
-                                                        <div className="relative flex space-x-3">
-                                                            <div>
-                                                                <span className={`h-8 w-8 rounded-full flex items-center justify-center ring-8 ring-white ${event.action?.includes('Query') ? 'bg-yellow-500' :
-                                                                    event.action === 'Submitted' ? 'bg-blue-500' : 'bg-green-500'
+                                                        <div className="relative flex space-x-4 items-start group">
+                                                            <div className="relative z-10">
+                                                                <span className={`h-10 w-10 rounded-2xl flex items-center justify-center shadow-lg transform group-hover:scale-110 transition-all duration-300 ${
+                                                                    event.action?.includes('Query') 
+                                                                        ? 'bg-gradient-to-br from-amber-400 to-orange-500 shadow-orange-200/50 ring-4 ring-orange-50' 
+                                                                        : event.action === 'Submitted' || event.action?.includes('Forwarded')
+                                                                            ? 'bg-gradient-to-br from-blue-400 to-indigo-500 shadow-blue-200/50 ring-4 ring-blue-50' 
+                                                                            : 'bg-gradient-to-br from-emerald-400 to-teal-500 shadow-emerald-200/50 ring-4 ring-emerald-50'
                                                                     }`}>
                                                                     {event.action?.includes('Query') ? <FiAlertCircle className="text-white h-5 w-5" /> : <FiClock className="text-white h-5 w-5" />}
                                                                 </span>
                                                             </div>
-                                                            <div className="min-w-0 flex-1 pt-1.5 flex justify-between space-x-4">
-                                                                <div>
-                                                                    <p className="text-sm text-gray-500">{event.action} <span className="font-medium text-gray-900">by {event.by}</span></p>
+                                                            <div className="min-w-0 flex-1 pt-0.5 flex flex-col sm:flex-row sm:justify-between sm:space-x-4">
+                                                                <div className="flex-1">
+                                                                    <p className="text-sm font-bold text-gray-800">
+                                                                        {event.action}
+                                                                    </p>
+                                                                    <p className="text-xs font-medium text-gray-500 mt-0.5">
+                                                                        by <span className="text-indigo-600">{event.by}</span>
+                                                                    </p>
                                                                     {event.comment && (
-                                                                        <p className="mt-1 text-sm text-gray-600 italic">"{event.comment}"</p>
+                                                                        <div className="mt-2 text-sm text-gray-600 italic bg-white border border-gray-100 p-3 rounded-xl shadow-[0_2px_10px_rgb(0,0,0,0.02)] relative">
+                                                                            <div className="absolute -left-1.5 top-3 w-3 h-3 bg-white border-l border-t border-gray-100 transform -rotate-45"></div>
+                                                                            "{event.comment}"
+                                                                        </div>
                                                                     )}
                                                                 </div>
-                                                                <div className="text-right text-sm whitespace-nowrap text-gray-500">
-                                                                    <time dateTime={event.date}>{new Date(event.date).toLocaleDateString()}</time>
-                                                                    <div className="text-xs">{new Date(event.date).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</div>
+                                                                <div className="text-left sm:text-right text-xs whitespace-nowrap text-gray-400 mt-2 sm:mt-0 font-medium bg-gray-50 px-2.5 py-1 rounded-lg h-fit border border-gray-100 group-hover:bg-indigo-50 group-hover:text-indigo-600 group-hover:border-indigo-100 transition-colors">
+                                                                    <time dateTime={event.date} className="block">{new Date(event.date).toLocaleDateString()}</time>
+                                                                    <div className="text-[10px] uppercase mt-0.5">{new Date(event.date).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</div>
                                                                 </div>
                                                             </div>
                                                         </div>

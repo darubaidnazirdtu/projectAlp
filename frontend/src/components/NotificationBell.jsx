@@ -241,26 +241,29 @@ const NotificationBell = () => {
         <div className="relative" ref={dropdownRef}>
             <button
                 onClick={handleToggle}
-                className="p-2 rounded-full hover:bg-gray-100 transition-colors relative"
+                className="p-2.5 rounded-full hover:bg-gray-100/80 transition-all relative backdrop-blur-sm shadow-sm border border-gray-200/50 bg-white/50"
                 aria-label="Notifications"
             >
-                <FiBell className="w-6 h-6 text-gray-600" />
+                <FiBell className="w-5 h-5 text-gray-700" />
                 {unreadCount > 0 && (
-                    <span className="absolute top-0 right-0 inline-flex items-center justify-center px-2 py-1 text-xs font-bold leading-none text-white transform translate-x-1/2 -translate-y-1/2 bg-red-500 rounded-full">
+                    <span className="absolute top-0 right-0 inline-flex items-center justify-center px-2 py-1 text-[10px] font-bold leading-none text-white transform translate-x-1/3 -translate-y-1/4 bg-gradient-to-br from-red-400 to-rose-600 rounded-full shadow-md shadow-red-200">
                         {unreadCount > 9 ? '9+' : unreadCount}
                     </span>
                 )}
             </button>
 
             {isOpen && (
-                <div className="absolute right-0 mt-2 w-96 bg-white rounded-xl shadow-2xl border border-gray-100 z-50 animate-in fade-in zoom-in duration-200 origin-top-right">
-                    <div className="p-4 border-b border-gray-100 flex justify-between items-center">
-                        <h3 className="font-bold text-gray-800 text-lg">Notifications</h3>
-                        <div className="flex items-center gap-3">
+                <div className="absolute right-0 mt-3 w-96 bg-white/90 backdrop-blur-2xl rounded-2xl shadow-[0_20px_60px_-15px_rgba(0,0,0,0.3)] border border-white/60 z-50 animate-in fade-in zoom-in duration-200 origin-top-right overflow-hidden">
+                    <div className="bg-gradient-to-r from-indigo-500 via-purple-500 to-indigo-600 px-5 py-4 flex justify-between items-center relative overflow-hidden">
+                        <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] opacity-10 mix-blend-overlay pointer-events-none"></div>
+                        <h3 className="font-bold text-white text-lg relative z-10 flex items-center gap-2">
+                            <FiBell className="w-5 h-5 text-indigo-100" /> Notifications
+                        </h3>
+                        <div className="flex items-center gap-3 relative z-10">
                             {unreadCount > 0 && (
                                 <button
                                     onClick={markAllRead}
-                                    className="text-sm text-indigo-600 hover:text-indigo-800 font-medium"
+                                    className="text-xs bg-white/20 hover:bg-white/30 text-white px-2.5 py-1.5 rounded-lg font-medium transition-colors backdrop-blur-sm border border-white/20"
                                 >
                                     Mark all read
                                 </button>
@@ -268,7 +271,7 @@ const NotificationBell = () => {
                             {notifications.length > 0 && (
                                 <button
                                     onClick={handleClearAll}
-                                    className="text-sm font-medium text-red-600 hover:text-red-800"
+                                    className="text-xs bg-white/10 hover:bg-red-500/80 text-white px-2 py-1.5 rounded-lg font-medium transition-colors backdrop-blur-sm"
                                 >
                                     Clear all
                                 </button>
@@ -276,13 +279,18 @@ const NotificationBell = () => {
                         </div>
                     </div>
 
-                    <div className="max-h-[500px] overflow-y-auto">
+                    <div className="max-h-[450px] overflow-y-auto bg-gradient-to-b from-gray-50/50 to-white">
                         {loading && notifications.length === 0 ? (
-                            <div className="p-8 text-center text-gray-400">Loading...</div>
+                            <div className="p-10 text-center text-gray-400 animate-pulse">
+                                <div className="w-8 h-8 border-4 border-indigo-200 border-t-indigo-600 rounded-full animate-spin mx-auto mb-3"></div>
+                                <p className="text-sm font-medium">Loading notifications...</p>
+                            </div>
                         ) : notifications.length === 0 ? (
-                            <div className="p-8 text-center text-gray-400 flex flex-col items-center gap-2">
-                                <FiBell className="w-10 h-10 opacity-20" />
-                                <p>No notifications yet</p>
+                            <div className="p-12 text-center text-gray-400 flex flex-col items-center gap-3">
+                                <div className="p-4 bg-gray-50 rounded-full shadow-inner">
+                                    <FiBell className="w-10 h-10 text-gray-300" />
+                                </div>
+                                <p className="font-medium text-gray-500">You're all caught up!</p>
                             </div>
                         ) : (
                             <div className="divide-y divide-gray-50">
@@ -293,27 +301,30 @@ const NotificationBell = () => {
                                     return (
                                         <div
                                             key={n._id}
-                                            className={`p-4 hover:bg-gray-50 transition-colors ${!n.isRead ? 'bg-indigo-50/30' : ''}`}
+                                            className={`p-5 hover:bg-indigo-50/40 transition-all border-l-4 group relative ${!n.isRead ? 'bg-indigo-50/20 border-indigo-500' : 'border-transparent'}`}
                                         >
                                             <div
-                                                className="flex gap-3 cursor-pointer"
+                                                className="flex gap-4 cursor-pointer"
                                                 onClick={() => handleNotificationClick(n)}
                                             >
-                                                <div className="mt-1 flex-shrink-0">
+                                                <div className="mt-1 flex-shrink-0 relative">
                                                     {getTypeIcon(n.type)}
+                                                    {!n.isRead && (
+                                                        <span className="absolute -top-1 -right-1 flex h-3 w-3">
+                                                            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-indigo-400 opacity-75"></span>
+                                                            <span className="relative inline-flex rounded-full h-3 w-3 bg-indigo-500 border-2 border-white"></span>
+                                                        </span>
+                                                    )}
                                                 </div>
                                                 <div className="flex-1 min-w-0">
                                                     <div className="flex items-start justify-between gap-2">
-                                                        <p className={`text-sm font-semibold text-gray-900 ${!n.isRead ? 'pr-4' : ''}`}>
+                                                        <p className={`text-sm font-bold text-gray-900 ${!n.isRead ? 'text-indigo-900' : ''}`}>
                                                             {n.title}
                                                         </p>
-                                                        {!n.isRead && (
-                                                            <div className="w-2 h-2 bg-indigo-600 rounded-full mt-1 flex-shrink-0" />
-                                                        )}
                                                         <button
                                                             type="button"
                                                             onClick={(event) => handleDeleteNotification(n, event)}
-                                                            className="rounded-md p-1 text-gray-400 hover:bg-red-50 hover:text-red-600"
+                                                            className="rounded-lg p-1.5 text-gray-300 hover:bg-red-50 hover:text-red-500 opacity-0 group-hover:opacity-100 transition-all duration-200"
                                                             title="Delete notification"
                                                         >
                                                             <FiTrash2 className="h-4 w-4" />
@@ -371,8 +382,8 @@ const NotificationBell = () => {
                         )}
                     </div>
 
-                    <div className="p-3 border-t border-gray-100 text-center">
-                        <button className="text-sm text-gray-500 hover:text-gray-700 font-medium">
+                    <div className="p-3 bg-gray-50/80 border-t border-gray-100 text-center backdrop-blur-md">
+                        <button className="text-sm text-indigo-600 hover:text-indigo-800 font-bold tracking-wide transition-colors uppercase">
                             View all activity
                         </button>
                     </div>

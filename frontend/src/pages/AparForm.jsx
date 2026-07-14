@@ -1631,6 +1631,17 @@ export default function AparForm() {
         }
     };
 
+    const handleStepClick = (stepClicked) => {
+        if (stepClicked < currentStep) {
+            setCurrentStep(stepClicked);
+            window.scrollTo(0, 0);
+        } else if (stepClicked === currentStep + 1) {
+            nextStep();
+        } else if (stepClicked > currentStep + 1) {
+            toast.error("Please complete the current step before jumping ahead.");
+        }
+    };
+
     const handlePersonalChange = (e) => {
         const { name, value } = e.target;
         const sanitized = sanitizeForApar(value, `personal.${name}`);
@@ -1760,7 +1771,7 @@ export default function AparForm() {
                 const weighted = parts.reduce((s, p) => s + p.val * p.w, 0) / (wsum || 1);
                 next.assessment.general = {
                     ...next.assessment.general,
-                    q6: String(Math.round(weighted))
+                    q6: (Math.round(weighted * 10) / 10).toFixed(1)
                 };
             }
 
@@ -2128,7 +2139,7 @@ export default function AparForm() {
                                 {Array.from({ length: totalSteps }, (_, i) => i + 1).map((step) => (
                                     <div 
                                         key={step} 
-                                        onClick={() => setCurrentStep(step)}
+                                        onClick={() => handleStepClick(step)}
                                         className={`flex flex-col items-center cursor-pointer hover:-translate-y-1 transition-all duration-300 ${step <= currentStep ? 'text-indigo-600' : 'text-gray-400'}`}
                                     >
                                         <div className={`rounded-full h-10 w-10 flex items-center justify-center border-2 transition-all duration-300 shadow-sm ${step === currentStep ? 'border-indigo-600 bg-indigo-600 text-white ring-4 ring-indigo-100' : step < currentStep ? 'border-indigo-600 bg-indigo-50 text-indigo-600' : 'border-gray-200 bg-white'}`}>
