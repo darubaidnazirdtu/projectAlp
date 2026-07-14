@@ -34,7 +34,7 @@ const FileUpload = ({ value, onChange, disabled, required = false, temporaryPdf 
         try {
             // A persisted PDF is removed before its replacement is uploaded. The
             // API clears the APAR reference and deletes the object as one action.
-            if (temporaryPdf && typeof value === 'string' && /^document\//.test(value)) {
+            if (temporaryPdf && typeof value === 'string' && /^(document|additional documents)\//.test(value)) {
                 await deleteSavedPdf(value);
                 onChange('');
             }
@@ -87,7 +87,7 @@ const FileUpload = ({ value, onChange, disabled, required = false, temporaryPdf 
                     console.warn('Temporary PDF cleanup failed:', error);
                 }
             }
-        } else if (temporaryPdf && typeof value === 'string' && /^document\//.test(value)) {
+        } else if (temporaryPdf && typeof value === 'string' && /^(document|additional documents)\//.test(value)) {
             try {
                 await deleteSavedPdf(value);
             } catch (error) {
@@ -102,7 +102,7 @@ const FileUpload = ({ value, onChange, disabled, required = false, temporaryPdf 
 
     const isTemporary = Boolean(value && typeof value === 'object' && value.tempId);
     const displayName = isTemporary ? value.originalName || 'Selected PDF' : null;
-    const viewUrl = typeof value === 'string' && /^(document|profilepicture)\//.test(value)
+    const viewUrl = typeof value === 'string' && /^(document|profilepicture|additional documents)\//.test(value)
         ? `${api.client.defaults.baseURL}/apar/mongo/document?path=${encodeURIComponent(value)}`
         : value;
 

@@ -633,6 +633,7 @@ import { FiPlus, FiTrash2, FiEdit2 } from 'react-icons/fi';
 import { toast } from 'sonner';
 import React, { useState } from 'react';
 import DynamicTableSection from '../../components/DynamicTableSection';
+import FileUpload from '../../components/FileUpload';
 
 
 
@@ -956,43 +957,16 @@ export default function PartII({ formData, addItem, removeItem, updateArrayField
                             <input id="health-checkup" type="text" disabled={readOnly} value={teachingData?.health_checkup_file || ''} onChange={(e) => updateField('teaching', 'health_checkup_file', e.target.value)} className="w-full border border-gray-300 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500 px-4 py-2.5 disabled:bg-gray-100 disabled:text-gray-500 transition-colors bg-white" placeholder="Paste Google Drive or Cloudinary link..." />
                         </div>
                     </div> */}
-                            <div>
-                <label
-                    htmlFor="property-return"
-                    className="block text-sm font-medium text-gray-700 mb-1"
-                >
-                    Immovable Property Return (Document URL)
+            <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Immovable Property Return (PDF Document)
                 </label>
-
-                <input
-                    id="property-return"
-                    type="text"
+                <FileUpload
+                    value={teachingData?.immovable_property_return}
+                    onChange={(val) => updateField('teaching', 'immovable_property_return', val)}
                     disabled={readOnly}
-                    value={teachingData?.immovable_property_return || ''}
-                    onChange={(e) =>
-                        updateField(
-                            'teaching',
-                            'immovable_property_return',
-                            e.target.value
-                        )
-                    }
-                    onBlur={(e) =>
-                        handleURLBlur(
-                            'immovable_property_return',
-                            e.target.value,
-                            'Immovable Property Return'
-                        )
-                    }
-                    className={`w-full border rounded-lg shadow-sm px-4 py-2.5 transition-colors bg-white
-                    ${
-                        errors?.immovable_property_return
-                            ? 'border-red-500 focus:ring-red-500 focus:border-red-500'
-                            : 'border-gray-300 focus:ring-blue-500 focus:border-blue-500'
-                    }
-                    disabled:bg-gray-100 disabled:text-gray-500`}
-                    placeholder="Paste Google Drive or Cloudinary link..."
+                    temporaryPdf={true}
                 />
-
                 {errors?.immovable_property_return && (
                     <p className="text-red-500 text-sm mt-1">
                         {errors.immovable_property_return}
@@ -1001,42 +975,15 @@ export default function PartII({ formData, addItem, removeItem, updateArrayField
             </div>
 
             <div>
-                <label
-                    htmlFor="health-checkup"
-                    className="block text-sm font-medium text-gray-700 mb-1"
-                >
-                    Health Checkup Report (Document URL)
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Health Checkup Report (PDF Document)
                 </label>
-
-                <input
-                    id="health-checkup"
-                    type="text"
+                <FileUpload
+                    value={teachingData?.health_checkup_file}
+                    onChange={(val) => updateField('teaching', 'health_checkup_file', val)}
                     disabled={readOnly}
-                    value={teachingData?.health_checkup_file || ''}
-                    onChange={(e) =>
-                        updateField(
-                            'teaching',
-                            'health_checkup_file',
-                            e.target.value
-                        )
-                    }
-                    onBlur={(e) =>
-                        handleURLBlur(
-                            'health_checkup_file',
-                            e.target.value,
-                            'Health Checkup Report'
-                        )
-                    }
-                    className={`w-full border rounded-lg shadow-sm px-4 py-2.5 transition-colors bg-white
-                    ${
-                        errors?.health_checkup_file
-                            ? 'border-red-500 focus:ring-red-500 focus:border-red-500'
-                            : 'border-gray-300 focus:ring-blue-500 focus:border-blue-500'
-                    }
-                    disabled:bg-gray-100 disabled:text-gray-500`}
-                    placeholder="Paste Google Drive or Cloudinary link..."
+                    temporaryPdf={true}
                 />
-
                 {errors?.health_checkup_file && (
                     <p className="text-red-500 text-sm mt-1">
                         {errors.health_checkup_file}

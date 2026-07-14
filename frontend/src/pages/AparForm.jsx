@@ -1362,33 +1362,9 @@ export default function AparForm() {
         if (currentStep < totalSteps) {
             // Special validation for Personal Data step (step 1)
             
-            // Add this helper function at the top of AparForm.jsx
-            const isValidUrl = (string) => {
-                if (!string || string.trim() === '') return true; // Optional fields are valid if empty
-                try {
-                    const url = new URL(string);
-                    return url.protocol === "http:" || url.protocol === "https:";
-                } catch (_) {
-                    return false;
-                }
-            };
             if (currentStep === 2) { // Assuming PartII is step 2
-            const propertyUrl = formData.teaching?.immovable_property_return || '';
-            const healthUrl = formData.teaching?.health_checkup_file || '';
-
-            const isPropertyValid = propertyUrl.trim() === '' || isValidUrl(propertyUrl);
-            const isHealthValid = healthUrl.trim() === '' || isValidUrl(healthUrl);
-
-            if (!isPropertyValid) {
-                toast.error("Please provide valid URL for Immovable Property Return");
-                return; // Blocks navigation
+                // Part II specific validation handled below
             }
-
-            if (!isHealthValid) {
-                toast.error("Please provide valid URL for Health Checkup Report.");
-                return; // Blocks navigation
-            }
-        }
            
            
             if (currentStep === 1 && !validatePersonalDataStep()) return;

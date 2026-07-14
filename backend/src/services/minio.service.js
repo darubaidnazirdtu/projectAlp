@@ -50,6 +50,12 @@ export const createDocumentPath = (facultyName, academicYear) => (
     `document/${safeSegment(facultyName, 'faculty')}/${safeSegment(academicYear, 'academic_year')}/${uuidv4()}.pdf`
 );
 
+export const createAdditionalDocumentPath = (facultyName, academicYear, originalName) => {
+    const extension = path.extname(originalName || '').toLowerCase();
+    const basename = path.basename(originalName || 'document', extension);
+    return `additional documents/${safeSegment(facultyName, 'faculty')}/${safeSegment(academicYear, 'academic_year')}/${safeSegment(basename, 'file')}${extension || '.pdf'}`;
+};
+
 export const uploadLocalFile = async ({ filePath, objectPath, contentType }) => {
     await ensureAparBucket();
     const fileStat = await stat(filePath);
@@ -71,5 +77,5 @@ export const getObject = async (objectPath) => {
 };
 
 export const isAparObjectPath = (value) => (
-    typeof value === 'string' && /^(profilepicture|document)\//.test(value)
+    typeof value === 'string' && /^(profilepicture|document|additional documents)\//.test(value)
 );

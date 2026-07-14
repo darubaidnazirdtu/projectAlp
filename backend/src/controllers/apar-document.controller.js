@@ -59,16 +59,20 @@ export const deleteSavedDocument = asyncHandler(async (req, res) => {
 
     const facultyId = await resolveToReadableId(req.user?.userId || req.user?.faculty_id || req.user?.id);
     const forms = await AparForm.find({ faculty_id: facultyId });
-    // Convert Mongoose subdocuments before traversing them. Traversing the live
-    // document walks Mongoose's circular internal parent references and causes
-    // the 500 seen when deleting/replacing a PDF.
-    const form = forms.find(candidate => containsDocumentPath(
-        candidate.research?.toObject?.() || candidate.research,
-        documentPath
-    ));
+    const form = forms.find(candidate => {
+        const plainCandidate = candidate.toObject?.() || candidate;
+        return containsDocumentPath(plainCandidate.research, documentPath) || 
+               containsDocumentPath(plainCandidate.teaching, documentPath);
+    });
     if (!form) throw new ApiError(404, 'PDF was not found in your APAR form');
 
-    form.research = clearDocumentReference(form.research.toObject?.() || form.research, documentPath);
+    const plainForm = form.toObject?.() || form;
+    if (containsDocumentPath(plainForm.research, documentPath)) {
+        form.research = clearDocumentReference(plainForm.research, documentPath);
+    }
+    if (containsDocumentPath(plainForm.teaching, documentPath)) {
+        form.teaching = clearDocumentReference(plainForm.teaching, documentPath);
+    }
     await form.save();
     await deleteObject(documentPath);
 

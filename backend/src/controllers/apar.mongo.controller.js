@@ -20,7 +20,7 @@ import { FacultyProfile } from "../models/facultyProfile.model.js";
 import { createNotification, notifyHeads } from "./notification.controller.js";
 import { v4 as uuidv4 } from 'uuid'; // Assuming uuid is available or use generic ID generator
 import { normalizeQualifications } from '../utils/qualification.util.js';
-import { createDocumentPath, deleteObject, isAparObjectPath, uploadLocalFile } from '../services/minio.service.js';
+import { createDocumentPath, createAdditionalDocumentPath, deleteObject, isAparObjectPath, uploadLocalFile } from '../services/minio.service.js';
 import {
     getCompletedTemporaryDocument,
     getTemporaryDocument,
@@ -862,7 +862,7 @@ const checkDraftDuplicates = (data) => {
 
 const documentFieldNames = new Set([
     'link', 'link_to_paper', 'link_to_publication', 'evidence_link',
-    'certificate_link', 'link_to_patent'
+    'certificate_link', 'link_to_patent', 'immovable_property_return', 'health_checkup_file'
 ]);
 
 const collectAparObjectPaths = (value, result = new Set()) => {
@@ -882,10 +882,10 @@ const collectAparObjectPaths = (value, result = new Set()) => {
     return result;
 };
 
-const resolveAparDocuments = async (research, { ownerId, facultyName, academicYear }) => {
+const resolveAparDocuments = async (formData, { ownerId, facultyName, academicYear }) => {
     const uploadedPaths = [];
     const temporaryIds = [];
-    const resolved = structuredClone(research || {});
+    const resolved = structuredClone(formData || {});
 
     const visit = async (value, key = '') => {
         if (Array.isArray(value)) {
@@ -901,7 +901,10 @@ const resolveAparDocuments = async (research, { ownerId, facultyName, academicYe
             const temporary = getTemporaryDocument(value.tempId, ownerId);
             if (!temporary) throw new ApiError(400, 'The selected PDF has expired. Please select it again.');
 
-            const objectPath = createDocumentPath(facultyName, academicYear);
+            const isAdditional = key === 'immovable_property_return' || key === 'health_checkup_file';
+            const objectPath = isAdditional
+                ? createAdditionalDocumentPath(facultyName, academicYear, value.originalName)
+                : createDocumentPath(facultyName, academicYear);
             temporaryIds.push(value.tempId);
             await uploadLocalFile({
                 filePath: temporary.filePath,
@@ -917,7 +920,7 @@ const resolveAparDocuments = async (research, { ownerId, facultyName, academicYe
     };
 
     try {
-        return { research: await visit(resolved), uploadedPaths, temporaryIds };
+        return { formData: await visit(resolved), uploadedPaths, temporaryIds };
     } catch (error) {
         await Promise.allSettled(uploadedPaths.map(objectPath => deleteObject(objectPath)));
         await Promise.allSettled(temporaryIds.map(tempId => discardTemporaryDocument(tempId)));
@@ -974,12 +977,12 @@ const saveForm = asyncHandler(async (req, res) => {
     let temporaryIds = [];
     let form;
     try {
-        const documents = await resolveAparDocuments(formData.research, {
+        const documents = await resolveAparDocuments(formData, {
             ownerId: req.user.id,
             facultyName,
             academicYear: ay
         });
-        formData.research = documents.research;
+        formData = documents.formData;
         uploadedPaths = documents.uploadedPaths;
         temporaryIds = documents.temporaryIds;
 
