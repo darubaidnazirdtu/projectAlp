@@ -17,17 +17,17 @@ export default function AparShellHeader({
         <div className="flex items-start gap-4">
           <Link
             to={backTo}
-            className="inline-flex items-center gap-1 rounded-lg border border-emerald-200 bg-white px-3 py-2 text-sm font-medium text-emerald-800 shadow-sm transition hover:bg-emerald-50"
+            className="inline-flex items-center gap-1.5 rounded-xl border border-gray-200 bg-white/80 backdrop-blur-sm px-3 py-2 text-sm font-semibold text-gray-700 shadow-sm transition-all duration-200 hover:bg-gray-50 hover:scale-[1.02] active:scale-95"
           >
             <FiArrowLeft className="h-4 w-4" />
             {backLabel}
           </Link>
           <div className="flex items-center gap-4">
-            <img src="/dtu_logo.jpeg" alt="DTU" className="h-14 w-auto object-contain rounded-lg bg-white p-1 shadow-sm" />
+            <img src="/dtu_logo.jpeg" alt="DTU" className="h-14 w-auto object-contain rounded-xl bg-white/90 p-1.5 shadow-sm border border-gray-100" />
             <div>
-              <p className="text-xs font-semibold uppercase tracking-[0.2em] text-emerald-700">APAR Portal</p>
-              <h1 className="text-2xl font-bold text-gray-900 sm:text-3xl">{title}</h1>
-              {subtitle && <p className="mt-0.5 text-sm text-gray-600">{subtitle}</p>}
+              <p className="text-xs font-bold uppercase tracking-[0.2em] text-indigo-600 mb-0.5">APAR Portal</p>
+              <h1 className="text-2xl font-extrabold bg-clip-text text-transparent bg-gradient-to-r from-gray-900 to-gray-600 sm:text-3xl">{title}</h1>
+              {subtitle && <p className="mt-1 text-sm font-medium text-gray-500">{subtitle}</p>}
             </div>
           </div>
         </div>

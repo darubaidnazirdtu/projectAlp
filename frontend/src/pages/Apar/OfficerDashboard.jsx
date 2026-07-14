@@ -261,14 +261,14 @@ export default function OfficerDashboard() {
                         <button
                             type="button"
                             onClick={() => navigate('/apar/iqac-approvals')}
-                            className="rounded-lg border border-indigo-200 bg-white px-4 py-2 text-sm font-semibold text-indigo-800 shadow-sm transition hover:bg-indigo-50"
+                            className="rounded-xl border border-gray-200 bg-white/80 backdrop-blur-sm px-4 py-2 text-sm font-semibold text-gray-700 shadow-sm transition-all duration-200 hover:bg-gray-50 hover:scale-[1.02] active:scale-95"
                         >
                             IQAC Approvals
                         </button>
                          <button
                             type="button"
                             onClick={() => navigate('/apar/profile')}
-                            className="rounded-lg border border-indigo-200 bg-white px-4 py-2 text-sm font-semibold text-indigo-800 shadow-sm transition hover:bg-indigo-50"
+                            className="rounded-xl border border-gray-200 bg-white/80 backdrop-blur-sm px-4 py-2 text-sm font-semibold text-gray-700 shadow-sm transition-all duration-200 hover:bg-gray-50 hover:scale-[1.02] active:scale-95"
                         >
                             Profile
                         </button>
@@ -276,7 +276,7 @@ export default function OfficerDashboard() {
                             type="button"
                             onClick={handleLogout}
                             disabled={logoutLoading}
-                            className="rounded-lg border border-emerald-200 bg-white px-4 py-2 text-sm font-semibold text-emerald-800 shadow-sm transition hover:bg-emerald-50 disabled:opacity-60"
+                            className="rounded-xl border border-red-200 bg-white/80 backdrop-blur-sm px-4 py-2 text-sm font-semibold text-red-600 shadow-sm transition-all duration-200 hover:bg-red-50 hover:scale-[1.02] active:scale-95 disabled:opacity-60"
                         >
                             {logoutLoading ? 'Signing out…' : 'Sign Out'}
                         </button>
@@ -286,12 +286,17 @@ export default function OfficerDashboard() {
 
                 {/* Faculty Profile Image & Info */}
                 {user?.name && (
-                    <div className="flex flex-col sm:flex-row items-center justify-center gap-6 mb-8 bg-white p-6 rounded-xl shadow-sm border border-gray-100">
-                        <div className="relative">
+                    <div className="relative overflow-hidden flex flex-col sm:flex-row items-center justify-center gap-6 mb-10 bg-white/80 backdrop-blur-md p-8 rounded-2xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-gray-100/50">
+                        {/* Decorative Background Blur */}
+                        <div className="absolute -top-24 -right-24 w-48 h-48 bg-indigo-500/10 rounded-full blur-3xl pointer-events-none"></div>
+                        <div className="absolute -bottom-24 -left-24 w-48 h-48 bg-purple-500/10 rounded-full blur-3xl pointer-events-none"></div>
+
+                        <div className="relative group">
+                            <div className="absolute inset-0 bg-gradient-to-br from-indigo-500 to-purple-500 rounded-2xl blur opacity-20 group-hover:opacity-40 transition-opacity duration-500"></div>
                             <img
                                 src={avatarSrc}
                                 alt={user.name}
-                                className="h-32 w-32 rounded-lg object-cover object-top shadow-md border border-gray-200"
+                                className="relative h-32 w-32 rounded-2xl object-cover object-top shadow-lg border-2 border-white transition-transform duration-500 group-hover:scale-105"
                                 onError={(e) => {
                                     try {
                                         if (user?.avatar) {
@@ -308,7 +313,7 @@ export default function OfficerDashboard() {
                             <button
                                 type="button"
                                 onClick={() => fileInputRef.current?.click()}
-                                className="absolute bottom-0 right-0 bg-white p-2 rounded-full shadow-md hover:bg-gray-100"
+                                className="absolute -bottom-2 -right-2 bg-white/90 backdrop-blur text-indigo-600 p-2.5 rounded-xl shadow-lg border border-indigo-50 hover:bg-indigo-50 transition-all hover:scale-110 active:scale-95 z-10"
                                 title="Change photo"
                             >
                                 {avatarUploading ? <FiLoader className="animate-spin" /> : <FiCamera />}
@@ -316,13 +321,13 @@ export default function OfficerDashboard() {
 
                             <input ref={fileInputRef} type="file" accept="image/*" onChange={handleAvatarSelected} className="hidden" />
                         </div>
-                        <div className="text-center sm:text-left">
-                            <h2 className="text-2xl font-bold text-gray-900">{user.name}</h2>
+                        <div className="text-center relative z-10">
+                            <h2 className="text-3xl font-extrabold text-gray-900 tracking-tight">{user.name}</h2>
                             {user.designation && (
-                                <p className="text-lg text-indigo-600 font-medium mt-1">{user.designation}</p>
+                                <p className="text-lg text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-purple-600 font-bold mt-1">{user.designation}</p>
                             )}
                             {user.department && (
-                                <p className="text-sm text-gray-500 mt-1 font-medium bg-gray-100 px-3 py-1 rounded-full inline-block">
+                                <p className="text-sm text-gray-600 mt-3 font-medium bg-gray-100/80 backdrop-blur-sm px-4 py-1.5 rounded-xl inline-block border border-gray-200/50 shadow-sm">
                                     {user.department}
                                 </p>
                             )}
@@ -331,21 +336,26 @@ export default function OfficerDashboard() {
                 )}
 
                 {/* Selected Year Section */}
-                <div className="mb-8 overflow-hidden rounded-2xl border border-emerald-100 bg-white shadow-lg">
-                    <div className="flex flex-col items-center justify-between gap-4 bg-gradient-to-r from-emerald-600 to-teal-600 px-6 py-4 text-white sm:flex-row">
-                        <h2 className="text-lg font-bold flex items-center">
-                            <FiClock className="mr-2" /> Selected Academic Year
+                <div className="mb-10 overflow-hidden rounded-2xl border border-gray-200/60 bg-white/80 backdrop-blur-md shadow-[0_8px_30px_rgb(0,0,0,0.04)]">
+                    <div className="flex flex-col items-center justify-between gap-4 border-b border-gray-100 bg-gray-50/50 px-6 py-5 sm:flex-row">
+                        <h2 className="text-lg font-bold flex items-center text-gray-800">
+                            <FiClock className="mr-2 text-indigo-600" /> APAR Status
                         </h2>
                         {/* 3. Added Dropdown Selector */}
-                        <select
-                            value={currentAY}
-                            onChange={(e) => setCurrentAY(e.target.value)}
-                            className="bg-white text-indigo-700 font-bold py-2 px-4 rounded-lg border-0 shadow-sm focus:ring-2 focus:ring-indigo-300 outline-none cursor-pointer"
-                        >
-                            {availableYears.map(year => (
-                                <option key={year} value={year}>{year}</option>
-                            ))}
-                        </select>
+                        <div className="relative">
+                            <select
+                                value={currentAY}
+                                onChange={(e) => setCurrentAY(e.target.value)}
+                                className="appearance-none bg-white text-gray-800 font-bold py-2.5 pl-4 pr-10 rounded-xl border border-gray-200 shadow-sm focus:ring-2 focus:ring-indigo-500/30 focus:border-indigo-500 outline-none cursor-pointer transition-all hover:border-gray-300 hover:shadow-md"
+                            >
+                                {availableYears.map(year => (
+                                    <option key={year} value={year}>{year} Academic Year</option>
+                                ))}
+                            </select>
+                            <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-4 text-gray-500">
+                                <svg className="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z"/></svg>
+                            </div>
+                        </div>
                     </div>
                     <div className="p-8 text-center">
                         {currentYearForm ? (
@@ -373,27 +383,27 @@ export default function OfficerDashboard() {
                                 <p className="text-gray-500 mb-6">
                                     Last updated: {new Date(currentYearForm.updatedAt).toLocaleDateString()}
                                 </p>
-                                <div className="flex gap-4">
+                                <div className="flex flex-wrap justify-center gap-4">
                                     <button
                                         onClick={() => handleStartOrEdit(currentAY)}
-                                        className="bg-indigo-600 text-white px-6 py-2 rounded-lg font-semibold hover:bg-indigo-700 transition-colors shadow-md"
+                                        className="bg-indigo-600 text-white px-6 py-2.5 rounded-xl font-bold hover:bg-indigo-700 transition-all shadow-[0_4px_14px_0_rgb(79,70,229,0.39)] hover:shadow-[0_6px_20px_rgba(79,70,229,0.23)] hover:-translate-y-0.5"
                                     >
-                                        {currentYearForm.status === 'Submitted' || currentYearForm.status?.includes('Forwarded') || currentYearForm.status?.includes('Accepted') ? 'View Form' : 'Continue Editing'}
+                                        {currentYearForm.status === 'Submitted' || currentYearForm.status?.includes('Forwarded') || currentYearForm.status?.includes('Accepted') ? 'View APAR Form' : 'Continue Editing'}
                                     </button>
                                     <button
                                         onClick={() => setShowStatusModal(true)}
-                                        className="bg-white border border-gray-300 text-gray-700 px-6 py-2 rounded-lg font-semibold hover:bg-gray-50 transition-colors shadow-sm"
+                                        className="bg-white border border-gray-200 text-gray-700 px-6 py-2.5 rounded-xl font-bold hover:bg-gray-50 transition-all shadow-sm hover:shadow-md hover:-translate-y-0.5"
                                     >
-                                        Track Status
+                                        Track Journey
                                     </button>
                                     {canDeleteForm(currentYearForm) && (
                                         <button
                                             type="button"
                                             onClick={() => requestDeleteForm(currentYearForm, currentAY)}
-                                            className="inline-flex items-center gap-2 rounded-lg border border-red-200 bg-white px-6 py-2 font-semibold text-red-700 shadow-sm transition-colors hover:bg-red-50"
+                                            className="inline-flex items-center gap-2 rounded-xl border border-red-200 bg-white px-6 py-2.5 font-bold text-red-600 shadow-sm transition-all hover:bg-red-50 hover:shadow-md hover:-translate-y-0.5"
                                         >
                                             <FiTrash2 className="h-4 w-4" />
-                                            Delete
+                                            Delete Draft
                                         </button>
                                     )}
                                 </div>
@@ -409,9 +419,9 @@ export default function OfficerDashboard() {
                                 </p>
                                 <button
                                     onClick={() => handleStartOrEdit(currentAY)}
-                                    className="bg-indigo-600 text-white px-6 py-3 rounded-xl font-bold shadow-lg hover:bg-indigo-700 transform hover:-translate-y-0.5 transition-all flex items-center"
+                                    className="bg-indigo-600 text-white px-8 py-3.5 rounded-xl font-bold hover:bg-indigo-700 transition-all shadow-[0_4px_14px_0_rgb(79,70,229,0.39)] hover:shadow-[0_6px_20px_rgba(79,70,229,0.23)] hover:-translate-y-0.5 flex items-center"
                                 >
-                                    <FiPlus className="mr-2" />
+                                    <FiPlus className="mr-2 h-5 w-5" />
                                     Start New APAR
                                 </button>
                             </div>
@@ -420,43 +430,50 @@ export default function OfficerDashboard() {
                 </div>
 
                 {/* Archive Section */}
-                <div className="data-table-wrapper">
-                    <div className="flex items-center border-b border-emerald-100 bg-gradient-to-r from-emerald-50 to-teal-50/50 px-6 py-4">
-                        <FiArchive className="mr-2 text-emerald-600" />
-                        <h2 className="text-lg font-bold text-gray-800">APAR Archive (Last 5 Years)</h2>
+                <div className="overflow-hidden rounded-2xl border border-gray-200/60 bg-white/80 backdrop-blur-md shadow-[0_8px_30px_rgb(0,0,0,0.04)]">
+                    <div className="flex items-center border-b border-gray-100 bg-gray-50/50 px-6 py-5">
+                        <FiArchive className="mr-2.5 text-indigo-600 h-5 w-5" />
+                        <h2 className="text-lg font-bold text-gray-800">APAR Archive</h2>
+                        <span className="ml-3 px-2.5 py-0.5 rounded-full bg-indigo-100 text-indigo-700 text-xs font-semibold">Last 5 Years</span>
                     </div>
 
-                    <div className="data-table-scroll">
-                        <table className="data-table data-table-apar text-left">
+                    <div className="overflow-x-auto">
+                        <table className="w-full text-left border-collapse">
                             <thead>
-                                <tr>
-                                    <th className="!text-left">Academic Year</th>
-                                    <th className="!text-left">Status</th>
-                                    <th className="!text-left">Last Updated</th>
-                                    <th className="!text-right">Action</th>
+                                <tr className="bg-gray-50/80 border-b border-gray-100 text-sm text-gray-500 font-semibold uppercase tracking-wider">
+                                    <th className="px-6 py-4">Academic Year</th>
+                                    <th className="px-6 py-4">Status</th>
+                                    <th className="px-6 py-4">Last Updated</th>
+                                    <th className="px-6 py-4 text-right">Action</th>
                                 </tr>
                             </thead>
-                            <tbody>
+                            <tbody className="divide-y divide-gray-100">
                                 {archiveYears.map((year) => {
                                     const form = history.find(f => normalizeAY(f.ay) === normalizeAY(year));
                                     return (
-                                        <tr key={year}>
-                                            <td className="!text-left whitespace-nowrap font-medium text-gray-900">{year}</td>
-                                            <td className="!text-left whitespace-nowrap">
-                                                <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${getStatusColor(form ? form.status : 'Not Filled')}`}>
+                                        <tr key={year} className="hover:bg-indigo-50/30 transition-colors duration-150">
+                                            <td className="px-6 py-4 whitespace-nowrap font-bold text-gray-900">{year}</td>
+                                            <td className="px-6 py-4 whitespace-nowrap">
+                                                <span className={`px-3 py-1 inline-flex text-xs leading-5 font-bold rounded-full border ${
+                                                    !form ? 'bg-gray-50 text-gray-600 border-gray-200' :
+                                                    form.status === 'Submitted' ? 'bg-blue-50 text-blue-700 border-blue-200' :
+                                                    form.status?.includes('Forwarded') || form.status === 'Verified' ? 'bg-emerald-50 text-emerald-700 border-emerald-200' :
+                                                    form.status?.includes('Query') ? 'bg-amber-50 text-amber-700 border-amber-200' :
+                                                    'bg-gray-50 text-gray-700 border-gray-200'
+                                                }`}>
                                                     {form ? (form.status || 'Draft') : 'Not Filled'}
                                                 </span>
                                             </td>
-                                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                            <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-500">
                                                 {form ? new Date(form.updatedAt).toLocaleDateString() : '-'}
                                             </td>
-                                            <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                                            <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-bold">
                                                 {form ? (
-                                                    <div className="flex justify-end gap-3">
+                                                    <div className="flex justify-end gap-4">
                                                         <button
                                                             type="button"
                                                             onClick={() => handleStartOrEdit(year)}
-                                                            className="font-semibold text-emerald-700 hover:text-emerald-900"
+                                                            className="text-indigo-600 hover:text-indigo-900 transition-colors"
                                                         >
                                                             View
                                                         </button>
@@ -464,14 +481,14 @@ export default function OfficerDashboard() {
                                                             <button
                                                                 type="button"
                                                                 onClick={() => requestDeleteForm(form, year)}
-                                                                className="font-semibold text-red-600 hover:text-red-800"
+                                                                className="text-red-500 hover:text-red-700 transition-colors"
                                                             >
                                                                 Delete
                                                             </button>
                                                         )}
                                                     </div>
                                                 ) : (
-                                                    <span className="text-gray-400 cursor-not-allowed">No Record</span>
+                                                    <span className="text-gray-300 cursor-not-allowed">No Record</span>
                                                 )}
                                             </td>
                                         </tr>
@@ -484,14 +501,14 @@ export default function OfficerDashboard() {
 
                 {/* History Modal */}
                 {showStatusModal && currentYearForm && (
-                    <div className="fixed inset-0 bg-transparent overflow-y-auto h-full w-full flex items-center justify-center z-50 backdrop-blur-md">
-                        <div className="relative bg-white rounded-2xl shadow-2xl max-w-lg w-full m-4 overflow-hidden transform transition-all h-[500px] flex flex-col border border-gray-100">
+                    <div className="fixed inset-0 bg-gray-900/40 backdrop-blur-sm overflow-y-auto h-full w-full flex items-center justify-center z-50 transition-all duration-300">
+                        <div className="relative bg-white/95 backdrop-blur-xl rounded-2xl shadow-2xl max-w-lg w-full m-4 overflow-hidden transform transition-all h-[500px] flex flex-col border border-white/20">
                             {/* Header */}
-                            <div className="bg-indigo-600 px-6 py-4 flex items-center justify-between shrink-0">
-                                <h3 className="text-xl font-bold text-white flex items-center">
+                            <div className="bg-gradient-to-r from-indigo-600 to-indigo-800 px-6 py-5 flex items-center justify-between shrink-0 shadow-sm">
+                                <h3 className="text-xl font-bold text-white flex items-center tracking-wide">
                                     <FiClock className="mr-2" /> Application Journey
                                 </h3>
-                                <button onClick={() => setShowStatusModal(false)} className="text-indigo-200 hover:text-white transition-colors">
+                                <button onClick={() => setShowStatusModal(false)} className="text-indigo-200 hover:text-white transition-colors p-1 hover:bg-white/10 rounded-lg">
                                     <span className="text-2xl">&times;</span>
                                 </button>
                             </div>
@@ -544,25 +561,25 @@ export default function OfficerDashboard() {
                 )}
 
                 {deleteTarget && (
-                    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/30 p-4 backdrop-blur-sm">
-                        <div className="w-full max-w-md rounded-2xl border border-red-100 bg-white p-6 shadow-2xl">
-                            <div className="mb-4 flex items-start gap-3">
-                                <div className="rounded-full bg-red-100 p-2 text-red-600">
-                                    <FiTrash2 className="h-5 w-5" />
+                    <div className="fixed inset-0 z-50 flex items-center justify-center bg-gray-900/40 p-4 backdrop-blur-sm transition-opacity duration-300">
+                        <div className="w-full max-w-md rounded-2xl border border-red-100 bg-white/95 backdrop-blur-xl p-8 shadow-[0_20px_50px_rgba(220,38,38,0.15)] transform transition-all duration-300">
+                            <div className="mb-6 flex items-start gap-4">
+                                <div className="rounded-2xl bg-red-50 p-3 text-red-600 border border-red-100 shadow-inner">
+                                    <FiTrash2 className="h-6 w-6" />
                                 </div>
                                 <div>
-                                    <h3 className="text-lg font-bold text-gray-900">Delete APAR Form</h3>
-                                    <p className="mt-1 text-sm text-gray-600">
-                                        This will permanently delete the {deleteTarget.ay} APAR draft and all saved entries in it.
+                                    <h3 className="text-xl font-bold text-gray-900">Delete APAR Form</h3>
+                                    <p className="mt-2 text-sm text-gray-600 leading-relaxed">
+                                        This will permanently delete the <span className="font-bold text-gray-900">{deleteTarget.ay}</span> APAR draft and all saved entries in it. This action cannot be undone.
                                     </p>
                                 </div>
                             </div>
-                            <div className="flex justify-end gap-3">
+                            <div className="flex justify-end gap-3 mt-4 pt-4 border-t border-gray-100">
                                 <button
                                     type="button"
                                     onClick={() => setDeleteTarget(null)}
                                     disabled={deleteLoading}
-                                    className="rounded-lg bg-gray-100 px-4 py-2 text-sm font-semibold text-gray-700 transition hover:bg-gray-200 disabled:opacity-60"
+                                    className="rounded-xl bg-white border border-gray-200 px-5 py-2.5 text-sm font-bold text-gray-700 transition hover:bg-gray-50 shadow-sm disabled:opacity-60"
                                 >
                                     Cancel
                                 </button>
@@ -570,7 +587,7 @@ export default function OfficerDashboard() {
                                     type="button"
                                     onClick={confirmDeleteForm}
                                     disabled={deleteLoading}
-                                    className="rounded-lg bg-red-600 px-4 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-red-700 disabled:opacity-60"
+                                    className="rounded-xl bg-red-600 px-5 py-2.5 text-sm font-bold text-white shadow-md transition hover:bg-red-700 disabled:opacity-60 hover:shadow-lg hover:-translate-y-0.5"
                                 >
                                     {deleteLoading ? 'Deleting...' : 'Delete Permanently'}
                                 </button>
