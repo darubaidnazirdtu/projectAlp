@@ -38,6 +38,7 @@ const toTitle = (value) => String(value || '')
 
 const sectionLabels = {
     personal: 'Part I - Personal Data',
+    profileQualifications: 'Part I - Academic Qualifications',
     teaching: 'Part II - Self Appraisal & Teaching',
     research: 'Part III - Research & Development',
     corporate: 'Part IV - Corporate Life',
