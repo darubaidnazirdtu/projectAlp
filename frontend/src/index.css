@@ -548,3 +548,59 @@ body {
         padding-right: max(1rem, env(safe-area-inset-right));
     }
 }
+
+/* Print Styles for Perfect PDF Generation */
+@media print {
+    @page {
+        size: landscape;
+        margin: 10mm;
+    }
+    
+    body {
+        background: none !important;
+        color: black !important;
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+    }
+    
+    .data-table-scroll, .data-table-wrapper, .form-card-body, .portal-card, .card {
+        overflow: visible !important;
+        overflow-x: visible !important;
+        border: none !important;
+        box-shadow: none !important;
+    }
+    
+    .data-table {
+        table-layout: auto !important;
+        width: 100% !important;
+        word-break: break-word !important;
+        page-break-inside: auto;
+    }
+    
+    .data-table th, .data-table td {
+        white-space: normal !important;
+        overflow-wrap: break-word !important;
+        padding: 4px 6px !important;
+        font-size: 10pt !important;
+        border: 1px solid #ccc !important;
+    }
+    
+    .data-table tr {
+        page-break-inside: avoid !important;
+        page-break-after: auto;
+    }
+    
+    .data-table thead {
+        display: table-header-group !important;
+    }
+    
+    /* Hide non-essential UI elements during print */
+    button, .iqac-sidebar, .notification-bell, nav, header {
+        display: none !important;
+    }
+
+    /* Remove specific background elements for print */
+    .apar-page-bg, .portal-page-bg, .feedback-page-bg {
+        background: none !important;
+    }
+}
