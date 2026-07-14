@@ -1113,36 +1113,79 @@ export default function AparForm() {
             ];
 
             const doc = new jsPDF({ orientation: 'landscape', unit: 'pt', format: 'a4' });
+            const pageWidth = doc.internal.pageSize.getWidth();
+            const pageHeight = doc.internal.pageSize.getHeight();
             
-            doc.setFontSize(16);
-            doc.text("Annual Performance Assessment Report Form", 40, 40);
-            doc.setFontSize(10);
-            doc.text(`Faculty: ${formData?.personal?.name || aparUser?.name || ''} | Academic Year: ${ay || ''}`, 40, 60);
+            const addPageNumberAndHeader = (data) => {
+                // Official Header
+                doc.setFont("helvetica", "bold");
+                doc.setFontSize(15);
+                doc.setTextColor(31, 41, 55); 
+                doc.text("DELHI TECHNOLOGICAL UNIVERSITY", pageWidth / 2, 35, { align: 'center' });
+                
+                doc.setFontSize(12);
+                doc.setTextColor(79, 70, 229); 
+                doc.text(`Annual Performance Assessment Report (APAR) - ${ay || ''}`, pageWidth / 2, 53, { align: 'center' });
+                
+                doc.setDrawColor(229, 231, 235);
+                doc.setLineWidth(1);
+                doc.line(40, 65, pageWidth - 40, 65);
 
-            let currentY = 80;
+                // Footer with Page Numbers & Timestamp
+                const str = "Page " + doc.internal.getNumberOfPages();
+                doc.setFontSize(8);
+                doc.setFont("helvetica", "normal");
+                doc.setTextColor(156, 163, 175);
+                doc.text(
+                    `Generated on ${new Date().toLocaleDateString('en-GB')} at ${new Date().toLocaleTimeString('en-GB')} | Faculty: ${formData?.personal?.name || aparUser?.name || ''}`,
+                    40, pageHeight - 20
+                );
+                doc.text(str, pageWidth - 40 - doc.getTextWidth(str), pageHeight - 20);
+            };
 
-            tables.forEach((table) => {
-                // Prevent title from printing if it's too close to the bottom
-                if (currentY > doc.internal.pageSize.getHeight() - 80) {
+            let currentY = 85;
+
+            tables.forEach((table, index) => {
+                if (currentY > pageHeight - 100) {
                     doc.addPage();
-                    currentY = 40;
+                    currentY = 85;
                 }
 
-                doc.setFontSize(12);
-                doc.setTextColor(0, 0, 0);
+                doc.setFont("helvetica", "bold");
+                doc.setFontSize(13);
+                doc.setTextColor(55, 65, 81);
                 doc.text(table.title, 40, currentY);
-                currentY += 10;
+                currentY += 12;
                 
+                const isSummary = index === 0;
+
                 autoTable(doc, {
                     head: [table.columns],
                     body: table.rows.map(row => table.columns.map(col => String(row[col] ?? ''))),
                     startY: currentY,
                     horizontalPageBreak: true,
-                    horizontalPageBreakRepeat: 0, // Repeat first column
-                    theme: 'grid',
-                    styles: { fontSize: 8, cellPadding: 3, overflow: 'linebreak' },
-                    headStyles: { fillColor: [79, 70, 229], textColor: [255, 255, 255] },
-                    margin: { top: 40, right: 40, bottom: 40, left: 40 }
+                    horizontalPageBreakRepeat: 0,
+                    theme: isSummary ? 'plain' : 'striped',
+                    styles: { 
+                        font: 'helvetica', 
+                        fontSize: 9, 
+                        cellPadding: 5, 
+                        overflow: 'linebreak',
+                        textColor: [55, 65, 81],
+                        lineColor: [229, 231, 235],
+                        lineWidth: 0.5
+                    },
+                    headStyles: { 
+                        fillColor: isSummary ? [243, 244, 246] : [79, 70, 229],
+                        textColor: isSummary ? [17, 24, 39] : [255, 255, 255],
+                        fontStyle: 'bold',
+                        halign: isSummary ? 'left' : 'center'
+                    },
+                    alternateRowStyles: {
+                        fillColor: [249, 250, 251]
+                    },
+                    margin: { top: 85, right: 40, bottom: 40, left: 40 },
+                    didDrawPage: addPageNumberAndHeader
                 });
                 
                 currentY = doc.lastAutoTable.finalY + 30;
