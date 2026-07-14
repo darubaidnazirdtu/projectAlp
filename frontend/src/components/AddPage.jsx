@@ -792,6 +792,7 @@ import {
 } from '../config/duplicateDetectionConfig';
 import { toast } from 'sonner';
 import { useIqacFilter } from '../context/IqacFilterContext.jsx';
+import { iqacApprovalService } from '../services/iqacApproval.service.js';
 
 console.log("dtu college")
 
@@ -1274,35 +1275,79 @@ const AddPage = () => {
                     }
                 }
                 
-                if (signature === 'formDataWithHeaders') {
-                    if (editMode) {
-                        response = await service[targetFunction](editId, data, { 'Content-Type': 'multipart/form-data' });
-                    } else {
-                        response = await service[targetFunction](data, { 'Content-Type': 'multipart/form-data' });
+                const hasFacultyIds = (data) => {
+                    const FACULTY_ID_KEYS = new Set([
+                        'faculty_id', 'supervisor_id', 'co_supervisor_id', 'faculty_ids',
+                        'faculty_members', 'faculty_associations', 'faculty_involved'
+                    ]);
+                    for (const key of Object.keys(data)) {
+                        if (FACULTY_ID_KEYS.has(key)) {
+                            if (Array.isArray(data[key]) && data[key].length > 0) return true;
+                            if (!Array.isArray(data[key]) && !!data[key]) return true;
+                        }
                     }
-                } else if (signature === 'payloadAndFile') {
-                    const fileAccessor = Object.keys(files)[0];
-                    const file = files[fileAccessor];
-                    const { [fileAccessor]: _, ...payload } = processedData;
-                    
-                    if (editMode) {
-                        response = await service[targetFunction](editId, payload, file);
-                    } else {
-                        response = await service[targetFunction](payload, file);
-                    }
-                } else {
-                    if (editMode) {
-                        response = await service[targetFunction](editId, data);
-                    } else {
-                        response = await service[targetFunction](data);
-                    }
-                }
+                    return false;
+                };
 
-            } else {
-                if (editMode) {
-                    response = await service[targetFunction](editId, processedData);
+                const isIqacCreatorRole = role === ROLES.IQAC_HEAD || role === ROLES.DEPARTMENT_HOD || role === 'IQAC Head' || role === 'Department HOD';
+                const requiresApproval = !editMode && isIqacCreatorRole && hasFacultyIds(processedData);
+
+                if (requiresApproval) {
+                    try {
+                        response = await iqacApprovalService.createApprovalRequest(resourceId, processedData, files);
+                    } catch (approvalErr) {
+                        // Fallback if resource is not configured for approval
+                        if (approvalErr.response?.data?.message?.includes('Faculty approval is not configured')) {
+                            console.warn(`Approval not configured for ${resourceId}, falling back to direct creation`);
+                            if (useFormData) {
+                                if (signature === 'formDataWithHeaders') {
+                                    response = await service[targetFunction](data, { 'Content-Type': 'multipart/form-data' });
+                                } else if (signature === 'payloadAndFile') {
+                                    const fileAccessor = Object.keys(files)[0];
+                                    const file = files[fileAccessor];
+                                    const { [fileAccessor]: _, ...payload } = processedData;
+                                    response = await service[targetFunction](payload, file);
+                                } else {
+                                    response = await service[targetFunction](data);
+                                }
+                            } else {
+                                response = await service[targetFunction](processedData);
+                            }
+                        } else {
+                            throw approvalErr;
+                        }
+                    }
+                } else if (useFormData) {
+                    if (signature === 'formDataWithHeaders') {
+                        if (editMode) {
+                            response = await service[targetFunction](editId, data, { 'Content-Type': 'multipart/form-data' });
+                        } else {
+                            response = await service[targetFunction](data, { 'Content-Type': 'multipart/form-data' });
+                        }
+                    } else if (signature === 'payloadAndFile') {
+                        const fileAccessor = Object.keys(files)[0];
+                        const file = files[fileAccessor];
+                        const { [fileAccessor]: _, ...payload } = processedData;
+                        
+                        if (editMode) {
+                            response = await service[targetFunction](editId, payload, file);
+                        } else {
+                            response = await service[targetFunction](payload, file);
+                        }
+                    } else {
+                        if (editMode) {
+                            response = await service[targetFunction](editId, data);
+                        } else {
+                            response = await service[targetFunction](data);
+                        }
+                    }
+
                 } else {
-                    response = await service[targetFunction](processedData);
+                    if (editMode) {
+                        response = await service[targetFunction](editId, processedData);
+                    } else {
+                        response = await service[targetFunction](processedData);
+                    }
                 }
             }
 

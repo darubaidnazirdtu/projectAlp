@@ -340,7 +340,14 @@ const syncIqacToAparForm = async (form, faculty_id, ay) => {
             if (naturalKey) byNatural.set(naturalKey, index);
         };
 
+        const newSectionIds = new Set(newSection.map(idKeyFor).filter(Boolean));
+
         for (const it of oldSection) {
+            const idKey = idKeyFor(it);
+            if (idKey && !newSectionIds.has(idKey)) {
+                modified = true;
+                continue;
+            }
             combined.push(it);
             indexItem(it, combined.length - 1);
         }
@@ -990,6 +997,47 @@ const saveForm = asyncHandler(async (req, res) => {
         }
     }
 
+    // NEW: Propagate faculty deletions to IQAC central database
+    if (existing && existing.research && formData && formData.research) {
+        const deletedIds = {
+            journals: [], conferences: [], books: [], projects: [], consultancy: [], patents: [], awards: [], fdps: [], e_content: [], collaborations: [], faculty_visits: []
+        };
+        const idFields = {
+            journals: 'paper_id', conferences: 'paper_id', books: 'publication_id', projects: 'project_id', consultancy: 'consultancy_id', patents: 'patent_id', awards: 'award_id', fdps: 'program_id', e_content: 'econtent_id', collaborations: 'activity_id', faculty_visits: 'visit_id'
+        };
+
+        for (const sectionKey of Object.keys(idFields)) {
+            const idField = idFields[sectionKey];
+            const oldArray = existing.research[sectionKey] || [];
+            const newArray = formData.research[sectionKey] || [];
+            
+            const oldIds = new Set(oldArray.map(item => item[idField]).filter(Boolean));
+            const newIds = new Set(newArray.map(item => item[idField]).filter(Boolean));
+            
+            for (const oldId of oldIds) {
+                if (!newIds.has(oldId)) {
+                    deletedIds[sectionKey].push(oldId);
+                }
+            }
+        }
+
+        try {
+            if (deletedIds.journals.length > 0) await Publication.deleteMany({ type: 'journal', paper_id: { $in: deletedIds.journals } });
+            if (deletedIds.conferences.length > 0) await Publication.deleteMany({ type: 'conference', paper_id: { $in: deletedIds.conferences } });
+            if (deletedIds.books.length > 0) await Publication.deleteMany({ type: 'book', publication_id: { $in: deletedIds.books } });
+            if (deletedIds.projects.length > 0) await ResearchProject.deleteMany({ project_id: { $in: deletedIds.projects } });
+            if (deletedIds.consultancy.length > 0) await FacultyActivity.deleteMany({ type: 'revenue_from_consultancy', consultancy_id: { $in: deletedIds.consultancy } });
+            if (deletedIds.patents.length > 0) await Patent.deleteMany({ patent_id: { $in: deletedIds.patents } });
+            if (deletedIds.awards.length > 0) await FacultyActivity.deleteMany({ type: 'research_innovation_award', award_id: { $in: deletedIds.awards } });
+            if (deletedIds.fdps.length > 0) await FacultyActivity.deleteMany({ type: 'faculty_development_program', program_id: { $in: deletedIds.fdps } });
+            if (deletedIds.e_content.length > 0) await FacultyActivity.deleteMany({ type: 'developed_e_content', econtent_id: { $in: deletedIds.e_content } });
+            if (deletedIds.collaborations.length > 0) await Collaboration.deleteMany({ activity_id: { $in: deletedIds.collaborations } });
+            if (deletedIds.faculty_visits.length > 0) await FacultyActivity.deleteMany({ type: 'faculty_visit', visit_id: { $in: deletedIds.faculty_visits } });
+        } catch (delError) {
+            console.error("Error deleting propagated IQAC records:", delError);
+        }
+    }
+
     const faculty = await Faculty.findOne({ faculty_id }).lean();
     const facultyName = faculty?.name || formData?.personal?.name || faculty_id;
     let uploadedPaths = [];
@@ -1261,6 +1309,21 @@ const saveToMonthly = asyncHandler(async (req, res) => {
         }));
     };
 
+    const ensureFaculty = (arr, fId, role = undefined) => {
+        let list = [];
+        if (Array.isArray(arr)) {
+            list = arr.map(f => {
+                let id = f.faculty_id || f.faculty || f;
+                if (typeof id === 'object') id = id.faculty_id || id.id;
+                return { faculty_id: id, role: f.role || role };
+            });
+        }
+        if (!list.some(f => String(f.faculty_id) === String(fId))) {
+            list.push({ faculty_id: fId, role });
+        }
+        return list;
+    };
+
     for (const item of (research.journals || [])) {
         const department_id = await normalizeDepartmentId(item.department_id || deptIdFallback);
         const publication_id = item.publication_id || generateId('PUB');
@@ -1285,7 +1348,7 @@ const saveToMonthly = asyncHandler(async (req, res) => {
             link: extractLink(item.link),
             link_to_paper: extractLink(item.link_to_paper),
             academic_year: item.academic_year || ay,
-            faculty_members: Array.isArray(item.faculty_members) ? item.faculty_members.map(f => ({ faculty_id: f.faculty_id || f })) : [],
+            faculty_members: ensureFaculty(item.faculty_members, faculty_id),
             students: Array.isArray(item.students) ? item.students.map(s => ({ student_id: s.student_id || s })) : [],
             external_authors: Array.isArray(item.external_authors) ? item.external_authors : [],
             external_contributors: Array.isArray(item.external_contributors) ? item.external_contributors : [],
@@ -1330,7 +1393,7 @@ const saveToMonthly = asyncHandler(async (req, res) => {
             link: extractLink(item.link),
             link_to_paper: extractLink(item.link_to_paper),
             academic_year: item.academic_year || ay,
-            faculty_members: Array.isArray(item.faculty_members) ? item.faculty_members.map(f => ({ faculty_id: f.faculty_id || f })) : [],
+            faculty_members: ensureFaculty(item.faculty_members, faculty_id),
             students: Array.isArray(item.students) ? item.students.map(s => ({ student_id: s.student_id || s })) : [],
             external_contributors: Array.isArray(item.external_contributors) ? item.external_contributors : [],
             metadata: { created_by: faculty_id, change_log: [{ action: 'updated', user_id: faculty_id, changes: 'Synced from APAR monthly save' }] }
@@ -1373,7 +1436,7 @@ const saveToMonthly = asyncHandler(async (req, res) => {
             doi: item.doi,
             indexing: item.indexing,
             academic_year: item.academic_year || ay,
-            faculty_members: Array.isArray(item.faculty_members) ? item.faculty_members.map(f => ({ faculty_id: f.faculty_id || f })) : (Array.isArray(item.faculty_ids) ? item.faculty_ids.map(fid => ({ faculty_id: fid })) : []),
+            faculty_members: ensureFaculty(item.faculty_members || item.faculty_ids, faculty_id),
             students: Array.isArray(item.students) ? item.students.map(s => ({ student_id: s.student_id || s })) : (Array.isArray(item.student_ids) ? item.student_ids.map(sid => ({ student_id: sid })) : []),
             external_contributors: Array.isArray(item.external_contributors) ? item.external_contributors : [],
             metadata: { created_by: faculty_id, change_log: [{ action: 'updated', user_id: faculty_id, changes: 'Synced from APAR monthly save' }] }
@@ -1422,7 +1485,7 @@ const saveToMonthly = asyncHandler(async (req, res) => {
             remarks: item.remarks,
             link: extractLink(item.link),
             academic_year: item.academic_year || ay,
-            faculty_involved: Array.isArray(item.faculty_involved) ? item.faculty_involved.map(f => ({ faculty_id: f.faculty_id || f.faculty || f, role: f.role })) : [],
+            faculty_involved: ensureFaculty(item.faculty_involved, faculty_id),
             students_involved: Array.isArray(item.students_involved) ? item.students_involved.map(s => ({ student_id: s.student_id || s, role: s.role })) : [],
             external_collaborators: Array.isArray(item.external_collaborators) ? item.external_collaborators : [],
             metadata: { created_by: faculty_id, change_log: [{ action: 'updated', user_id: faculty_id, changes: 'Synced from APAR monthly save' }] }
@@ -1462,7 +1525,7 @@ const saveToMonthly = asyncHandler(async (req, res) => {
             remarks: item.remarks,
             link: extractLink(item.link),
             academic_year: item.academic_year || ay,
-            faculty_involved: Array.isArray(item.faculty_involved) ? item.faculty_involved.map(f => ({ faculty_id: f.faculty_id || f.faculty_id || f, role: f.role })) : [],
+            faculty_involved: ensureFaculty(item.faculty_involved, faculty_id),
             students_involved: Array.isArray(item.students_involved) ? item.students_involved.map(s => ({ student_id: s.student_id || s.student_id || s, role: s.role })) : [],
             external_collaborators: Array.isArray(item.external_collaborators) ? item.external_collaborators : [],
             external_consultants: Array.isArray(item.external_consultants) ? item.external_consultants : [],
@@ -1498,7 +1561,7 @@ const saveToMonthly = asyncHandler(async (req, res) => {
             patent_awarding_agency: item.patent_awarding_agency,
             link_to_patent: extractLink(item.link_to_patent),
             academic_year: item.academic_year || ay,
-            faculty_members: Array.isArray(item.faculty_members) ? item.faculty_members.map(f => ({ faculty_id: f.faculty_id || f })) : [],
+            faculty_members: ensureFaculty(item.faculty_members, faculty_id),
             students: Array.isArray(item.students) ? item.students.map(s => ({ student_id: s.student_id || s })) : [],
             external_inventors: Array.isArray(item.external_inventors) ? item.external_inventors : [],
             metadata: { created_by: faculty_id, change_log: [{ action: 'updated', user_id: faculty_id, changes: 'Synced from APAR monthly save' }] }
@@ -1532,7 +1595,7 @@ const saveToMonthly = asyncHandler(async (req, res) => {
             link: extractLink(item.link),
             evidence_link: extractLink(item.evidence_link),
             academic_year: item.academic_year || ay,
-            faculty_recipients: Array.isArray(item.faculty_recipients) ? item.faculty_recipients.map(f => ({ faculty_id: f.faculty_id || f })) : [],
+            faculty_recipients: ensureFaculty(item.faculty_recipients, faculty_id),
             student_recipients: Array.isArray(item.student_recipients) ? item.student_recipients.map(s => ({ student_id: s.student_id || s })) : [],
             external_recipients: Array.isArray(item.external_recipients) ? item.external_recipients : [],
             metadata: { created_by: faculty_id, change_log: [{ action: 'updated', user_id: faculty_id, changes: 'Synced from APAR monthly save' }] }
@@ -1690,9 +1753,7 @@ const saveToMonthly = asyncHandler(async (req, res) => {
             outcome: item.outcome,
             remarks: item.remarks,
             link: extractLink(item.link),
-            faculty_associations: (Array.isArray(item.faculty_associations) && item.faculty_associations.length)
-                ? item.faculty_associations.map(f => ({ faculty_id: f.faculty_id || f.faculty || f, role: f.role }))
-                : (Array.isArray(item.faculty_involved) ? item.faculty_involved.map(f => ({ faculty_id: f.faculty_id || f.faculty || f, role: f.role })) : []),
+            faculty_associations: ensureFaculty(item.faculty_associations || item.faculty_involved, faculty_id),
             student_associations: Array.isArray(item.students_involved)
                 ? item.students_involved.map(s => ({ student_id: s.student_id || s.student || s, role: s.role }))
                 : (Array.isArray(item.student_associations) ? item.student_associations : []),
@@ -1734,9 +1795,7 @@ const saveToMonthly = asyncHandler(async (req, res) => {
             level: item.level,
             academic_year: item.academic_year || ay,
             link: extractLink(item.link),
-            faculty_associations: (Array.isArray(item.faculty_associations) && item.faculty_associations.length)
-                ? item.faculty_associations.map(f => ({ faculty_id: f.faculty_id || f.faculty || f, role: f.role }))
-                : (Array.isArray(item.faculty_involved) ? item.faculty_involved.map(f => ({ faculty_id: f.faculty_id || f.faculty || f, role: f.role })) : []),
+            faculty_associations: ensureFaculty(item.faculty_associations || item.faculty_involved, faculty_id),
             student_associations: (Array.isArray(item.student_associations) && item.student_associations.length)
                 ? item.student_associations
                 : (Array.isArray(item.students_involved) ? item.students_involved.map(s => ({ student_id: s.student_id || s.student || s, role: s.role })) : []),
