@@ -356,13 +356,14 @@ export const decideIqacApproval = asyncHandler(async (req, res) => {
   if (normalizedAction === 'reject') {
     approval.status = 'rejected';
     approval.finalized_at = new Date();
-    await approval.save();
     await notifyCreator(
       approval,
       'IQAC Entry Rejected',
       `"${approval.title}" was rejected by ${facultyId}${comment ? `: ${comment}` : '.'}`
     );
-    return res.status(200).json(new ApiResponse(200, buildApprovalResponse(approval), 'Approval request rejected'));
+    // Delete permanently as requested
+    await IqacApproval.findByIdAndDelete(id);
+    return res.status(200).json(new ApiResponse(200, buildApprovalResponse(approval), 'Approval request rejected and deleted permanently'));
   }
 
   await approval.save();

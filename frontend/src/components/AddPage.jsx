@@ -1292,9 +1292,12 @@ const AddPage = () => {
                 const isIqacCreatorRole = role === ROLES.IQAC_HEAD || role === ROLES.DEPARTMENT_HOD || role === 'IQAC Head' || role === 'Department HOD';
                 const requiresApproval = !editMode && isIqacCreatorRole && hasFacultyIds(processedData);
 
+                let wasSentForApproval = false;
+
                 if (requiresApproval) {
                     try {
                         response = await iqacApprovalService.createApprovalRequest(resourceId, processedData, files);
+                        wasSentForApproval = true;
                     } catch (approvalErr) {
                         // Fallback if resource is not configured for approval
                         if (approvalErr.response?.data?.message?.includes('Faculty approval is not configured')) {
@@ -1351,7 +1354,11 @@ const AddPage = () => {
                 }
             }
 
-            setSuccess(`${resource.title} ${editMode ? 'updated' : 'added'} successfully!`);
+            if (wasSentForApproval) {
+                setSuccess(`Approval request sent successfully for new ${resource.title}!`);
+            } else {
+                setSuccess(`${resource.title} ${editMode ? 'updated' : 'added'} successfully!`);
+            }
 
             if (!editMode) {
                 setFiles({});

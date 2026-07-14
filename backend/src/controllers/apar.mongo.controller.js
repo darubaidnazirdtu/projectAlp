@@ -1000,10 +1000,10 @@ const saveForm = asyncHandler(async (req, res) => {
     // NEW: Propagate faculty deletions to IQAC central database
     if (existing && existing.research && formData && formData.research) {
         const deletedIds = {
-            journals: [], conferences: [], books: [], projects: [], consultancy: [], patents: [], awards: [], fdps: [], e_content: [], collaborations: [], faculty_visits: []
+            journals: [], conferences: [], books: [], projects: [], consultancy: [], patents: [], awards: [], fdps: [], e_content: [], collaborations: [], faculty_visits: [], mous: [], phd_supervision: []
         };
         const idFields = {
-            journals: 'paper_id', conferences: 'paper_id', books: 'publication_id', projects: 'project_id', consultancy: 'consultancy_id', patents: 'patent_id', awards: 'award_id', fdps: 'program_id', e_content: 'econtent_id', collaborations: 'activity_id', faculty_visits: 'visit_id'
+            journals: 'paper_id', conferences: 'paper_id', books: 'publication_id', projects: 'project_id', consultancy: 'consultancy_id', patents: 'patent_id', awards: 'award_id', fdps: 'activity_id', e_content: 'econtent_id', collaborations: 'activity_id', faculty_visits: 'visit_id', mous: 'mou_id', phd_supervision: 'defence_id'
         };
 
         for (const sectionKey of Object.keys(idFields)) {
@@ -1025,14 +1025,16 @@ const saveForm = asyncHandler(async (req, res) => {
             if (deletedIds.journals.length > 0) await Publication.deleteMany({ type: 'journal', paper_id: { $in: deletedIds.journals } });
             if (deletedIds.conferences.length > 0) await Publication.deleteMany({ type: 'conference', paper_id: { $in: deletedIds.conferences } });
             if (deletedIds.books.length > 0) await Publication.deleteMany({ type: 'book', publication_id: { $in: deletedIds.books } });
-            if (deletedIds.projects.length > 0) await ResearchProject.deleteMany({ project_id: { $in: deletedIds.projects } });
-            if (deletedIds.consultancy.length > 0) await FacultyActivity.deleteMany({ type: 'revenue_from_consultancy', consultancy_id: { $in: deletedIds.consultancy } });
+            if (deletedIds.projects.length > 0) await ResearchProject.deleteMany({ type: 'funding', project_id: { $in: deletedIds.projects } });
+            if (deletedIds.consultancy.length > 0) await ResearchProject.deleteMany({ type: 'consultancy', project_id: { $in: deletedIds.consultancy } });
             if (deletedIds.patents.length > 0) await Patent.deleteMany({ patent_id: { $in: deletedIds.patents } });
-            if (deletedIds.awards.length > 0) await FacultyActivity.deleteMany({ type: 'research_innovation_award', award_id: { $in: deletedIds.awards } });
-            if (deletedIds.fdps.length > 0) await FacultyActivity.deleteMany({ type: 'faculty_development_program', program_id: { $in: deletedIds.fdps } });
-            if (deletedIds.e_content.length > 0) await FacultyActivity.deleteMany({ type: 'developed_e_content', econtent_id: { $in: deletedIds.e_content } });
-            if (deletedIds.collaborations.length > 0) await Collaboration.deleteMany({ activity_id: { $in: deletedIds.collaborations } });
-            if (deletedIds.faculty_visits.length > 0) await FacultyActivity.deleteMany({ type: 'faculty_visit', visit_id: { $in: deletedIds.faculty_visits } });
+            if (deletedIds.awards.length > 0) await FacultyActivity.deleteMany({ type: 'award', activity_id: { $in: deletedIds.awards } });
+            if (deletedIds.fdps.length > 0) await FacultyActivity.deleteMany({ type: 'fdp', activity_id: { $in: deletedIds.fdps } });
+            if (deletedIds.e_content.length > 0) await FacultyActivity.deleteMany({ type: 'econtent', activity_id: { $in: deletedIds.e_content } });
+            if (deletedIds.collaborations.length > 0) await Collaboration.deleteMany({ type: 'activity', collaboration_id: { $in: deletedIds.collaborations } });
+            if (deletedIds.faculty_visits.length > 0) await FacultyActivity.deleteMany({ type: 'visit', activity_id: { $in: deletedIds.faculty_visits } });
+            if (deletedIds.mous.length > 0) await Collaboration.deleteMany({ type: 'mou', collaboration_id: { $in: deletedIds.mous } });
+            if (deletedIds.phd_supervision.length > 0) await PhdDefence.deleteMany({ defence_id: { $in: deletedIds.phd_supervision } });
         } catch (delError) {
             console.error("Error deleting propagated IQAC records:", delError);
         }
