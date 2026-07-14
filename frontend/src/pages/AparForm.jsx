@@ -249,7 +249,15 @@ const getColumns = (rows) => {
     const columns = [];
     rows.forEach(row => {
         Object.keys(row || {}).forEach(key => {
-            if (!columns.includes(key)) columns.push(key);
+            // Filter out purely internal ID columns that clutter exports
+            const lowerKey = String(key).toLowerCase();
+            const isInternalId = lowerKey === 'id' || lowerKey === '_id' || lowerKey.endsWith(' id') || lowerKey.endsWith('_id');
+            // Allow faculty/student/employee IDs which might be relevant for reports
+            const isAllowedId = lowerKey.includes('faculty') || lowerKey.includes('student') || lowerKey.includes('employee');
+            
+            if (!columns.includes(key) && (!isInternalId || isAllowedId)) {
+                columns.push(key);
+            }
         });
     });
     if (columns.includes('S. No.')) {
@@ -325,8 +333,8 @@ const createAparExportTables = (formData) => {
     });
 };
 
-const createWordCell = (text, bold = false, width = 50) => new TableCell({
-    width: { size: width, type: WidthType.PERCENTAGE },
+const createWordCell = (text, bold = false) => new TableCell({
+    width: { size: 10, type: WidthType.AUTO },
     margins: { top: 100, bottom: 100, left: 100, right: 100 },
     children: String(text ?? '').split('\n').map(line => new Paragraph({
         spacing: { after: 100 },
@@ -337,9 +345,11 @@ const createWordCell = (text, bold = false, width = 50) => new TableCell({
 const createWordTable = (columns, rows) => {
     const safeRows = rows.length ? rows : [{ Message: 'No entries' }];
     const safeColumns = columns.length ? columns : getColumns(safeRows);
-    const width = Math.max(8, Math.floor(100 / safeColumns.length));
+    
+    // Instead of forcing strict percentages which crush text, we use AUTO 
+    // so Word can naturally expand the columns based on the text length.
     return new Table({
-        width: { size: 100, type: WidthType.PERCENTAGE },
+        width: { size: 100, type: WidthType.AUTO },
         borders: {
             top: { style: BorderStyle.SINGLE, size: 1, color: "000000" },
             bottom: { style: BorderStyle.SINGLE, size: 1, color: "000000" },
@@ -351,10 +361,10 @@ const createWordTable = (columns, rows) => {
         rows: [
             new TableRow({
                 tableHeader: true,
-                children: safeColumns.map(column => createWordCell(column, true, width))
+                children: safeColumns.map(column => createWordCell(column, true))
             }),
             ...safeRows.map(row => new TableRow({
-                children: safeColumns.map(column => createWordCell(row[column], false, width))
+                children: safeColumns.map(column => createWordCell(row[column], false))
             }))
         ]
     });
