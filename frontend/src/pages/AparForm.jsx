@@ -1983,10 +1983,17 @@ export default function AparForm() {
     );
 
     return (
-        <div className="min-h-screen bg-gray-50 py-8 px-4 sm:px-6 lg:px-8 print:p-0 print:bg-white">
+        <div className="apar-page-bg min-h-screen py-8 px-4 sm:px-6 lg:px-8 print:p-0 print:bg-white relative overflow-hidden">
+            {/* Decorative Premium Background */}
+            <div className="absolute top-0 left-0 w-full h-full overflow-hidden pointer-events-none z-0 print:hidden">
+                <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-indigo-500/10 rounded-full blur-[120px]"></div>
+                <div className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-purple-500/10 rounded-full blur-[120px]"></div>
+                <div className="absolute top-[40%] right-[10%] w-[20%] h-[20%] bg-emerald-500/5 rounded-full blur-[100px]"></div>
+            </div>
+            
             <Toaster richColors position="top-right" />
-            <div className="max-w-7xl mx-auto mb-6">
-                <div className="flex justify-between items-center print:hidden mb-4">
+            <div className="max-w-7xl mx-auto mb-8 relative z-50 print:hidden">
+                <div className="flex flex-col sm:flex-row justify-between items-center bg-white/80 backdrop-blur-md px-6 py-4 rounded-2xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-white gap-4">
                     <button
                         onClick={() => {
                             if (activeRole === 'Officer (Graded)') {
@@ -1995,38 +2002,43 @@ export default function AparForm() {
                                 navigate('/apar/reporting');
                             }
                         }}
-                        className="flex items-center text-gray-600 hover:text-gray-900"
+                        className="flex items-center gap-2 text-gray-600 hover:text-indigo-600 font-semibold transition-all hover:-translate-x-1 group"
                     >
-                        <FiArrowLeft className="mr-2" /> Back to Dashboard
+                        <div className="p-1.5 bg-gray-100 rounded-lg group-hover:bg-indigo-50 transition-colors">
+                            <FiArrowLeft className="w-4 h-4" />
+                        </div>
+                        Back to Dashboard
                     </button>
-                    <div className="flex items-center space-x-3">
+                    <div className="flex items-center gap-3">
                         <NotificationBell />
+                        <div className="h-6 w-px bg-gray-200 mx-1 hidden sm:block"></div>
                         <button
                             onClick={handlePrint}
-                            className="flex items-center px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 transition-colors"
+                            className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-indigo-600 to-purple-600 text-white text-sm font-bold rounded-xl shadow-md shadow-indigo-200 hover:shadow-lg hover:-translate-y-0.5 active:scale-95 transition-all"
                         >
-                            <FiPrinter className="mr-2" /> Print Form
+                            <FiPrinter className="w-4 h-4" /> Print
                         </button>
                         <button
                             type="button"
                             onClick={handleExportWord}
-                            className="flex items-center px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors"
+                            className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-blue-500 to-cyan-500 text-white text-sm font-bold rounded-xl shadow-md shadow-blue-200 hover:shadow-lg hover:-translate-y-0.5 active:scale-95 transition-all"
                         >
-                            <FiFileText className="mr-2" /> Word
+                            <FiFileText className="w-4 h-4" /> Word
                         </button>
                         <button
                             type="button"
                             onClick={handleExportExcel}
-                            className="flex items-center px-4 py-2 bg-emerald-600 text-white rounded-md hover:bg-emerald-700 transition-colors"
+                            className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-emerald-500 to-teal-500 text-white text-sm font-bold rounded-xl shadow-md shadow-emerald-200 hover:shadow-lg hover:-translate-y-0.5 active:scale-95 transition-all"
                         >
-                            <FiGrid className="mr-2" /> Excel
+                            <FiGrid className="w-4 h-4" /> Excel
                         </button>
+                        <div className="h-6 w-px bg-gray-200 mx-1 hidden sm:block"></div>
                         <ProfileDropdown />
                     </div>
                 </div>
             </div>
 
-            <div className="max-w-7xl mx-auto bg-white shadow-2xl rounded-2xl overflow-hidden p-8 print:shadow-none print:p-0 transition-all duration-300">
+            <div className="max-w-7xl mx-auto bg-white/90 backdrop-blur-md shadow-[0_8px_30px_rgb(0,0,0,0.06)] border border-white/60 rounded-3xl overflow-hidden p-6 sm:p-10 print:shadow-none print:border-none print:bg-white print:p-0 transition-all duration-300 relative z-10">
                 {viewMode === 'list' && (activeRole === 'Reporting Officer' || activeRole === 'Reviewing Officer') ? (
                     <>
                         <div>

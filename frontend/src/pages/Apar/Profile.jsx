@@ -3,6 +3,7 @@ import { facultyProfileService } from '../../services/faculty_profile.service.js
 import { toast } from 'sonner';
 import AparShellHeader from '../../components/AparShellHeader.jsx';
 import FileUpload from '../../components/FileUpload.jsx';
+import { FiUser, FiMapPin, FiBriefcase, FiBookOpen, FiLink, FiCheckCircle, FiAlertCircle } from 'react-icons/fi';
 
 export default function Profile() {
   const [loading, setLoading] = useState(true);
@@ -46,9 +47,9 @@ export default function Profile() {
   const DEGREE_ORDER = { '10th': 1, 'Diploma': 2, '12th': 3, 'Graduation': 4, 'Master': 5, 'PhD': 6, 'Post Doc': 7 };
   const PRESENT_GRADE_OPTIONS = Array.from({ length: 11 }, (_, i) => 10 + i); // 10..20
 
-  const inputBase = 'w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-indigo-200 focus:border-indigo-500 border-gray-300';
-  const labelBase = 'block text-sm font-medium text-gray-700 mb-1';
-  const errorText = 'mt-1 text-xs text-red-600';
+  const inputBase = 'w-full px-4 py-2.5 bg-gray-50/50 border border-gray-200/60 rounded-xl focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-400 focus:bg-white transition-all duration-300 text-gray-800 placeholder-gray-400 shadow-[inset_0_2px_4px_rgba(0,0,0,0.02)]';
+  const labelBase = 'block text-sm font-semibold text-gray-700 mb-1.5 tracking-wide';
+  const errorText = 'mt-1.5 text-xs font-medium text-red-500 flex items-center gap-1';
 
   const todayISO = useMemo(() => new Date().toISOString().substring(0,10), []);
   const maxDobISO = useMemo(() => {
@@ -526,15 +527,28 @@ export default function Profile() {
 
   if (loading) {
     return (
-      <div className="apar-page-bg min-h-screen flex items-center justify-center">
-        <div className="bg-white px-4 py-2 rounded shadow text-sm text-gray-600">Loading profile…</div>
+      <div className="apar-page-bg min-h-screen flex items-center justify-center relative overflow-hidden">
+        {/* Decorative Background Blur */}
+        <div className="absolute top-20 left-20 w-72 h-72 bg-indigo-500/20 rounded-full blur-[100px] pointer-events-none"></div>
+        <div className="absolute bottom-20 right-20 w-72 h-72 bg-purple-500/20 rounded-full blur-[100px] pointer-events-none"></div>
+        <div className="bg-white/80 backdrop-blur-md px-6 py-4 rounded-2xl shadow-xl border border-white flex items-center gap-3">
+          <div className="w-5 h-5 rounded-full border-2 border-indigo-500 border-t-transparent animate-spin"></div>
+          <span className="text-sm font-medium text-gray-700 tracking-wide">Loading profile...</span>
+        </div>
       </div>
     );
   }
 
   return (
-    <div className="apar-page-bg min-h-screen py-10 px-4 sm:px-6 lg:px-8">
-      <div className="mx-auto max-w-5xl">
+    <div className="apar-page-bg min-h-screen py-10 px-4 sm:px-6 lg:px-8 relative overflow-hidden">
+      {/* Premium Decorative Background */}
+      <div className="absolute top-0 left-0 w-full h-full overflow-hidden pointer-events-none z-0">
+        <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-indigo-500/10 rounded-full blur-[120px]"></div>
+        <div className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-purple-500/10 rounded-full blur-[120px]"></div>
+        <div className="absolute top-[40%] right-[10%] w-[20%] h-[20%] bg-emerald-500/5 rounded-full blur-[100px]"></div>
+      </div>
+      
+      <div className="mx-auto max-w-5xl relative z-10">
         <AparShellHeader
           title="My Profile"
           subtitle="Update your personal and professional information"
@@ -601,9 +615,15 @@ export default function Profile() {
         )}
 
         <form onSubmit={handleSave} className="space-y-8">
-          <section className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
-            <h2 className="text-lg font-bold text-gray-900 mb-4">Basic Information</h2>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <section className="bg-white/80 backdrop-blur-md rounded-2xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-white p-6 md:p-8 relative overflow-hidden group">
+            <div className="absolute top-0 left-0 w-2 h-full bg-gradient-to-b from-indigo-500 to-purple-500 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+            <div className="flex items-center gap-3 mb-6 border-b border-gray-100/50 pb-4">
+              <div className="p-2.5 bg-indigo-50 rounded-xl">
+                <FiUser className="w-5 h-5 text-indigo-600" />
+              </div>
+              <h2 className="text-xl font-bold text-gray-900 tracking-tight">Basic Information</h2>
+            </div>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
               <div>
                 <label className={labelBase}>Full Name <span className="text-red-500">*</span></label>
                 <input className={`${inputBase} ${errors['basic_info.full_name'] ? 'border-red-500' : ''}`} value={profile.basic_info?.full_name || ''} onChange={(e) => update('basic_info.full_name', sanitizeAlpha(e.target.value))} placeholder="e.g. Dr. John Doe" />
@@ -667,10 +687,16 @@ export default function Profile() {
             </div>
           </section>
 
-          <section className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
-            <h2 className="text-lg font-bold text-gray-900 mb-4">Contact Information</h2>
+          <section className="bg-white/80 backdrop-blur-md rounded-2xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-white p-6 md:p-8 relative overflow-hidden group">
+            <div className="absolute top-0 left-0 w-2 h-full bg-gradient-to-b from-emerald-500 to-teal-500 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+            <div className="flex items-center gap-3 mb-6 border-b border-gray-100/50 pb-4">
+              <div className="p-2.5 bg-emerald-50 rounded-xl">
+                <FiMapPin className="w-5 h-5 text-emerald-600" />
+              </div>
+              <h2 className="text-xl font-bold text-gray-900 tracking-tight">Contact Information</h2>
+            </div>
             {/* Contact Details */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-5 mb-8">
               {[
                 ['contact_info.mobile_number','Mobile Number', true, '10-digit mobile'],
                 ['contact_info.alternate_mobile_number','Alternate Mobile Number', false, '10-digit alternate mobile'],
@@ -768,9 +794,15 @@ export default function Profile() {
             </div>
           </section>
 
-          <section className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
-            <h2 className="text-lg font-bold text-gray-900 mb-4">Professional Information</h2>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <section className="bg-white/80 backdrop-blur-md rounded-2xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-white p-6 md:p-8 relative overflow-hidden group">
+            <div className="absolute top-0 left-0 w-2 h-full bg-gradient-to-b from-blue-500 to-cyan-500 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+            <div className="flex items-center gap-3 mb-6 border-b border-gray-100/50 pb-4">
+              <div className="p-2.5 bg-blue-50 rounded-xl">
+                <FiBriefcase className="w-5 h-5 text-blue-600" />
+              </div>
+              <h2 className="text-xl font-bold text-gray-900 tracking-tight">Professional Information</h2>
+            </div>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
               {[
                 ['professional_info.faculty_staff_id','Employee ID', '', false, 'Fetched from system'],
                 ['professional_info.designation','Designation', '', false, 'Select Designation'],
@@ -873,11 +905,17 @@ export default function Profile() {
             </div>
           </section>
 
-          <section ref={eduSectionRef} className="bg-white rounded-xl shadow-sm border border-gray-100 p-6 mb-6">
-            <div className="flex items-center justify-between mb-4">
-              <h2 className="text-lg font-bold text-gray-900">Educational Qualifications</h2>
+          <section ref={eduSectionRef} className="bg-white/80 backdrop-blur-md rounded-2xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-white p-6 md:p-8 mb-8 relative overflow-hidden group">
+            <div className="absolute top-0 left-0 w-2 h-full bg-gradient-to-b from-amber-500 to-orange-500 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6 border-b border-gray-100/50 pb-4">
+              <div className="flex items-center gap-3">
+                <div className="p-2.5 bg-amber-50 rounded-xl">
+                  <FiBookOpen className="w-5 h-5 text-amber-600" />
+                </div>
+                <h2 className="text-xl font-bold text-gray-900 tracking-tight">Educational Qualifications</h2>
+              </div>
               {!showEduForm && (
-                <button type="button" onClick={handleAddQualification} className="rounded-md bg-emerald-600 text-white px-4 py-2 text-sm font-semibold hover:bg-emerald-700">Add Qualification</button>
+                <button type="button" onClick={handleAddQualification} className="rounded-xl bg-gradient-to-r from-amber-500 to-orange-500 text-white px-5 py-2 text-sm font-bold shadow-md hover:shadow-lg hover:scale-105 active:scale-95 transition-all">Add Qualification</button>
               )}
             </div>
             
@@ -889,48 +927,51 @@ export default function Profile() {
 
             {/* Table View */}
             {!showEduForm && Array.isArray(profile.educational_qualifications) && profile.educational_qualifications.length > 0 && (
-              <div className="overflow-x-auto border border-gray-200 rounded-lg mb-4">
-                <table className="min-w-full divide-y divide-gray-200">
-                  <thead className="bg-gray-50">
-                    <tr>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Degree</th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Course</th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Institution</th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Year</th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Score</th>
-                      <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
-                    </tr>
-                  </thead>
-                  <tbody className="bg-white divide-y divide-gray-200">
-                    {profile.educational_qualifications.map((q, idx) => (
-                      <tr key={idx}>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{q.degree}</td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{q.course}</td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{q.institution_name}</td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{q.year_of_passing}</td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{q.percentage_cgpa}</td>
-                        <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                          <button type="button" onClick={() => handleEditQualification(idx)} className="text-indigo-600 hover:text-indigo-900 mr-4">Edit</button>
-                          <button type="button" onClick={() => handleRemoveQualification(idx)} className="text-red-600 hover:text-red-900">Remove</button>
-                        </td>
+              <div className="overflow-hidden border border-gray-200/60 rounded-2xl mb-4 shadow-[0_4px_20px_rgb(0,0,0,0.02)]">
+                <div className="overflow-x-auto">
+                  <table className="min-w-full divide-y divide-gray-200/60">
+                    <thead className="bg-gray-50/80 backdrop-blur-sm">
+                      <tr>
+                        <th className="px-6 py-4 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">Degree</th>
+                        <th className="px-6 py-4 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">Course</th>
+                        <th className="px-6 py-4 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">Institution</th>
+                        <th className="px-6 py-4 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">Year</th>
+                        <th className="px-6 py-4 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">Score</th>
+                        <th className="px-6 py-4 text-right text-xs font-bold text-gray-500 uppercase tracking-wider">Actions</th>
                       </tr>
-                    ))}
-                  </tbody>
-                </table>
+                    </thead>
+                    <tbody className="bg-white/40 divide-y divide-gray-100/80 backdrop-blur-sm">
+                      {profile.educational_qualifications.map((q, idx) => (
+                        <tr key={idx} className="hover:bg-gray-50/50 transition-colors">
+                          <td className="px-6 py-4 whitespace-nowrap text-sm font-bold text-gray-900">{q.degree}</td>
+                          <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-600">{q.course}</td>
+                          <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-600">{q.institution_name}</td>
+                          <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-600">{q.year_of_passing}</td>
+                          <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-600">{q.percentage_cgpa}</td>
+                          <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                            <button type="button" onClick={() => handleEditQualification(idx)} className="text-indigo-600 hover:text-indigo-800 bg-indigo-50 px-3 py-1.5 rounded-lg mr-2 transition-colors">Edit</button>
+                            <button type="button" onClick={() => handleRemoveQualification(idx)} className="text-red-600 hover:text-red-800 bg-red-50 px-3 py-1.5 rounded-lg transition-colors">Remove</button>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
               </div>
             )}
 
             {!showEduForm && (!profile.educational_qualifications || profile.educational_qualifications.length === 0) && (
-              <div className="text-center py-8 text-gray-500 border-2 border-dashed border-gray-200 rounded-lg">
+              <div className="text-center py-10 text-gray-500 bg-gray-50/50 border border-dashed border-gray-300 rounded-2xl">
                 No educational qualifications added yet.
               </div>
             )}
 
             {/* Inline Add/Edit Form */}
             {showEduForm && (
-              <div className="border border-indigo-100 bg-indigo-50/30 p-5 rounded-lg mb-4">
-                <h3 className="text-md font-semibold text-gray-900 mb-4">{editEduIndex >= 0 ? 'Edit Qualification' : 'Add Qualification'}</h3>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div className="border border-indigo-100/60 bg-gradient-to-br from-indigo-50/50 to-white/50 backdrop-blur-md p-6 rounded-2xl mb-4 shadow-[0_4px_20px_rgb(0,0,0,0.03)] relative overflow-hidden">
+                <div className="absolute top-0 left-0 w-1.5 h-full bg-indigo-500"></div>
+                <h3 className="text-lg font-bold text-gray-900 mb-5">{editEduIndex >= 0 ? 'Edit Qualification' : 'Add Qualification'}</h3>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
                   {[
                     ['degree','Degree', 'Select Degree'],
                     ['course','Course', 'e.g. B.Tech, M.Tech'],
@@ -944,7 +985,7 @@ export default function Profile() {
                       <label className={labelBase}>{label} <span className="text-red-500">*</span></label>
                       {k === 'degree' ? (
                         <select
-                          className={`${inputBase} ${eduFormErrors[k] ? 'border-red-500' : ''}`}
+                          className={`${inputBase} ${eduFormErrors[k] ? 'border-red-500 focus:border-red-500 focus:ring-red-500/20' : ''}`}
                           value={eduForm[k] || ''}
                           onChange={(e) => {
                              setEduForm({...eduForm, degree: e.target.value});
@@ -958,7 +999,7 @@ export default function Profile() {
                           {DEGREE_OPTIONS.map(d => <option key={d} value={d}>{d}</option>)}
                         </select>
                       ) : (
-                        <input className={`${inputBase} ${eduFormErrors[k] ? 'border-red-500' : ''}`} value={eduForm[k] || ''} placeholder={placeholder} onChange={(e) => {
+                        <input className={`${inputBase} ${eduFormErrors[k] ? 'border-red-500 focus:border-red-500 focus:ring-red-500/20' : ''}`} value={eduForm[k] || ''} placeholder={placeholder} onChange={(e) => {
                           let v = e.target.value;
                           if (k === 'year_of_passing') v = sanitizeNumeric(v);
                           else if (k === 'percentage_cgpa') v = sanitizePercent(v);
@@ -971,17 +1012,23 @@ export default function Profile() {
                     </div>
                   ))}
                 </div>
-                <div className="flex justify-end gap-3 mt-6 pt-4 border-t border-gray-200">
-                  <button type="button" onClick={() => setShowEduForm(false)} className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50">Cancel</button>
-                  <button type="button" onClick={handleSaveEduForm} className="px-4 py-2 text-sm font-medium text-white bg-indigo-600 rounded-md hover:bg-indigo-700">Save to List</button>
+                <div className="flex justify-end gap-3 mt-6 pt-5 border-t border-indigo-100/50">
+                  <button type="button" onClick={() => setShowEduForm(false)} className="px-5 py-2.5 text-sm font-bold text-gray-700 bg-white border border-gray-200/80 rounded-xl hover:bg-gray-50 hover:shadow-sm transition-all">Cancel</button>
+                  <button type="button" onClick={handleSaveEduForm} className="px-5 py-2.5 text-sm font-bold text-white bg-indigo-600 rounded-xl hover:bg-indigo-700 hover:shadow-md transition-all hover:-translate-y-0.5">Save to List</button>
                 </div>
               </div>
             )}
           </section>
 
-          <section className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
-            <h2 className="text-lg font-bold text-gray-900 mb-4">Social & Professional Links</h2>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <section className="bg-white/80 backdrop-blur-md rounded-2xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-white p-6 md:p-8 relative overflow-hidden group mb-8">
+            <div className="absolute top-0 left-0 w-2 h-full bg-gradient-to-b from-pink-500 to-rose-500 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+            <div className="flex items-center gap-3 mb-6 border-b border-gray-100/50 pb-4">
+              <div className="p-2.5 bg-pink-50 rounded-xl">
+                <FiLink className="w-5 h-5 text-pink-600" />
+              </div>
+              <h2 className="text-xl font-bold text-gray-900 tracking-tight">Social & Professional Links</h2>
+            </div>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
               {[
                 ['social_links.google_scholar_profile','Google Scholar Profile', true, 'URL to Google Scholar'],
                 ['social_links.researchgate_profile','ResearchGate Profile', true, 'URL to ResearchGate'],
@@ -1003,12 +1050,16 @@ export default function Profile() {
             </div>
           </section>
 
-          <div className="flex flex-col items-end gap-2">
+          <div className="flex flex-col items-end gap-3 mt-8 pb-10">
             {saveStatus === 'saved' && (
-              <span className="text-sm font-medium text-emerald-700">Save successful</span>
+              <span className="text-sm font-medium text-emerald-700 bg-emerald-50 px-4 py-2 rounded-xl flex items-center gap-2">
+                <FiCheckCircle /> Save successful
+              </span>
             )}
-            <button type="button" onClick={handleSave} disabled={saving} className="rounded-lg bg-indigo-600 px-6 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-indigo-700 disabled:opacity-60">
-              {saving ? 'Saving…' : 'Save Changes'}
+            <button type="button" onClick={handleSave} disabled={saving} className="rounded-xl bg-gradient-to-r from-indigo-600 to-purple-600 px-8 py-3.5 text-base font-bold text-white shadow-lg shadow-indigo-200 transition-all hover:shadow-xl hover:-translate-y-0.5 active:scale-95 disabled:opacity-60 disabled:pointer-events-none flex items-center gap-2">
+              {saving ? (
+                <><FiAlertCircle className="animate-pulse" /> Saving...</>
+              ) : 'Save Changes'}
             </button>
           </div>
         </form>

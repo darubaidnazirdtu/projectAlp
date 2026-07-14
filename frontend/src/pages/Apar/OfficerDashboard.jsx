@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
 import { AparFormGradedService } from '../../services/apar_form_graded.services.js';
 import { aparLogout, aparInitializeSession } from '../../store/slices/aparAuthSlice.js';
-import { FiAlertCircle, FiClock, FiFileText, FiArchive, FiPlus, FiCamera, FiLoader, FiTrash2 } from 'react-icons/fi';
+import { FiAlertCircle, FiClock, FiFileText, FiArchive, FiPlus, FiCamera, FiLoader, FiTrash2, FiMail, FiHash, FiBriefcase } from 'react-icons/fi';
 import NotificationBell from '../../components/NotificationBell.jsx';
 import { useSocket } from '../../context/SocketContext.jsx';
 import { Api } from '../../api/Api.js';
@@ -321,16 +321,32 @@ export default function OfficerDashboard() {
 
                             <input ref={fileInputRef} type="file" accept="image/*" onChange={handleAvatarSelected} className="hidden" />
                         </div>
-                        <div className="text-center relative z-10">
+                        <div className="text-center relative z-10 flex-1">
                             <h2 className="text-3xl font-extrabold text-gray-900 tracking-tight">{user.name}</h2>
                             {user.designation && (
-                                <p className="text-lg text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-purple-600 font-bold mt-1">{user.designation}</p>
+                                <p className="text-lg text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-purple-600 font-bold mt-1.5">{user.designation}</p>
                             )}
-                            {user.department && (
-                                <p className="text-sm text-gray-600 mt-3 font-medium bg-gray-100/80 backdrop-blur-sm px-4 py-1.5 rounded-xl inline-block border border-gray-200/50 shadow-sm">
-                                    {user.department}
-                                </p>
-                            )}
+                            
+                            <div className="mt-5 flex flex-wrap justify-center gap-3">
+                                {user.department && (
+                                    <div className="flex items-center gap-1.5 bg-white/60 backdrop-blur-sm px-4 py-2 rounded-xl border border-gray-200/60 text-sm font-semibold text-gray-700 shadow-[0_2px_10px_rgb(0,0,0,0.02)] transition-all hover:bg-white hover:shadow-md hover:-translate-y-0.5">
+                                        <FiBriefcase className="text-indigo-500 h-4 w-4" />
+                                        {user.department}
+                                    </div>
+                                )}
+                                {user.user_id && (
+                                    <div className="flex items-center gap-1.5 bg-white/60 backdrop-blur-sm px-4 py-2 rounded-xl border border-gray-200/60 text-sm font-semibold text-gray-700 shadow-[0_2px_10px_rgb(0,0,0,0.02)] transition-all hover:bg-white hover:shadow-md hover:-translate-y-0.5">
+                                        <FiHash className="text-indigo-500 h-4 w-4" />
+                                        ID: {user.user_id}
+                                    </div>
+                                )}
+                                {user.email && (
+                                    <div className="flex items-center gap-1.5 bg-white/60 backdrop-blur-sm px-4 py-2 rounded-xl border border-gray-200/60 text-sm font-semibold text-gray-700 shadow-[0_2px_10px_rgb(0,0,0,0.02)] transition-all hover:bg-white hover:shadow-md hover:-translate-y-0.5">
+                                        <FiMail className="text-indigo-500 h-4 w-4" />
+                                        {user.email}
+                                    </div>
+                                )}
+                            </div>
                         </div>
                     </div>
                 )}
