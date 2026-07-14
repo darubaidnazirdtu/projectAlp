@@ -382,7 +382,20 @@ export default function AparForm() {
     const { socket } = useSocket(); 
     const navigate = useNavigate();
     const location = useLocation();
-    const [currentStep, setCurrentStep] = useState(1);
+    const [currentStep, setCurrentStep] = useState(() => {
+        try {
+            const savedStep = sessionStorage.getItem('apar_current_step');
+            return savedStep ? parseInt(savedStep, 10) : 1;
+        } catch (e) {
+            return 1;
+        }
+    });
+
+    React.useEffect(() => {
+        try {
+            sessionStorage.setItem('apar_current_step', currentStep);
+        } catch (e) {}
+    }, [currentStep]);
     
     const [loginData, setLoginData] = useState({ id: '', password: '', role: 'Officer (Graded)' });
     const aparUser = useSelector((state) => state.aparAuth.user);
@@ -2101,7 +2114,11 @@ export default function AparForm() {
                             </div>
                             <div className="hidden sm:flex justify-between mt-4">
                                 {Array.from({ length: totalSteps }, (_, i) => i + 1).map((step) => (
-                                    <div key={step} className={`flex flex-col items-center ${step <= currentStep ? 'text-indigo-600' : 'text-gray-400'}`}>
+                                    <div 
+                                        key={step} 
+                                        onClick={() => setCurrentStep(step)}
+                                        className={`flex flex-col items-center cursor-pointer hover:opacity-80 transition-opacity ${step <= currentStep ? 'text-indigo-600' : 'text-gray-400'}`}
+                                    >
                                         <div className={`rounded-full h-8 w-8 flex items-center justify-center border-2 ${step <= currentStep ? 'border-indigo-600 bg-indigo-50' : 'border-gray-200'}`}>
                                             {step < currentStep ? <FiCheck /> : step}
                                         </div>
