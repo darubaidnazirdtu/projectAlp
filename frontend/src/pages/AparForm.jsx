@@ -3,6 +3,8 @@ import { FiArrowLeft, FiPrinter, FiCheck, FiAlertCircle, FiFileText, FiGrid } fr
 import { Document, HeadingLevel, Packer, Paragraph, Table, TableCell, TableRow, TextRun, WidthType, BorderStyle, PageOrientation } from 'docx';
 import { saveAs } from 'file-saver';
 import * as XLSX from 'xlsx';
+import { jsPDF } from 'jspdf';
+import autoTable from 'jspdf-autotable';
 import ProfileDropdown from '../components/ProfileDropdown.jsx';
 import { toast, Toaster } from 'sonner';
 import { useNavigate, useLocation } from 'react-router-dom';
@@ -1091,7 +1093,57 @@ export default function AparForm() {
         };
     }, [socket, aparUser, reduxAy, loginData.academic_year, location.state?.ay, formData.personal.report_start_date, formData.personal.report_end_date, fetchFormData]);
 
-    const handlePrint = () => window.print();
+    const handlePrint = () => {
+        try {
+            const ay = reduxAy || loginData.academic_year || location.state?.ay || getAcademicYearFromDates(formData.personal?.report_start_date, formData.personal?.report_end_date);
+            const tables = [
+                createSummaryTable(formData, aparUser, ay),
+                ...createAparExportTables(formData)
+            ];
+
+            const doc = new jsPDF({ orientation: 'landscape', unit: 'pt', format: 'a4' });
+            
+            doc.setFontSize(16);
+            doc.text("Annual Performance Assessment Report Form", 40, 40);
+            doc.setFontSize(10);
+            doc.text(`Faculty: ${formData?.personal?.name || aparUser?.name || ''} | Academic Year: ${ay || ''}`, 40, 60);
+
+            let currentY = 80;
+
+            tables.forEach((table) => {
+                // Prevent title from printing if it's too close to the bottom
+                if (currentY > doc.internal.pageSize.getHeight() - 80) {
+                    doc.addPage();
+                    currentY = 40;
+                }
+
+                doc.setFontSize(12);
+                doc.setTextColor(0, 0, 0);
+                doc.text(table.title, 40, currentY);
+                currentY += 10;
+                
+                autoTable(doc, {
+                    head: [table.columns],
+                    body: table.rows.map(row => table.columns.map(col => String(row[col] ?? ''))),
+                    startY: currentY,
+                    horizontalPageBreak: true,
+                    horizontalPageBreakRepeat: 0, // Repeat first column
+                    theme: 'grid',
+                    styles: { fontSize: 8, cellPadding: 3, overflow: 'linebreak' },
+                    headStyles: { fillColor: [79, 70, 229], textColor: [255, 255, 255] },
+                    margin: { top: 40, right: 40, bottom: 40, left: 40 }
+                });
+                
+                currentY = doc.lastAutoTable.finalY + 30;
+            });
+            
+            doc.save(`${getExportFileBaseName()}.pdf`);
+            toast.success("PDF file generated successfully");
+        } catch (error) {
+            console.error('PDF export failed', error);
+            toast.error('PDF export failed. Try exporting to Word.');
+        }
+    };
 
     const getExportFileBaseName = () => {
         const facultyId = aparUser?.teacherId || aparUser?.faculty_id || aparUser?.userId || aparUser?.user_id || aparUser?.id || 'faculty';
