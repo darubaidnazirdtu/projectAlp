@@ -2026,7 +2026,7 @@ export default function AparForm() {
                 </div>
             </div>
 
-            <div className="max-w-7xl mx-auto bg-white shadow-xl rounded-lg overflow-hidden p-8 print:shadow-none print:p-0">
+            <div className="max-w-7xl mx-auto bg-white shadow-2xl rounded-2xl overflow-hidden p-8 print:shadow-none print:p-0 transition-all duration-300">
                 {viewMode === 'list' && (activeRole === 'Reporting Officer' || activeRole === 'Reviewing Officer') ? (
                     <>
                         <div>
@@ -2097,16 +2097,16 @@ export default function AparForm() {
                             </div>
                         </div>
 
-                        <div className="mb-8 print:hidden">
+                        <div className="mb-8 print:hidden sticky top-0 z-50 bg-white/90 backdrop-blur-md py-4 px-2 sm:px-6 rounded-xl shadow-sm border border-gray-100 transition-all duration-300 mt-[-1rem]">
                             <div className="flex justify-between mb-2">
-                                <span className="text-xs font-semibold inline-block py-1 px-2 uppercase rounded-full text-indigo-600 bg-indigo-200">
+                                <span className="text-xs font-bold inline-block py-1 px-3 uppercase rounded-full text-indigo-700 bg-indigo-100 tracking-wide">
                                     Step {currentStep} of {totalSteps}: {getStepTitle(currentStep)}
                                 </span>
-                                <span className="text-xs font-semibold inline-block py-1 px-2 uppercase text-indigo-600">
+                                <span className="text-xs font-bold inline-block py-1 px-2 uppercase text-indigo-600">
                                     {Math.round(((currentStep - 1) / totalSteps) * 100)}% Completed
                                 </span>
                             </div>
-                            <div className="flex w-full h-2 bg-gray-200 rounded-full overflow-hidden">
+                            <div className="flex w-full h-2.5 bg-gray-100 rounded-full overflow-hidden shadow-inner">
                                 <div
                                     className="flex flex-col justify-center overflow-hidden bg-indigo-500 text-xs text-white text-center whitespace-nowrap transition-all duration-500 ease-out"
                                     style={{ width: `${(currentStep / totalSteps) * 100}%` }}
@@ -2117,53 +2117,65 @@ export default function AparForm() {
                                     <div 
                                         key={step} 
                                         onClick={() => setCurrentStep(step)}
-                                        className={`flex flex-col items-center cursor-pointer hover:opacity-80 transition-opacity ${step <= currentStep ? 'text-indigo-600' : 'text-gray-400'}`}
+                                        className={`flex flex-col items-center cursor-pointer hover:-translate-y-1 transition-all duration-300 ${step <= currentStep ? 'text-indigo-600' : 'text-gray-400'}`}
                                     >
-                                        <div className={`rounded-full h-8 w-8 flex items-center justify-center border-2 ${step <= currentStep ? 'border-indigo-600 bg-indigo-50' : 'border-gray-200'}`}>
-                                            {step < currentStep ? <FiCheck /> : step}
+                                        <div className={`rounded-full h-10 w-10 flex items-center justify-center border-2 transition-all duration-300 shadow-sm ${step === currentStep ? 'border-indigo-600 bg-indigo-600 text-white ring-4 ring-indigo-100' : step < currentStep ? 'border-indigo-600 bg-indigo-50 text-indigo-600' : 'border-gray-200 bg-white'}`}>
+                                            {step < currentStep ? <FiCheck size={20} /> : <span className="font-semibold">{step}</span>}
                                         </div>
-                                        <div className="text-xs mt-1 text-center font-medium">{getStepTitle(step)}</div>
+                                        <div className={`text-xs mt-2 text-center font-semibold ${step === currentStep ? 'text-indigo-700' : ''}`}>{getStepTitle(step)}</div>
                                     </div>
                                 ))}
                             </div>
                         </div>
 
                         <form className="space-y-8" onSubmit={(e) => e.preventDefault()}>
-                            <div id="apar-step-1" className={currentStep === 1 ? 'block' : 'hidden print:block'}>
-                                <div className="shadow-lg">
-                                    <div>
-                                        <button onClick={() => setPersonalOpen(p => !p)} className="text-sm text-indigo-600 mb-3">{personalOpen ? 'Hide' : 'Show'} Personal Data</button>
-                                        {personalOpen && <PartIPersonal personal={formData.personal} onChange={handlePersonalChange} readOnly={isReadOnlyMode()} departments={departments} qualifications={formData.profileQualifications} />}
+                            <div id="apar-step-1" className={currentStep === 1 ? 'block animate-fade-in' : 'hidden print:block'}>
+                                <div className="shadow-xl rounded-2xl overflow-hidden bg-white">
+                                    <div className="px-6 pt-4">
+                                        <button onClick={() => setPersonalOpen(p => !p)} className="text-sm font-semibold text-indigo-600 hover:text-indigo-800 transition-colors mb-3 flex items-center">
+                                            {personalOpen ? 'Hide' : 'Show'} Personal Data
+                                        </button>
                                     </div>
+                                    {personalOpen && <div className="border-t border-gray-100"><PartIPersonal personal={formData.personal} onChange={handlePersonalChange} readOnly={isReadOnlyMode()} departments={departments} qualifications={formData.profileQualifications} /></div>}
                                 </div>
                             </div>
 
-                            <div id="apar-step-2" className={currentStep === 2 ? 'block' : 'hidden print:block'}>
-                                <PartII formData={formData} addItem={addItem} removeItem={requestDelete} updateArrayField={updateArrayField} updateArrayItem={updateArrayItem} updateAssessment={updateAssessment} updateField={updateField} readOnly={isReadOnlyMode()} />
+                            <div id="apar-step-2" className={currentStep === 2 ? 'block animate-fade-in' : 'hidden print:block'}>
+                                <div className="shadow-xl rounded-2xl overflow-hidden bg-white">
+                                    <PartII formData={formData} addItem={addItem} removeItem={requestDelete} updateArrayField={updateArrayField} updateArrayItem={updateArrayItem} updateAssessment={updateAssessment} updateField={updateField} readOnly={isReadOnlyMode()} />
+                                </div>
                             </div>
 
-                            <div id="apar-step-3" className={currentStep === 3 ? 'block' : 'hidden print:block'}>
-                                <PartIII formData={formData} academicYear={activeAparAcademicYear} addItem={addItem} removeItem={requestDelete} updateArrayField={updateArrayField} updateArrayItem={updateArrayItem} updateField={updateField} readOnly={isReadOnlyMode()} onSaveMonthly={handleSaveMonthly} />
+                            <div id="apar-step-3" className={currentStep === 3 ? 'block animate-fade-in' : 'hidden print:block'}>
+                                <div className="shadow-xl rounded-2xl overflow-hidden bg-white">
+                                    <PartIII formData={formData} academicYear={activeAparAcademicYear} addItem={addItem} removeItem={requestDelete} updateArrayField={updateArrayField} updateArrayItem={updateArrayItem} updateField={updateField} readOnly={isReadOnlyMode()} onSaveMonthly={handleSaveMonthly} />
+                                </div>
                             </div>
 
-                            <div id="apar-step-4" className={currentStep === 4 ? 'block' : 'hidden print:block'}>
-                                <PartIV formData={formData} addItem={addItem} removeItem={requestDelete} updateArrayField={updateArrayField} updateArrayItem={updateArrayItem} updateField={updateField} readOnly={isReadOnlyMode()} />
+                            <div id="apar-step-4" className={currentStep === 4 ? 'block animate-fade-in' : 'hidden print:block'}>
+                                <div className="shadow-xl rounded-2xl overflow-hidden bg-white">
+                                    <PartIV formData={formData} addItem={addItem} removeItem={requestDelete} updateArrayField={updateArrayField} updateArrayItem={updateArrayItem} updateField={updateField} readOnly={isReadOnlyMode()} />
+                                </div>
                             </div>
 
                             {(activeRole === 'Reporting Officer' || activeRole === 'Reviewing Officer') && (
-                                <div id="apar-step-5" className={currentStep === 5 ? 'block' : 'hidden print:block'}>
-                                    <PartV formData={formData} updateAssessment={updateAssessment} activeRole={activeRole} formStatus={formStatus} />
+                                <div id="apar-step-5" className={currentStep === 5 ? 'block animate-fade-in' : 'hidden print:block'}>
+                                    <div className="shadow-xl rounded-2xl overflow-hidden bg-white">
+                                        <PartV formData={formData} updateAssessment={updateAssessment} activeRole={activeRole} formStatus={formStatus} />
+                                    </div>
                                 </div>
                             )}
 
                             {activeRole === 'Reviewing Officer' && (
-                                <div id="apar-step-6" className={currentStep === 6 ? 'block' : 'hidden print:block'}>
-                                    <PartVIRemarks formData={formData} updateRemarks={updateRemarks} formStatus={formStatus} />
+                                <div id="apar-step-6" className={currentStep === 6 ? 'block animate-fade-in' : 'hidden print:block'}>
+                                    <div className="shadow-xl rounded-2xl overflow-hidden bg-white">
+                                        <PartVIRemarks formData={formData} updateRemarks={updateRemarks} formStatus={formStatus} />
+                                    </div>
                                 </div>
                             )}
 
-                            <div id={`apar-step-${totalSteps}`} className={currentStep === totalSteps ? 'block' : 'hidden print:block'}>
-                                <div className="bg-white border border-gray-200 rounded-xl p-8 shadow-sm">
+                            <div id={`apar-step-${totalSteps}`} className={currentStep === totalSteps ? 'block animate-fade-in' : 'hidden print:block'}>
+                                <div className="shadow-xl rounded-2xl overflow-hidden bg-white p-8">
                                     <h3 className="text-xl font-bold text-gray-800 mb-6 border-b border-gray-100 pb-4">One Final Check</h3>
                                     <p className="text-sm text-gray-600 mb-6">
                                         {activeRole === 'Reporting Officer' || activeRole === 'Reviewing Officer'

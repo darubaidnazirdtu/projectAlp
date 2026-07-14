@@ -131,8 +131,13 @@ export default function PartIPersonal({ personal, onChange, readOnly, department
   };
 
   return (
-    <div className="bg-white border border-gray-200 rounded-xl p-8 shadow-sm">
-      <h3 className="text-xl font-bold text-gray-800 mb-6 border-b border-gray-100 pb-4">PART I - PERSONAL DATA</h3>
+    <div className="p-2 space-y-6">
+      <h3 className="text-xl font-bold text-gray-800 mb-6 border-b border-gray-100 pb-4 flex items-center">
+          <span className="bg-indigo-100 text-indigo-700 p-2 rounded-lg mr-3">
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path></svg>
+          </span>
+          PART I - PERSONAL DATA
+      </h3>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <div>

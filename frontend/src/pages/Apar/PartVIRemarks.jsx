@@ -5,9 +5,14 @@ export default function PartVI_Remarks({ formData, updateRemarks, formStatus }) 
     const requiredProps = !isDisabled ? { required: true, 'aria-required': 'true' } : {};
 
     return (
-        <div className="bg-white border border-gray-200 rounded-xl p-8 shadow-sm space-y-8">
+        <div className="p-2 space-y-8">
             <div className="border-b border-gray-100 pb-4">
-                <h3 className="text-xl font-bold text-gray-800">Part VII – REMARKS OF THE REVIEWING OFFICER</h3>
+                <h3 className="text-xl font-bold text-gray-800 flex items-center">
+                    <span className="bg-indigo-100 text-indigo-700 p-2 rounded-lg mr-3">
+                        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path></svg>
+                    </span>
+                    Part VII – REMARKS OF THE REVIEWING OFFICER
+                </h3>
             </div>
 
             <fieldset disabled={isDisabled}>

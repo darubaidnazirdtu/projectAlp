@@ -19,10 +19,15 @@ export default function PartVAssessment({ formData, updateAssessment, activeRole
   };
 
   return (
-    <div className="bg-white border border-gray-200 rounded-xl p-8 shadow-sm space-y-8">
+    <div className="p-2 space-y-8">
       <div className="border-b border-gray-100 pb-4">
-        <h3 className="text-xl font-bold text-gray-800">Part V – NUMERICAL ASSESSMENT ({activeRole === 'Reviewing Officer' ? 'review' : 'fill'})</h3>
-        <p className="text-sm text-gray-500 mt-1">Numerical grading is to be awarded on a scale of 1-10 (1: Lowest, 10: Highest).</p>
+        <h3 className="text-xl font-bold text-gray-800 flex items-center">
+          <span className="bg-indigo-100 text-indigo-700 p-2 rounded-lg mr-3">
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path></svg>
+          </span>
+          Part V – NUMERICAL ASSESSMENT ({activeRole === 'Reviewing Officer' ? 'review' : 'fill'})
+        </h3>
+        <p className="text-sm text-gray-500 mt-2">Numerical grading is to be awarded on a scale of 1-10 (1: Lowest, 10: Highest).</p>
       </div>
 
       <fieldset disabled={isDisabled}>

@@ -910,15 +910,19 @@ export default function PartII({ formData, addItem, removeItem, updateArrayField
 
     return (
         <div
-            className="bg-white border border-gray-200 rounded-xl p-8 shadow-sm"
+            className="p-2 space-y-6"
             onInputCapture={handleNumberInputCapture}
             onKeyDownCapture={handleNumberKeyDownCapture}
             onPasteCapture={handleNumberPasteCapture}
         >
-            
             {/* Header & Score Badge */}
             <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 border-b border-gray-100 pb-4">
-                <h3 className="text-xl font-bold text-gray-800">Part II - SELF APPRAISAL (Teaching)</h3>
+                <h3 className="text-xl font-bold text-gray-800 flex items-center">
+                    <span className="bg-indigo-100 text-indigo-700 p-2 rounded-lg mr-3">
+                        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path></svg>
+                    </span>
+                    Part II - SELF APPRAISAL (Teaching)
+                </h3>
             </div>
 
             <div className="space-y-6">
@@ -1059,77 +1063,77 @@ export default function PartII({ formData, addItem, removeItem, updateArrayField
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-3">
                                     <div>
                                         <label htmlFor="course-name-temp" className="block text-sm font-medium text-gray-700 mb-1">Name of the course <span className="text-red-500">*</span></label>
-                                        <input id="course-name-temp" type="text" required disabled={readOnly} value={tempCourse.name_of_course || ''} onChange={(e) => setTempCourse(prev => ({ ...prev, name_of_course: e.target.value }))} className="w-full border border-gray-300 rounded-lg shadow-sm focus:ring-indigo-500 focus:border-indigo-500 px-4 py-2.5 bg-white" />
+                                        <input id="course-name-temp" type="text" required disabled={readOnly} value={tempCourse.name_of_course || ''} onChange={(e) => setTempCourse(prev => ({ ...prev, name_of_course: e.target.value }))} className="w-full bg-gray-50 border border-gray-200 text-gray-900 rounded-lg shadow-sm focus:ring-2 focus:ring-indigo-500/30 focus:border-indigo-500 hover:border-indigo-300 transition-all duration-200 px-4 py-2.5" />
                                     </div>
                                     <div>
                                         <label htmlFor="course-code-temp" className="block text-sm font-medium text-gray-700 mb-1">Course Code <span className="text-red-500">*</span></label>
-                                        <input id="course-code-temp" type="text" required disabled={readOnly} value={tempCourse.course_code || ''} onChange={(e) => setTempCourse(prev => ({ ...prev, course_code: e.target.value }))} className="w-full border border-gray-300 rounded-lg shadow-sm focus:ring-indigo-500 focus:border-indigo-500 px-4 py-2.5 bg-white" />
+                                        <input id="course-code-temp" type="text" required disabled={readOnly} value={tempCourse.course_code || ''} onChange={(e) => setTempCourse(prev => ({ ...prev, course_code: e.target.value }))} className="w-full bg-gray-50 border border-gray-200 text-gray-900 rounded-lg shadow-sm focus:ring-2 focus:ring-indigo-500/30 focus:border-indigo-500 hover:border-indigo-300 transition-all duration-200 px-4 py-2.5" />
                                     </div>
                                     <div>
                                         <label htmlFor="degree-type-temp" className="block text-sm font-medium text-gray-700 mb-1">Degree type of course <span className="text-red-500">*</span></label>
-                                        <select id="degree-type-temp" required disabled={readOnly} value={tempCourse.degree_type || 'UG'} onChange={(e) => setTempCourse(prev => ({ ...prev, degree_type: e.target.value }))} className="w-full border border-gray-300 rounded-lg shadow-sm focus:ring-indigo-500 focus:border-indigo-500 px-4 py-2.5 bg-white">
+                                        <select id="degree-type-temp" required disabled={readOnly} value={tempCourse.degree_type || 'UG'} onChange={(e) => setTempCourse(prev => ({ ...prev, degree_type: e.target.value }))} className="w-full bg-gray-50 border border-gray-200 text-gray-900 rounded-lg shadow-sm focus:ring-2 focus:ring-indigo-500/30 focus:border-indigo-500 hover:border-indigo-300 transition-all duration-200 px-4 py-2.5">
                                             <option>UG</option>
                                             <option>PG</option>
                                         </select>
                                     </div>
                                     <div>
                                         <label htmlFor="semester-temp" className="block text-sm font-medium text-gray-700 mb-1">Semester <span className="text-red-500">*</span></label>
-                                        <select id="semester-temp" required disabled={readOnly} value={tempCourse.semester || 'Odd'} onChange={(e) => setTempCourse(prev => ({ ...prev, semester: e.target.value }))} className="w-full border border-gray-300 rounded-lg shadow-sm focus:ring-indigo-500 focus:border-indigo-500 px-4 py-2.5 bg-white">
+                                        <select id="semester-temp" required disabled={readOnly} value={tempCourse.semester || 'Odd'} onChange={(e) => setTempCourse(prev => ({ ...prev, semester: e.target.value }))} className="w-full bg-gray-50 border border-gray-200 text-gray-900 rounded-lg shadow-sm focus:ring-2 focus:ring-indigo-500/30 focus:border-indigo-500 hover:border-indigo-300 transition-all duration-200 px-4 py-2.5">
                                             <option value="Odd">Odd Semester</option>
                                             <option value="Even">Even Semester</option>
                                         </select>
                                     </div>
                                     <div>
                                         <label htmlFor="course-type-temp" className="block text-sm font-medium text-gray-700 mb-1">Course Type <span className="text-red-500">*</span></label>
-                                        <select id="course-type-temp" required disabled={readOnly} value={tempCourse.course_type || 'Theory'} onChange={(e) => setTempCourse(prev => ({ ...prev, course_type: e.target.value }))} className="w-full border border-gray-300 rounded-lg shadow-sm focus:ring-indigo-500 focus:border-indigo-500 px-4 py-2.5 bg-white">
+                                        <select id="course-type-temp" required disabled={readOnly} value={tempCourse.course_type || 'Theory'} onChange={(e) => setTempCourse(prev => ({ ...prev, course_type: e.target.value }))} className="w-full bg-gray-50 border border-gray-200 text-gray-900 rounded-lg shadow-sm focus:ring-2 focus:ring-indigo-500/30 focus:border-indigo-500 hover:border-indigo-300 transition-all duration-200 px-4 py-2.5">
                                             <option value="Theory">Theory</option>
                                             <option value="Practical">Practical</option>
                                         </select>
                                     </div>
                                     <div>
                                         <label htmlFor="lectures-sch-temp" className="block text-sm font-medium text-gray-700 mb-1">Total lectures Scheduled <span className="text-red-500">*</span></label>
-                                        <input id="lectures-sch-temp" type="number" min="0" required disabled={readOnly} value={tempCourse.total_lectures_scheduled || ''} onChange={(e) => setTempCourse(prev => ({ ...prev, total_lectures_scheduled: e.target.value, extra_lectures_engaged: (Number(e.target.value) === Number(prev.total_lectures_engaged) ? prev.extra_lectures_engaged : '') }))} className="w-full border border-gray-300 rounded-lg shadow-sm focus:ring-indigo-500 focus:border-indigo-500 px-4 py-2.5 bg-white" />
+                                        <input id="lectures-sch-temp" type="number" min="0" required disabled={readOnly} value={tempCourse.total_lectures_scheduled || ''} onChange={(e) => setTempCourse(prev => ({ ...prev, total_lectures_scheduled: e.target.value, extra_lectures_engaged: (Number(e.target.value) === Number(prev.total_lectures_engaged) ? prev.extra_lectures_engaged : '') }))} className="w-full bg-gray-50 border border-gray-200 text-gray-900 rounded-lg shadow-sm focus:ring-2 focus:ring-indigo-500/30 focus:border-indigo-500 hover:border-indigo-300 transition-all duration-200 px-4 py-2.5" />
                                     </div>
                                     <div>
                                         <label htmlFor="lectures-eng-temp" className="block text-sm font-medium text-gray-700 mb-1">Total lectures engaged <span className="text-red-500">*</span></label>
-                                        <input id="lectures-eng-temp" type="number" min="0" max={tempCourse.total_lectures_scheduled || ''} required disabled={readOnly} value={tempCourse.total_lectures_engaged || ''} onChange={(e) => setTempCourse(prev => ({ ...prev, total_lectures_engaged: e.target.value, extra_lectures_engaged: (Number(e.target.value) === Number(prev.total_lectures_scheduled) ? prev.extra_lectures_engaged : '') }))} onBlur={() => handleEngagedBlurTemp(courseEngagementLimits[0])} className="w-full border border-gray-300 rounded-lg shadow-sm focus:ring-indigo-500 focus:border-indigo-500 px-4 py-2.5 bg-white" />
+                                        <input id="lectures-eng-temp" type="number" min="0" max={tempCourse.total_lectures_scheduled || ''} required disabled={readOnly} value={tempCourse.total_lectures_engaged || ''} onChange={(e) => setTempCourse(prev => ({ ...prev, total_lectures_engaged: e.target.value, extra_lectures_engaged: (Number(e.target.value) === Number(prev.total_lectures_scheduled) ? prev.extra_lectures_engaged : '') }))} onBlur={() => handleEngagedBlurTemp(courseEngagementLimits[0])} className="w-full bg-gray-50 border border-gray-200 text-gray-900 rounded-lg shadow-sm focus:ring-2 focus:ring-indigo-500/30 focus:border-indigo-500 hover:border-indigo-300 transition-all duration-200 px-4 py-2.5" />
                                     </div>
                                     <div>
                                         <label htmlFor="extra-lectures-eng-temp" className="block text-sm font-medium text-gray-700 mb-1">Extra lectures engaged (Optional)</label>
-                                        <input id="extra-lectures-eng-temp" type="number" min="0" disabled={readOnly || !tempCourse.total_lectures_scheduled || !tempCourse.total_lectures_engaged || Number(tempCourse.total_lectures_scheduled) !== Number(tempCourse.total_lectures_engaged)} value={tempCourse.extra_lectures_engaged || ''} onChange={(e) => setTempCourse(prev => ({ ...prev, extra_lectures_engaged: e.target.value }))} className="w-full border border-gray-300 rounded-lg shadow-sm focus:ring-indigo-500 focus:border-indigo-500 px-4 py-2.5 bg-white disabled:bg-gray-100 disabled:text-gray-500" />
+                                        <input id="extra-lectures-eng-temp" type="number" min="0" disabled={readOnly || !tempCourse.total_lectures_scheduled || !tempCourse.total_lectures_engaged || Number(tempCourse.total_lectures_scheduled) !== Number(tempCourse.total_lectures_engaged)} value={tempCourse.extra_lectures_engaged || ''} onChange={(e) => setTempCourse(prev => ({ ...prev, extra_lectures_engaged: e.target.value }))} className="w-full bg-gray-50 border border-gray-200 text-gray-900 rounded-lg shadow-sm focus:ring-2 focus:ring-indigo-500/30 focus:border-indigo-500 hover:border-indigo-300 transition-all duration-200 px-4 py-2.5 disabled:bg-gray-100 disabled:text-gray-500" />
                                     </div>
                                     
                                     <div>
                                         <label htmlFor="tut-sch-temp" className="block text-sm font-medium text-gray-700 mb-1">Tutorials Scheduled <span className="text-red-500">*</span></label>
-                                        <input id="tut-sch-temp" type="number" min="0" required disabled={readOnly} value={tempCourse.tutorials_scheduled || ''} onChange={(e) => setTempCourse(prev => ({ ...prev, tutorials_scheduled: e.target.value, extra_tutorials_engaged: (Number(e.target.value) === Number(prev.tutorials_engaged) ? prev.extra_tutorials_engaged : '') }))} className="w-full border border-gray-300 rounded-lg shadow-sm focus:ring-indigo-500 focus:border-indigo-500 px-4 py-2.5 bg-white" />
+                                        <input id="tut-sch-temp" type="number" min="0" required disabled={readOnly} value={tempCourse.tutorials_scheduled || ''} onChange={(e) => setTempCourse(prev => ({ ...prev, tutorials_scheduled: e.target.value, extra_tutorials_engaged: (Number(e.target.value) === Number(prev.tutorials_engaged) ? prev.extra_tutorials_engaged : '') }))} className="w-full bg-gray-50 border border-gray-200 text-gray-900 rounded-lg shadow-sm focus:ring-2 focus:ring-indigo-500/30 focus:border-indigo-500 hover:border-indigo-300 transition-all duration-200 px-4 py-2.5" />
                                     </div>
                                     <div>
                                         <label htmlFor="tut-eng-temp" className="block text-sm font-medium text-gray-700 mb-1">Tutorials engaged <span className="text-red-500">*</span></label>
-                                        <input id="tut-eng-temp" type="number" min="0" max={tempCourse.tutorials_scheduled || ''} required disabled={readOnly} value={tempCourse.tutorials_engaged || ''} onChange={(e) => setTempCourse(prev => ({ ...prev, tutorials_engaged: e.target.value, extra_tutorials_engaged: (Number(e.target.value) === Number(prev.tutorials_scheduled) ? prev.extra_tutorials_engaged : '') }))} onBlur={() => handleEngagedBlurTemp(courseEngagementLimits[1])} className="w-full border border-gray-300 rounded-lg shadow-sm focus:ring-indigo-500 focus:border-indigo-500 px-4 py-2.5 bg-white" />
+                                        <input id="tut-eng-temp" type="number" min="0" max={tempCourse.tutorials_scheduled || ''} required disabled={readOnly} value={tempCourse.tutorials_engaged || ''} onChange={(e) => setTempCourse(prev => ({ ...prev, tutorials_engaged: e.target.value, extra_tutorials_engaged: (Number(e.target.value) === Number(prev.tutorials_scheduled) ? prev.extra_tutorials_engaged : '') }))} onBlur={() => handleEngagedBlurTemp(courseEngagementLimits[1])} className="w-full bg-gray-50 border border-gray-200 text-gray-900 rounded-lg shadow-sm focus:ring-2 focus:ring-indigo-500/30 focus:border-indigo-500 hover:border-indigo-300 transition-all duration-200 px-4 py-2.5" />
                                     </div>
                                     <div>
                                         <label htmlFor="extra-tut-eng-temp" className="block text-sm font-medium text-gray-700 mb-1">Extra tutorials engaged (Optional)</label>
-                                        <input id="extra-tut-eng-temp" type="number" min="0" disabled={readOnly || !tempCourse.tutorials_scheduled || !tempCourse.tutorials_engaged || Number(tempCourse.tutorials_scheduled) !== Number(tempCourse.tutorials_engaged)} value={tempCourse.extra_tutorials_engaged || ''} onChange={(e) => setTempCourse(prev => ({ ...prev, extra_tutorials_engaged: e.target.value }))} className="w-full border border-gray-300 rounded-lg shadow-sm focus:ring-indigo-500 focus:border-indigo-500 px-4 py-2.5 bg-white disabled:bg-gray-100 disabled:text-gray-500" />
+                                        <input id="extra-tut-eng-temp" type="number" min="0" disabled={readOnly || !tempCourse.tutorials_scheduled || !tempCourse.tutorials_engaged || Number(tempCourse.tutorials_scheduled) !== Number(tempCourse.tutorials_engaged)} value={tempCourse.extra_tutorials_engaged || ''} onChange={(e) => setTempCourse(prev => ({ ...prev, extra_tutorials_engaged: e.target.value }))} className="w-full bg-gray-50 border border-gray-200 text-gray-900 rounded-lg shadow-sm focus:ring-2 focus:ring-indigo-500/30 focus:border-indigo-500 hover:border-indigo-300 transition-all duration-200 px-4 py-2.5 disabled:bg-gray-100 disabled:text-gray-500" />
                                     </div>
 
                                     <div>
                                         <label htmlFor="labs-sch-temp" className="block text-sm font-medium text-gray-700 mb-1">Labs Scheduled <span className="text-red-500">*</span></label>
-                                        <input id="labs-sch-temp" type="number" min="0" required disabled={readOnly} value={tempCourse.labs_scheduled || ''} onChange={(e) => setTempCourse(prev => ({ ...prev, labs_scheduled: e.target.value, extra_labs_engaged: (Number(e.target.value) === Number(prev.labs_engaged) ? prev.extra_labs_engaged : '') }))} className="w-full border border-gray-300 rounded-lg shadow-sm focus:ring-indigo-500 focus:border-indigo-500 px-4 py-2.5 bg-white" />
+                                        <input id="labs-sch-temp" type="number" min="0" required disabled={readOnly} value={tempCourse.labs_scheduled || ''} onChange={(e) => setTempCourse(prev => ({ ...prev, labs_scheduled: e.target.value, extra_labs_engaged: (Number(e.target.value) === Number(prev.labs_engaged) ? prev.extra_labs_engaged : '') }))} className="w-full bg-gray-50 border border-gray-200 text-gray-900 rounded-lg shadow-sm focus:ring-2 focus:ring-indigo-500/30 focus:border-indigo-500 hover:border-indigo-300 transition-all duration-200 px-4 py-2.5" />
                                     </div>
                                     <div>
                                         <label htmlFor="labs-eng-temp" className="block text-sm font-medium text-gray-700 mb-1">Labs engaged <span className="text-red-500">*</span></label>
-                                        <input id="labs-eng-temp" type="number" min="0" max={tempCourse.labs_scheduled || ''} required disabled={readOnly} value={tempCourse.labs_engaged || ''} onChange={(e) => setTempCourse(prev => ({ ...prev, labs_engaged: e.target.value, extra_labs_engaged: (Number(e.target.value) === Number(prev.labs_scheduled) ? prev.extra_labs_engaged : '') }))} onBlur={() => handleEngagedBlurTemp(courseEngagementLimits[2])} className="w-full border border-gray-300 rounded-lg shadow-sm focus:ring-indigo-500 focus:border-indigo-500 px-4 py-2.5 bg-white" />
+                                        <input id="labs-eng-temp" type="number" min="0" max={tempCourse.labs_scheduled || ''} required disabled={readOnly} value={tempCourse.labs_engaged || ''} onChange={(e) => setTempCourse(prev => ({ ...prev, labs_engaged: e.target.value, extra_labs_engaged: (Number(e.target.value) === Number(prev.labs_scheduled) ? prev.extra_labs_engaged : '') }))} onBlur={() => handleEngagedBlurTemp(courseEngagementLimits[2])} className="w-full bg-gray-50 border border-gray-200 text-gray-900 rounded-lg shadow-sm focus:ring-2 focus:ring-indigo-500/30 focus:border-indigo-500 hover:border-indigo-300 transition-all duration-200 px-4 py-2.5" />
                                     </div>
                                     <div>
                                         <label htmlFor="extra-labs-eng-temp" className="block text-sm font-medium text-gray-700 mb-1">Extra labs engaged (Optional)</label>
-                                        <input id="extra-labs-eng-temp" type="number" min="0" disabled={readOnly || !tempCourse.labs_scheduled || !tempCourse.labs_engaged || Number(tempCourse.labs_scheduled) !== Number(tempCourse.labs_engaged)} value={tempCourse.extra_labs_engaged || ''} onChange={(e) => setTempCourse(prev => ({ ...prev, extra_labs_engaged: e.target.value }))} className="w-full border border-gray-300 rounded-lg shadow-sm focus:ring-indigo-500 focus:border-indigo-500 px-4 py-2.5 bg-white disabled:bg-gray-100 disabled:text-gray-500" />
+                                        <input id="extra-labs-eng-temp" type="number" min="0" disabled={readOnly || !tempCourse.labs_scheduled || !tempCourse.labs_engaged || Number(tempCourse.labs_scheduled) !== Number(tempCourse.labs_engaged)} value={tempCourse.extra_labs_engaged || ''} onChange={(e) => setTempCourse(prev => ({ ...prev, extra_labs_engaged: e.target.value }))} className="w-full bg-gray-50 border border-gray-200 text-gray-900 rounded-lg shadow-sm focus:ring-2 focus:ring-indigo-500/30 focus:border-indigo-500 hover:border-indigo-300 transition-all duration-200 px-4 py-2.5 disabled:bg-gray-100 disabled:text-gray-500" />
                                     </div>
                                 </div>
                                 
                                 {hasEngagedLessThanScheduled(tempCourse) && (
                                     <div className="mb-4 p-3 bg-red-50 border border-red-100 rounded-lg">
                                         <label htmlFor="reasons-temp" className="block text-sm font-medium text-red-800 mb-1">Reasons for not engaging all scheduled classes<span className="text-red-500">*</span></label>
-                                        <textarea id="reasons-temp" rows="2" required disabled={readOnly} value={tempCourse.reasons_not_engaged || ''} onChange={(e) => setTempCourse(prev => ({ ...prev, reasons_not_engaged: e.target.value }))} className="w-full border border-red-300 rounded-lg shadow-sm focus:ring-red-500 focus:border-red-500 p-3 bg-white"></textarea>
+                                        <textarea id="reasons-temp" rows="2" required disabled={readOnly} value={tempCourse.reasons_not_engaged || ''} onChange={(e) => setTempCourse(prev => ({ ...prev, reasons_not_engaged: e.target.value }))} className="w-full bg-white border border-red-300 text-red-900 rounded-lg shadow-sm focus:ring-2 focus:ring-red-500/30 focus:border-red-500 hover:border-red-400 transition-all duration-200 p-3"></textarea>
                                     </div>
                                 )}
 
@@ -1150,11 +1154,11 @@ export default function PartII({ formData, addItem, removeItem, updateArrayField
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <div>
                                 <label className="block text-sm font-medium text-gray-700 mb-1">For odd semester<span className="text-red-500">*</span></label>
-                                <input id="time-table-provided-odd" type="number" min="0" required disabled={readOnly} value={timeTable?.provided?.odd_semester || ''} onChange={(e) => { updateField('teaching', 'time_table', { ...timeTable, provided: { ...timeTable.provided, odd_semester: e.target.value } }); }} className="w-full border border-gray-300 rounded px-3 py-2 disabled:bg-gray-100 disabled:text-gray-500" />
+                                <input id="time-table-provided-odd" type="number" min="0" required disabled={readOnly} value={timeTable?.provided?.odd_semester || ''} onChange={(e) => { updateField('teaching', 'time_table', { ...timeTable, provided: { ...timeTable.provided, odd_semester: e.target.value } }); }} className="w-full bg-gray-50 border border-gray-200 text-gray-900 rounded-lg shadow-sm focus:ring-2 focus:ring-indigo-500/30 focus:border-indigo-500 hover:border-indigo-300 transition-all duration-200 px-4 py-2.5 disabled:bg-gray-100 disabled:text-gray-500" />
                             </div>
                             <div>
                                 <label className="block text-sm font-medium text-gray-700 mb-1">For even semester<span className="text-red-500">*</span></label>
-                                <input id="time-table-provided-even" type="number" min="0" required disabled={readOnly} value={timeTable?.provided?.even_semester || ''} onChange={(e) => { updateField('teaching', 'time_table', { ...timeTable, provided: { ...timeTable.provided, even_semester: e.target.value } }); }} className="w-full border border-gray-300 rounded px-3 py-2 disabled:bg-gray-100 disabled:text-gray-500" />
+                                <input id="time-table-provided-even" type="number" min="0" required disabled={readOnly} value={timeTable?.provided?.even_semester || ''} onChange={(e) => { updateField('teaching', 'time_table', { ...timeTable, provided: { ...timeTable.provided, even_semester: e.target.value } }); }} className="w-full bg-gray-50 border border-gray-200 text-gray-900 rounded-lg shadow-sm focus:ring-2 focus:ring-indigo-500/30 focus:border-indigo-500 hover:border-indigo-300 transition-all duration-200 px-4 py-2.5 disabled:bg-gray-100 disabled:text-gray-500" />
                             </div>
                         </div>
 
@@ -1162,11 +1166,11 @@ export default function PartII({ formData, addItem, removeItem, updateArrayField
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <div>
                                 <label className="block text-sm font-medium text-gray-700 mb-1">For odd semester<span className="text-red-500">*</span></label>
-                                <input id="time-table-actual-odd" type="number" min="0" max={timeTable?.provided?.odd_semester || ''} required disabled={readOnly} value={timeTable?.actual?.odd_semester || ''} onChange={(e) => { updateField('teaching', 'time_table', { ...timeTable, actual: { ...timeTable.actual, odd_semester: e.target.value } }); }} onBlur={() => validateTimeTableHours('odd_semester')} className="w-full border border-gray-300 rounded px-3 py-2 disabled:bg-gray-100 disabled:text-gray-500" />
+                                <input id="time-table-actual-odd" type="number" min="0" max={timeTable?.provided?.odd_semester || ''} required disabled={readOnly} value={timeTable?.actual?.odd_semester || ''} onChange={(e) => { updateField('teaching', 'time_table', { ...timeTable, actual: { ...timeTable.actual, odd_semester: e.target.value } }); }} onBlur={() => validateTimeTableHours('odd_semester')} className="w-full bg-gray-50 border border-gray-200 text-gray-900 rounded-lg shadow-sm focus:ring-2 focus:ring-indigo-500/30 focus:border-indigo-500 hover:border-indigo-300 transition-all duration-200 px-4 py-2.5 disabled:bg-gray-100 disabled:text-gray-500" />
                             </div>
                             <div>
                                 <label className="block text-sm font-medium text-gray-700 mb-1">For even semester<span className="text-red-500">*</span></label>
-                                <input id="time-table-actual-even" type="number" min="0" max={timeTable?.provided?.even_semester || ''} required disabled={readOnly} value={timeTable?.actual?.even_semester || ''} onChange={(e) => { updateField('teaching', 'time_table', { ...timeTable, actual: { ...timeTable.actual, even_semester: e.target.value } }); }} onBlur={() => validateTimeTableHours('even_semester')} className="w-full border border-gray-300 rounded px-3 py-2 disabled:bg-gray-100 disabled:text-gray-500" />
+                                <input id="time-table-actual-even" type="number" min="0" max={timeTable?.provided?.even_semester || ''} required disabled={readOnly} value={timeTable?.actual?.even_semester || ''} onChange={(e) => { updateField('teaching', 'time_table', { ...timeTable, actual: { ...timeTable.actual, even_semester: e.target.value } }); }} onBlur={() => validateTimeTableHours('even_semester')} className="w-full bg-gray-50 border border-gray-200 text-gray-900 rounded-lg shadow-sm focus:ring-2 focus:ring-indigo-500/30 focus:border-indigo-500 hover:border-indigo-300 transition-all duration-200 px-4 py-2.5 disabled:bg-gray-100 disabled:text-gray-500" />
                             </div>
                         </div>
                     </div>
@@ -1180,19 +1184,19 @@ export default function PartII({ formData, addItem, removeItem, updateArrayField
                         <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
                             <div>
                                 <label className="block text-sm text-gray-700 mb-1">Lectures<span className="text-red-500">*</span></label>
-                                <input type="number" min="0" required disabled={readOnly} value={workloadWeek?.odd_semester?.lectures || ''} onChange={(e) => { updateField('teaching', 'workload_week', { ...workloadWeek, odd_semester: { ...workloadWeek.odd_semester, lectures: e.target.value } }); }} className="w-full border border-gray-300 rounded px-3 py-2 disabled:bg-gray-100 disabled:text-gray-500" />
+                                <input type="number" min="0" required disabled={readOnly} value={workloadWeek?.odd_semester?.lectures || ''} onChange={(e) => { updateField('teaching', 'workload_week', { ...workloadWeek, odd_semester: { ...workloadWeek.odd_semester, lectures: e.target.value } }); }} className="w-full bg-gray-50 border border-gray-200 text-gray-900 rounded-lg shadow-sm focus:ring-2 focus:ring-indigo-500/30 focus:border-indigo-500 hover:border-indigo-300 transition-all duration-200 px-4 py-2.5 disabled:bg-gray-100 disabled:text-gray-500" />
                             </div>
                             <div>
                                 <label className="block text-sm text-gray-700 mb-1">Tutorials</label>
-                                <input type="number" min="0" disabled={readOnly} value={workloadWeek?.odd_semester?.tutorials || ''} onChange={(e) => { updateField('teaching', 'workload_week', { ...workloadWeek, odd_semester: { ...workloadWeek.odd_semester, tutorials: e.target.value } }); }} className="w-full border border-gray-300 rounded px-3 py-2 disabled:bg-gray-100 disabled:text-gray-500" />
+                                <input type="number" min="0" disabled={readOnly} value={workloadWeek?.odd_semester?.tutorials || ''} onChange={(e) => { updateField('teaching', 'workload_week', { ...workloadWeek, odd_semester: { ...workloadWeek.odd_semester, tutorials: e.target.value } }); }} className="w-full bg-gray-50 border border-gray-200 text-gray-900 rounded-lg shadow-sm focus:ring-2 focus:ring-indigo-500/30 focus:border-indigo-500 hover:border-indigo-300 transition-all duration-200 px-4 py-2.5 disabled:bg-gray-100 disabled:text-gray-500" />
                             </div>
                             <div>
                                 <label className="block text-sm text-gray-700 mb-1">Practicals</label>
-                                <input type="number" min="0" disabled={readOnly} value={workloadWeek?.odd_semester?.practicals || ''} onChange={(e) => { updateField('teaching', 'workload_week', { ...workloadWeek, odd_semester: { ...workloadWeek.odd_semester, practicals: e.target.value } }); }} className="w-full border border-gray-300 rounded px-3 py-2 disabled:bg-gray-100 disabled:text-gray-500" />
+                                <input type="number" min="0" disabled={readOnly} value={workloadWeek?.odd_semester?.practicals || ''} onChange={(e) => { updateField('teaching', 'workload_week', { ...workloadWeek, odd_semester: { ...workloadWeek.odd_semester, practicals: e.target.value } }); }} className="w-full bg-gray-50 border border-gray-200 text-gray-900 rounded-lg shadow-sm focus:ring-2 focus:ring-indigo-500/30 focus:border-indigo-500 hover:border-indigo-300 transition-all duration-200 px-4 py-2.5 disabled:bg-gray-100 disabled:text-gray-500" />
                             </div>
                             <div>
                                 <label className="block text-sm text-gray-700 mb-1">Seminars</label>
-                                <input type="number" min="0" disabled={readOnly} value={workloadWeek?.odd_semester?.seminars || ''} onChange={(e) => { updateField('teaching', 'workload_week', { ...workloadWeek, odd_semester: { ...workloadWeek.odd_semester, seminars: e.target.value } }); }} className="w-full border border-gray-300 rounded px-3 py-2 disabled:bg-gray-100 disabled:text-gray-500" />
+                                <input type="number" min="0" disabled={readOnly} value={workloadWeek?.odd_semester?.seminars || ''} onChange={(e) => { updateField('teaching', 'workload_week', { ...workloadWeek, odd_semester: { ...workloadWeek.odd_semester, seminars: e.target.value } }); }} className="w-full bg-gray-50 border border-gray-200 text-gray-900 rounded-lg shadow-sm focus:ring-2 focus:ring-indigo-500/30 focus:border-indigo-500 hover:border-indigo-300 transition-all duration-200 px-4 py-2.5 disabled:bg-gray-100 disabled:text-gray-500" />
                             </div>
                         </div>
 
@@ -1200,19 +1204,19 @@ export default function PartII({ formData, addItem, removeItem, updateArrayField
                         <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
                             <div>
                                 <label className="block text-sm text-gray-700 mb-1">Lectures<span className="text-red-500">*</span></label>
-                                <input type="number" min="0" required disabled={readOnly} value={workloadWeek?.even_semester?.lectures || ''} onChange={(e) => { updateField('teaching', 'workload_week', { ...workloadWeek, even_semester: { ...workloadWeek.even_semester, lectures: e.target.value } }); }} className="w-full border border-gray-300 rounded px-3 py-2 disabled:bg-gray-100 disabled:text-gray-500" />
+                                <input type="number" min="0" required disabled={readOnly} value={workloadWeek?.even_semester?.lectures || ''} onChange={(e) => { updateField('teaching', 'workload_week', { ...workloadWeek, even_semester: { ...workloadWeek.even_semester, lectures: e.target.value } }); }} className="w-full bg-gray-50 border border-gray-200 text-gray-900 rounded-lg shadow-sm focus:ring-2 focus:ring-indigo-500/30 focus:border-indigo-500 hover:border-indigo-300 transition-all duration-200 px-4 py-2.5 disabled:bg-gray-100 disabled:text-gray-500" />
                             </div>
                             <div>
                                 <label className="block text-sm text-gray-700 mb-1">Tutorials</label>
-                                <input type="number" min="0" disabled={readOnly} value={workloadWeek?.even_semester?.tutorials || ''} onChange={(e) => { updateField('teaching', 'workload_week', { ...workloadWeek, even_semester: { ...workloadWeek.even_semester, tutorials: e.target.value } }); }} className="w-full border border-gray-300 rounded px-3 py-2 disabled:bg-gray-100 disabled:text-gray-500" />
+                                <input type="number" min="0" disabled={readOnly} value={workloadWeek?.even_semester?.tutorials || ''} onChange={(e) => { updateField('teaching', 'workload_week', { ...workloadWeek, even_semester: { ...workloadWeek.even_semester, tutorials: e.target.value } }); }} className="w-full bg-gray-50 border border-gray-200 text-gray-900 rounded-lg shadow-sm focus:ring-2 focus:ring-indigo-500/30 focus:border-indigo-500 hover:border-indigo-300 transition-all duration-200 px-4 py-2.5 disabled:bg-gray-100 disabled:text-gray-500" />
                             </div>
                             <div>
                                 <label className="block text-sm text-gray-700 mb-1">Practicals</label>
-                                <input type="number" min="0" disabled={readOnly} value={workloadWeek?.even_semester?.practicals || ''} onChange={(e) => { updateField('teaching', 'workload_week', { ...workloadWeek, even_semester: { ...workloadWeek.even_semester, practicals: e.target.value } }); }} className="w-full border border-gray-300 rounded px-3 py-2 disabled:bg-gray-100 disabled:text-gray-500" />
+                                <input type="number" min="0" disabled={readOnly} value={workloadWeek?.even_semester?.practicals || ''} onChange={(e) => { updateField('teaching', 'workload_week', { ...workloadWeek, even_semester: { ...workloadWeek.even_semester, practicals: e.target.value } }); }} className="w-full bg-gray-50 border border-gray-200 text-gray-900 rounded-lg shadow-sm focus:ring-2 focus:ring-indigo-500/30 focus:border-indigo-500 hover:border-indigo-300 transition-all duration-200 px-4 py-2.5 disabled:bg-gray-100 disabled:text-gray-500" />
                             </div>
                             <div>
                                 <label className="block text-sm text-gray-700 mb-1">Seminars</label>
-                                <input type="number" min="0" disabled={readOnly} value={workloadWeek?.even_semester?.seminars || ''} onChange={(e) => { updateField('teaching', 'workload_week', { ...workloadWeek, even_semester: { ...workloadWeek.even_semester, seminars: e.target.value } }); }} className="w-full border border-gray-300 rounded px-3 py-2 disabled:bg-gray-100 disabled:text-gray-500" />
+                                <input type="number" min="0" disabled={readOnly} value={workloadWeek?.even_semester?.seminars || ''} onChange={(e) => { updateField('teaching', 'workload_week', { ...workloadWeek, even_semester: { ...workloadWeek.even_semester, seminars: e.target.value } }); }} className="w-full bg-gray-50 border border-gray-200 text-gray-900 rounded-lg shadow-sm focus:ring-2 focus:ring-indigo-500/30 focus:border-indigo-500 hover:border-indigo-300 transition-all duration-200 px-4 py-2.5 disabled:bg-gray-100 disabled:text-gray-500" />
                             </div>
                         </div>
                     </div>
@@ -1273,11 +1277,11 @@ export default function PartII({ formData, addItem, removeItem, updateArrayField
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
                             <div>
                                 <label className="block text-sm text-gray-700 mb-1">Number of tests held</label>
-                                <input type="number" min="0" disabled={readOnly} value={tutorialsTests?.ug_odd?.number_of_tests || ''} onChange={(e) => { updateField('teaching', 'tutorials_tests', { ...tutorialsTests, ug_odd: { ...tutorialsTests.ug_odd, number_of_tests: e.target.value } }); }} className="w-full border border-gray-300 rounded px-3 py-2 disabled:bg-gray-100 disabled:text-gray-500" />
+                                <input type="number" min="0" disabled={readOnly} value={tutorialsTests?.ug_odd?.number_of_tests || ''} onChange={(e) => { updateField('teaching', 'tutorials_tests', { ...tutorialsTests, ug_odd: { ...tutorialsTests.ug_odd, number_of_tests: e.target.value } }); }} className="w-full bg-gray-50 border border-gray-200 text-gray-900 rounded-lg shadow-sm focus:ring-2 focus:ring-indigo-500/30 focus:border-indigo-500 hover:border-indigo-300 transition-all duration-200 px-4 py-2.5 disabled:bg-gray-100 disabled:text-gray-500" />
                             </div>
                             <div>
                                 <label className="block text-sm text-gray-700 mb-1">Assignment Assigned</label>
-                                <input type="number" min="0" disabled={readOnly} value={tutorialsTests?.ug_odd?.assignment_checked || ''} onChange={(e) => { updateField('teaching', 'tutorials_tests', { ...tutorialsTests, ug_odd: { ...tutorialsTests.ug_odd, assignment_checked: e.target.value } }); }} className="w-full border border-gray-300 rounded px-3 py-2 disabled:bg-gray-100 disabled:text-gray-500" />
+                                <input type="number" min="0" disabled={readOnly} value={tutorialsTests?.ug_odd?.assignment_checked || ''} onChange={(e) => { updateField('teaching', 'tutorials_tests', { ...tutorialsTests, ug_odd: { ...tutorialsTests.ug_odd, assignment_checked: e.target.value } }); }} className="w-full bg-gray-50 border border-gray-200 text-gray-900 rounded-lg shadow-sm focus:ring-2 focus:ring-indigo-500/30 focus:border-indigo-500 hover:border-indigo-300 transition-all duration-200 px-4 py-2.5 disabled:bg-gray-100 disabled:text-gray-500" />
                             </div>
                         </div>
 
@@ -1285,11 +1289,11 @@ export default function PartII({ formData, addItem, removeItem, updateArrayField
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
                             <div>
                                 <label className="block text-sm text-gray-700 mb-1">Number of tests held</label>
-                                <input type="number" min="0" disabled={readOnly} value={tutorialsTests?.ug_even?.number_of_tests || ''} onChange={(e) => { updateField('teaching', 'tutorials_tests', { ...tutorialsTests, ug_even: { ...tutorialsTests.ug_even, number_of_tests: e.target.value } }); }} className="w-full border border-gray-300 rounded px-3 py-2 disabled:bg-gray-100 disabled:text-gray-500" />
+                                <input type="number" min="0" disabled={readOnly} value={tutorialsTests?.ug_even?.number_of_tests || ''} onChange={(e) => { updateField('teaching', 'tutorials_tests', { ...tutorialsTests, ug_even: { ...tutorialsTests.ug_even, number_of_tests: e.target.value } }); }} className="w-full bg-gray-50 border border-gray-200 text-gray-900 rounded-lg shadow-sm focus:ring-2 focus:ring-indigo-500/30 focus:border-indigo-500 hover:border-indigo-300 transition-all duration-200 px-4 py-2.5 disabled:bg-gray-100 disabled:text-gray-500" />
                             </div>
                             <div>
                                 <label className="block text-sm text-gray-700 mb-1">Assignment Assigned</label>
-                                <input type="number" min="0" disabled={readOnly} value={tutorialsTests?.ug_even?.assignment_checked || ''} onChange={(e) => { updateField('teaching', 'tutorials_tests', { ...tutorialsTests, ug_even: { ...tutorialsTests.ug_even, assignment_checked: e.target.value } }); }} className="w-full border border-gray-300 rounded px-3 py-2 disabled:bg-gray-100 disabled:text-gray-500" />
+                                <input type="number" min="0" disabled={readOnly} value={tutorialsTests?.ug_even?.assignment_checked || ''} onChange={(e) => { updateField('teaching', 'tutorials_tests', { ...tutorialsTests, ug_even: { ...tutorialsTests.ug_even, assignment_checked: e.target.value } }); }} className="w-full bg-gray-50 border border-gray-200 text-gray-900 rounded-lg shadow-sm focus:ring-2 focus:ring-indigo-500/30 focus:border-indigo-500 hover:border-indigo-300 transition-all duration-200 px-4 py-2.5 disabled:bg-gray-100 disabled:text-gray-500" />
                             </div>
                         </div>
 
@@ -1297,11 +1301,11 @@ export default function PartII({ formData, addItem, removeItem, updateArrayField
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
                             <div>
                                 <label className="block text-sm text-gray-700 mb-1">Number of tests held</label>
-                                <input type="number" min="0" disabled={readOnly} value={tutorialsTests?.pg_odd?.number_of_tests || ''} onChange={(e) => { updateField('teaching', 'tutorials_tests', { ...tutorialsTests, pg_odd: { ...tutorialsTests.pg_odd, number_of_tests: e.target.value } }); }} className="w-full border border-gray-300 rounded px-3 py-2 disabled:bg-gray-100 disabled:text-gray-500" />
+                                <input type="number" min="0" disabled={readOnly} value={tutorialsTests?.pg_odd?.number_of_tests || ''} onChange={(e) => { updateField('teaching', 'tutorials_tests', { ...tutorialsTests, pg_odd: { ...tutorialsTests.pg_odd, number_of_tests: e.target.value } }); }} className="w-full bg-gray-50 border border-gray-200 text-gray-900 rounded-lg shadow-sm focus:ring-2 focus:ring-indigo-500/30 focus:border-indigo-500 hover:border-indigo-300 transition-all duration-200 px-4 py-2.5 disabled:bg-gray-100 disabled:text-gray-500" />
                             </div>
                             <div>
                                 <label className="block text-sm text-gray-700 mb-1">Assignment Assigned</label>
-                                <input type="number" min="0" disabled={readOnly} value={tutorialsTests?.pg_odd?.assignment_checked || ''} onChange={(e) => { updateField('teaching', 'tutorials_tests', { ...tutorialsTests, pg_odd: { ...tutorialsTests.pg_odd, assignment_checked: e.target.value } }); }} className="w-full border border-gray-300 rounded px-3 py-2 disabled:bg-gray-100 disabled:text-gray-500" />
+                                <input type="number" min="0" disabled={readOnly} value={tutorialsTests?.pg_odd?.assignment_checked || ''} onChange={(e) => { updateField('teaching', 'tutorials_tests', { ...tutorialsTests, pg_odd: { ...tutorialsTests.pg_odd, assignment_checked: e.target.value } }); }} className="w-full bg-gray-50 border border-gray-200 text-gray-900 rounded-lg shadow-sm focus:ring-2 focus:ring-indigo-500/30 focus:border-indigo-500 hover:border-indigo-300 transition-all duration-200 px-4 py-2.5 disabled:bg-gray-100 disabled:text-gray-500" />
                             </div>
                         </div>
 
@@ -1309,11 +1313,11 @@ export default function PartII({ formData, addItem, removeItem, updateArrayField
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <div>
                                 <label className="block text-sm text-gray-700 mb-1">Number of tests held</label>
-                                <input type="number" min="0" disabled={readOnly} value={tutorialsTests?.pg_even?.number_of_tests || ''} onChange={(e) => { updateField('teaching', 'tutorials_tests', { ...tutorialsTests, pg_even: { ...tutorialsTests.pg_even, number_of_tests: e.target.value } }); }} className="w-full border border-gray-300 rounded px-3 py-2 disabled:bg-gray-100 disabled:text-gray-500" />
+                                <input type="number" min="0" disabled={readOnly} value={tutorialsTests?.pg_even?.number_of_tests || ''} onChange={(e) => { updateField('teaching', 'tutorials_tests', { ...tutorialsTests, pg_even: { ...tutorialsTests.pg_even, number_of_tests: e.target.value } }); }} className="w-full bg-gray-50 border border-gray-200 text-gray-900 rounded-lg shadow-sm focus:ring-2 focus:ring-indigo-500/30 focus:border-indigo-500 hover:border-indigo-300 transition-all duration-200 px-4 py-2.5 disabled:bg-gray-100 disabled:text-gray-500" />
                             </div>
                             <div>
                                 <label className="block text-sm text-gray-700 mb-1">Assignment Assigned</label>
-                                <input type="number" min="0" disabled={readOnly} value={tutorialsTests?.pg_even?.assignment_checked || ''} onChange={(e) => { updateField('teaching', 'tutorials_tests', { ...tutorialsTests, pg_even: { ...tutorialsTests.pg_even, assignment_checked: e.target.value } }); }} className="w-full border border-gray-300 rounded px-3 py-2 disabled:bg-gray-100 disabled:text-gray-500" />
+                                <input type="number" min="0" disabled={readOnly} value={tutorialsTests?.pg_even?.assignment_checked || ''} onChange={(e) => { updateField('teaching', 'tutorials_tests', { ...tutorialsTests, pg_even: { ...tutorialsTests.pg_even, assignment_checked: e.target.value } }); }} className="w-full bg-gray-50 border border-gray-200 text-gray-900 rounded-lg shadow-sm focus:ring-2 focus:ring-indigo-500/30 focus:border-indigo-500 hover:border-indigo-300 transition-all duration-200 px-4 py-2.5 disabled:bg-gray-100 disabled:text-gray-500" />
                             </div>
                         </div>
                     </div>

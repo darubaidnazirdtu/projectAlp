@@ -684,7 +684,7 @@ export default function DynamicTableSection({
                                         onChange={(e) => handleChange(f.key, sanitizeForResearchKey(f.key, e.target.value, 'text'))}
                                         required={f.required || (typeof f.requiredIf === 'function' && f.requiredIf(tempItem))}
                                         disabled={f.disabled || f.readOnly || readOnly}
-                                        className="w-full border-gray-300 rounded-lg shadow-sm focus:ring-indigo-500 focus:border-indigo-500 p-2.5"
+                                        className="w-full bg-gray-50 border border-gray-200 text-gray-900 rounded-xl shadow-sm focus:ring-2 focus:ring-indigo-500/30 focus:border-indigo-500 hover:border-indigo-300 transition-all duration-200 p-3"
                                     />
                                 ) : f.type === 'select' ? (
                                     <select
@@ -781,7 +781,7 @@ export default function DynamicTableSection({
                                                                         onChange={(e) => handleSubItemChange(f.key, subF.key, e.target.value)}
                                                                         disabled={subF.disabled || subF.readOnly || readOnly}
                                                                         required={isRequired}
-                                                                        className="w-full text-sm border-gray-300 rounded p-1.5"
+                                                                        className="w-full text-sm bg-gray-50 border border-gray-200 text-gray-900 rounded-lg focus:ring-2 focus:ring-indigo-500/30 focus:border-indigo-500 hover:border-indigo-300 transition-all duration-200 p-2"
                                                                     >
                                                                         <option value="">Select...</option>
                                                                         {subF.options.map(opt => <option key={opt} value={opt}>{opt}</option>)}
@@ -835,7 +835,7 @@ export default function DynamicTableSection({
                                                                         readOnly={subF.readOnly || readOnly}
                                                                         disabled={subF.disabled || readOnly}
                                                                         required={isRequired}
-                                                                        className="w-full text-sm border-gray-300 rounded p-1.5"
+                                                                        className="w-full text-sm bg-gray-50 border border-gray-200 text-gray-900 rounded-lg focus:ring-2 focus:ring-indigo-500/30 focus:border-indigo-500 hover:border-indigo-300 transition-all duration-200 p-2"
                                                                     />
                                                                 )}
                                                             </div>
@@ -886,7 +886,7 @@ export default function DynamicTableSection({
                                             readOnly={f.readOnly || readOnly}
                                             disabled={f.disabled || readOnly}
                                             required={f.required || (typeof f.requiredIf === 'function' && f.requiredIf(tempItem))}
-                                            className="w-full border-gray-300 rounded-lg shadow-sm focus:ring-indigo-500 focus:border-indigo-500 p-2.5"
+                                            className="w-full bg-gray-50 border border-gray-200 text-gray-900 rounded-xl shadow-sm focus:ring-2 focus:ring-indigo-500/30 focus:border-indigo-500 hover:border-indigo-300 transition-all duration-200 p-3"
                                             onBlur={() => {
                                                 if (title.includes('PhD') && f.key === 'enrollment_no' && tempItem.enrollment_no) {
                                                     handleEnrollmentLookup(tempItem.enrollment_no);
