@@ -611,7 +611,7 @@ export default function DynamicTableSection({
                                     {fields.map(f => {
                                         if (f.hideInTable) return null;
                                         return (
-                                        <td key={f.key} className="px-4 py-4 whitespace-nowrap text-sm text-gray-700">
+                                        <td key={f.key} className="px-4 py-4 text-sm text-gray-700 break-words whitespace-normal">
                                             {f.type === 'file' ? (
                                                 (() => {
                                                     const fileVal = item[f.key] || item.link;
@@ -645,7 +645,7 @@ export default function DynamicTableSection({
                                                     {(item[f.key] || []).length === 0 && <span className="text-gray-400 text-xs">-</span>}
                                                 </div>
                                             ) : (
-                                                <div className="truncate max-w-xs" title={item[f.key]}>{item[f.key]}</div>
+                                                <div className="whitespace-pre-wrap" title={item[f.key]}>{item[f.key]}</div>
                                             )}
                                         </td>
                                     )})}

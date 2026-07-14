@@ -95,6 +95,10 @@ const hasEngagedLessThanScheduled = (course = {}) => courseEngagementLimits.some
 const getCourseValidationIssues = (coursesTaught = []) => coursesTaught.flatMap((course = {}, index) => {
     const missingIssues = requiredCourseFields
         .filter(({ key }) => {
+            const courseType = course.course_type || 'Theory';
+            if (courseType === 'Practical' && key.startsWith('total_lectures')) return false;
+            if (courseType === 'Theory' && key.startsWith('labs_')) return false;
+
             const value = key === 'degree_type' ? (course[key] || 'UG') : course[key];
             return isBlankCourseValue(value);
         })
