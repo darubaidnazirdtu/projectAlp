@@ -9,7 +9,7 @@ export default function Profile() {
   const [saving, setSaving] = useState(false);
   
   // Education form state
-  const emptyEdu = { degree: '', course: '', field_of_study: '', institution_name: '', university_board: '', year_of_passing: '', percentage_cgpa: '', certificate_url: '' };
+  const emptyEdu = { degree: '', course: '', field_of_study: '', institution_name: '', university_board: '', year_of_passing: '', percentage_cgpa: '' };
   const [eduForm, setEduForm] = useState(emptyEdu);
   const [eduFormErrors, setEduFormErrors] = useState({});
   const [editEduIndex, setEditEduIndex] = useState(-1);
@@ -42,7 +42,8 @@ export default function Profile() {
     'Andaman and Nicobar Islands','Chandigarh','Dadra and Nagar Haveli and Daman and Diu','Delhi','Jammu and Kashmir','Ladakh','Lakshadweep','Puducherry'
   ];
   const DESIGNATIONS = ['Professor','Associate Professor','Assistant Professor'];
-  const DEGREE_OPTIONS = ['10th','12th','Diploma','Graduation','Masters','PhD','Postdoctoral','Certification'];
+  const DEGREE_OPTIONS = ['10th', 'Diploma', '12th', 'Graduation', 'Master', 'PhD', 'Post Doc'];
+  const DEGREE_ORDER = { '10th': 1, 'Diploma': 2, '12th': 3, 'Graduation': 4, 'Master': 5, 'PhD': 6, 'Post Doc': 7 };
   const PRESENT_GRADE_OPTIONS = Array.from({ length: 11 }, (_, i) => 10 + i); // 10..20
 
   const inputBase = 'w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-indigo-200 focus:border-indigo-500 border-gray-300';
@@ -344,6 +345,11 @@ export default function Profile() {
           fixed.professional_info = fixed.professional_info || {};
           fixed.professional_info.specialization = spec ? [String(spec)] : [];
         }
+        if (Array.isArray(fixed.educational_qualifications)) {
+          fixed.educational_qualifications.sort((a, b) => 
+            (DEGREE_ORDER[a.degree] || 99) - (DEGREE_ORDER[b.degree] || 99)
+          );
+        }
         console.info('[Profile] Loaded profile payload', fixed);
         setProfile(fixed);
       } catch (e) {
@@ -424,6 +430,11 @@ export default function Profile() {
       } else {
         list.push(eduForm);
       }
+      
+      list.sort((a, b) => 
+        (DEGREE_ORDER[a.degree] || 99) - (DEGREE_ORDER[b.degree] || 99)
+      );
+
       return { ...prev, educational_qualifications: list };
     });
     setShowEduForm(false);
@@ -959,12 +970,6 @@ export default function Profile() {
                       {eduFormErrors[k] && <div className={errorText}>{eduFormErrors[k]}</div>}
                     </div>
                   ))}
-                  <div className="sm:col-span-2">
-                    <label className={labelBase}>Supporting Certificate Upload</label>
-                    <FileUpload value={eduForm.certificate_url || ''} onChange={(url) => {
-                       setEduForm({...eduForm, certificate_url: url});
-                    }} />
-                  </div>
                 </div>
                 <div className="flex justify-end gap-3 mt-6 pt-4 border-t border-gray-200">
                   <button type="button" onClick={() => setShowEduForm(false)} className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50">Cancel</button>
