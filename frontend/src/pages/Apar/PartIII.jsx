@@ -156,7 +156,6 @@ export default function PartIII({ formData, academicYear, addItem, removeItem, u
                 initialItem={{ title: '', author_names: '', name_of_journal: '', volume: '', issue: '', issn: '', page_numbers: '', year_of_publication: '', indexing: '', doi: '', link_to_paper: '' }}
                 fields={[
                     { label: 'Title', key: 'title', fullWidth: true, required: true, placeholder: 'Enter paper title' },
-                    { label: 'Paper ID', key: 'paper_id', placeholder: 'Enter paper ID' },
                     { label: 'Authors', key: 'author_names', required: true, placeholder: 'Enter author names' },
                     { label: 'Journal', key: 'name_of_journal', required: true, placeholder: 'Enter journal name' },
                     { label: 'Volume', key: 'volume', type: 'number', min: 0, placeholder: 'Volume' },
