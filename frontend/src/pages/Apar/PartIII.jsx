@@ -505,7 +505,7 @@ export default function PartIII({ formData, academicYear, addItem, removeItem, u
 
             {/* FDPs / Events */}
             < DynamicTableSection
-                title="FDPs / Workshops / Seminars Attended"
+                title="FDPs / Workshops / Seminars"
                 data={formData.research.fdps || []}
                 uniqueKey="program_title"
                 {...createHandlers('fdps')}
@@ -515,6 +515,8 @@ export default function PartIII({ formData, academicYear, addItem, removeItem, u
                     program_title: '',
                     type_of_program: '',
                     level: '',
+                    participation_level: '',
+                    amount_for_funding: '',
                     mode: '',
                     organising_body: '',
                     venue: '',
@@ -535,6 +537,8 @@ export default function PartIII({ formData, academicYear, addItem, removeItem, u
                     { label: 'Type', key: 'type_of_program', type: 'select', options: ['FDP', 'Workshop', 'Seminar', 'STTP', 'Training', 'Orientation', 'Other'], required: true, placeholder: 'Select type' },
                     { label: 'Specify Other Type', key: 'type_of_program_other', showIf: (item) => item.type_of_program === 'Other', requiredIf: (item) => item.type_of_program === 'Other', placeholder: 'Enter type', hideInTable: true },
                     { label: 'Level', key: 'level', type: 'select', options: ['Institutional', 'National', 'International'], required: true, placeholder: 'Select level' },
+                    { label: 'Participation Level', key: 'participation_level', type: 'select', options: ['Attended', 'Organized'], placeholder: 'Select Attended/Organized' },
+                    { label: 'Amount for Funding (INR)', key: 'amount_for_funding', type: 'number', min: 0, placeholder: 'Enter amount' },
                     { label: 'Mode', key: 'mode', type: 'select', options: ['Online', 'Offline', 'Hybrid'], required: true, placeholder: 'Select mode' },
                     { label: 'Organizer', key: 'organising_body', required: true, placeholder: 'Enter organizer' },
                     { label: 'Venue', key: 'venue', placeholder: 'Venue' },
@@ -597,15 +601,7 @@ export default function PartIII({ formData, academicYear, addItem, removeItem, u
                         initialItem={{ description: '' }}
                         fields={[{ label: 'Description', key: 'description', fullWidth: true, required: true, placeholder: 'Enter details' }]}
                     />
-                    <DynamicTableSection
-                        title="ii) Ph.D Guidance"
-                        data={formData.research.phd_guidance_text || []}
-                        uniqueKey="description"
-                        {...createHandlers('phd_guidance_text')}
-                        readOnly={readOnly}
-                        initialItem={{ description: '' }}
-                        fields={[{ label: 'Description', key: 'description', fullWidth: true, required: true, placeholder: 'Enter details' }]}
-                    />
+
                     <DynamicTableSection
                         title="iii) Research guidance"
                         data={formData.research.research_guidance || []}
@@ -625,7 +621,7 @@ export default function PartIII({ formData, academicYear, addItem, removeItem, u
 
                     <div className="mb-6">
                         <DynamicTableSection
-                            title="General Description"
+                            title="i) General Description"
                             data={formData.research.industry_interaction || []}
                             uniqueKey="description"
                             {...createHandlers('industry_interaction')}
@@ -640,7 +636,7 @@ export default function PartIII({ formData, academicYear, addItem, removeItem, u
                     </div>
 
                     <DynamicTableSection
-                        title="Patents (obtained or applied for)"
+                        title="ii) Patents (obtained or applied for)"
                         data={formData.research.patents || []}
                         uniqueKey="patent_title"
                         {...createHandlers('patents')}
@@ -685,7 +681,7 @@ export default function PartIII({ formData, academicYear, addItem, removeItem, u
                     <div className="mt-8"></div>
 
                     <DynamicTableSection
-                        title="Professional Consultancy"
+                        title="iii) Professional Consultancy"
                         data={formData.research.consultancy || []}
                         uniqueKey="name_of_project"
                         {...createHandlers('consultancy')}
