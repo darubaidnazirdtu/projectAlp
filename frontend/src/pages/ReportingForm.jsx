@@ -79,7 +79,8 @@ export default function Form_({ Token }) {
             let role = Token?.title;
             let ay = Token?.ay
             let data = JSON.stringify({ email: email, password: password, graded_id: graded_id, role: role, ay: ay })
-            let response = await fetch('http://localhost:3001/get_responses', {
+            let backendUrl = typeof window !== 'undefined' ? `${window.location.protocol}//${window.location.hostname}:8000` : 'http://localhost:8000';
+            let response = await fetch(`${backendUrl}/get_responses`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
@@ -116,7 +117,8 @@ export default function Form_({ Token }) {
 
     useEffect(() => {
         async function fetchStatus() {
-            let get_status = await fetch(`http://localhost:3001/check_status?graded_id=${Token?.graded_id}&ay=${Token?.ay}`, {
+            let backendUrl = typeof window !== 'undefined' ? `${window.location.protocol}//${window.location.hostname}:8000` : 'http://localhost:8000';
+            let get_status = await fetch(`${backendUrl}/check_status?graded_id=${Token?.graded_id}&ay=${Token?.ay}`, {
                 method: "GET",
             })
 
@@ -171,7 +173,8 @@ export default function Form_({ Token }) {
                 let data = { ...formData };
                 data = { ...data, ...currentData };
                 console.log('Submitting all data:', data);
-                let response = await fetch('http://localhost:3001/form_path/submit', {
+                let backendUrl = typeof window !== 'undefined' ? `${window.location.protocol}//${window.location.hostname}:8000` : 'http://localhost:8000';
+                let response = await fetch(`${backendUrl}/form_path/submit`, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json'

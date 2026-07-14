@@ -31,7 +31,7 @@ export const SocketProvider = ({ children }) => {
         const userId = user.userId || user.teacherId || user.faculty_id || user.id;
         if (!userId) return;
 
-        const backendUrl = import.meta.env.VITE_BASEURL || 'http://localhost:8000';
+        const backendUrl = import.meta.env.VITE_BASEURL || (typeof window !== 'undefined' ? `${window.location.protocol}//${window.location.hostname}:8000` : 'http://localhost:8000');
         // Remove /api/v1 or any API path for Socket.IO connection (Socket.IO runs on root)
         const socketUrl = backendUrl.replace(/\/api\/v\d+$/, '').replace(/\/api$/, '');
 
