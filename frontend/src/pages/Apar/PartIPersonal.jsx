@@ -205,7 +205,7 @@ export default function PartIPersonal({ personal, onChange, readOnly, department
                     <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Degree</th>
                     <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Field of Study</th>
                     <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Institution</th>
-                    <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Year</th>
+                    <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">End Date</th>
                     <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Percentage/CGPA</th>
                   </tr>
                 </thead>
@@ -215,7 +215,7 @@ export default function PartIPersonal({ personal, onChange, readOnly, department
                       <td className="px-4 py-2 text-sm text-gray-900">{q.degree || '-'}</td>
                       <td className="px-4 py-2 text-sm text-gray-900">{q.field_of_study || '-'}</td>
                       <td className="px-4 py-2 text-sm text-gray-900">{q.institution_name || '-'}</td>
-                      <td className="px-4 py-2 text-sm text-gray-900">{q.year_of_passing || '-'}</td>
+                      <td className="px-4 py-2 text-sm text-gray-900">{q.end_date ? new Date(q.end_date).toLocaleDateString('en-GB') : q.year_of_passing || '-'}</td>
                       <td className="px-4 py-2 text-sm text-gray-900">{q.percentage_cgpa || '-'}</td>
                     </tr>
                   ))}
@@ -361,23 +361,12 @@ export default function PartIPersonal({ personal, onChange, readOnly, department
                       required={absenceRows.length === 0 || newAbsenceRow.start_date !== '' || newAbsenceRow.end_date !== ''}
                     >
                       <option value="">Select leave type</option>
-                      <option value="Casual Leave (CL)">Casual Leave (CL)</option>
-                      <option value="Special Casual Leave (SCL)">Special Casual Leave (SCL)</option>
-                      <option value="Duty Leave (DL)">Duty Leave (DL)</option>
-                      <option value="Earned Leave (EL)">Earned Leave (EL)</option>
-                      <option value="Half Pay Leave (HPL)">Half Pay Leave (HPL)</option>
-                      <option value="Commuted Leave">Commuted Leave</option>
-                      <option value="Extraordinary Leave (EOL)">Extraordinary Leave (EOL)</option>
-                      <option value="Leave Not Due (LND)">Leave Not Due (LND)</option>
-                      <option value="Maternity Leave">Maternity Leave</option>
-                      <option value="Paternity Leave">Paternity Leave</option>
-                      <option value="Child Care Leave (CCL)">Child Care Leave (CCL)</option>
-                      <option value="Adoption Leave">Adoption Leave</option>
-                      <option value="Study Leave">Study Leave</option>
                       <option value="Sabbatical Leave">Sabbatical Leave</option>
-                      <option value="Academic Leave">Academic Leave</option>
-                      <option value="Medical Leave (availed through applicable leave rules such as HPL/Commuted Leave)">Medical Leave (availed through applicable leave rules such as HPL/Commuted Leave)</option>
-                      <option value="Vacation (Summer/Winter Vacation for eligible teaching faculty)">Vacation (Summer/Winter Vacation for eligible teaching faculty)</option>
+                      <option value="Half Pay Leave">Half Pay Leave</option>
+                      <option value="CCL">CCL</option>
+                      <option value="Maternity">Maternity</option>
+                      <option value="Earned Leave">Earned Leave</option>
+                      <option value="Medical Leave">Medical Leave</option>
                     </select>
                   </div>
                   <button

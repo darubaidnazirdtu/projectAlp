@@ -54,7 +54,8 @@ const AparFormSchema = new mongoose.Schema({
 
     // Step 2: Self Appraisal & Teaching
     teaching: {
-        immovable_property_return: String,
+        description_of_duties_department_proof: String, // URL or data
+        description_of_duties_admin_proof: String, // URL or data
         health_checkup_file: String, // URL or data
         description_of_duties_department: [{ description: String }],
         description_of_duties_admin: [{ description: String }],
@@ -84,7 +85,16 @@ const AparFormSchema = new mongoose.Schema({
             even_semester: { lectures: String, tutorials: String, practicals: String, seminars: String }
         },
         teaching_methods: [{ description: String }],
-        faculty_visits_other_institutions: [{ description: String }],
+        faculty_visits_other_institutions: [{
+            institution: String,
+            nature_of_visit: String,
+            title_of_activity: String,
+            role_of_faculty: String,
+            date_of_visit: String,
+            mode: String,
+            level: String,
+            description: String // legacy
+        }],
         ict_tools: [{ description: String, room_no: String }],
         student_centric_methods: [{ description: String }],
         tutorials_tests: {

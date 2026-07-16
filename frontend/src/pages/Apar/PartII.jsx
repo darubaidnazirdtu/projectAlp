@@ -739,6 +739,14 @@ export default function PartII({ formData, addItem, removeItem, updateArrayField
     const workloadWeek = teachingData?.workload_week || { odd_semester: {}, even_semester: {} };
     const tutorialsTests = teachingData?.tutorials_tests || { ug_odd: {}, ug_even: {}, pg_odd: {}, pg_even: {} };
 
+    let age = 0;
+    if (formData?.personal?.date_of_birth) {
+        const dob = new Date(formData.personal.date_of_birth);
+        const diff = Date.now() - dob.getTime();
+        age = Math.floor(diff / (1000 * 60 * 60 * 24 * 365.25));
+    }
+    const isHealthCheckupMandatory = age > 40;
+
     const [errors, setErrors] = useState({});
     const [editingCourseIndex, setEditingCourseIndex] = useState(null); // null: table, -1: new, >= 0: edit
     const [tempCourse, setTempCourse] = useState(null);
@@ -952,6 +960,47 @@ export default function PartII({ formData, addItem, removeItem, updateArrayField
                     />
                 </div>
 
+                {/* Proof of Description of Duties */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-4 mb-6">
+                    {/* Department Level Proof */}
+                    {(teachingData?.description_of_duties_department && teachingData.description_of_duties_department.length > 0) && (
+                        <div className="bg-gray-50 border border-gray-200 rounded-lg p-6">
+                            <label className="block text-sm font-medium text-gray-700 mb-1">
+                                Proof for Department Level Duties (PDF Document) <span className="text-red-500">*</span>
+                            </label>
+                            <FileUpload
+                                value={teachingData?.description_of_duties_department_proof}
+                                onChange={(val) => updateField('teaching', 'description_of_duties_department_proof', val)}
+                                disabled={readOnly}
+                                temporaryPdf={true}
+                                required={true}
+                            />
+                            {errors?.description_of_duties_department_proof && (
+                                <p className="text-red-500 text-sm mt-1">{errors.description_of_duties_department_proof}</p>
+                            )}
+                        </div>
+                    )}
+
+                    {/* Administration Proof */}
+                    {(teachingData?.description_of_duties_admin && teachingData.description_of_duties_admin.length > 0) && (
+                        <div className="bg-gray-50 border border-gray-200 rounded-lg p-6">
+                            <label className="block text-sm font-medium text-gray-700 mb-1">
+                                Proof for Administration Duties (PDF Document) <span className="text-red-500">*</span>
+                            </label>
+                            <FileUpload
+                                value={teachingData?.description_of_duties_admin_proof}
+                                onChange={(val) => updateField('teaching', 'description_of_duties_admin_proof', val)}
+                                disabled={readOnly}
+                                temporaryPdf={true}
+                                required={true}
+                            />
+                            {errors?.description_of_duties_admin_proof && (
+                                <p className="text-red-500 text-sm mt-1">{errors.description_of_duties_admin_proof}</p>
+                            )}
+                        </div>
+                    )}
+                </div>
+
                 {/* Mandatory Documents (Schema Alignment) */}
                 <div className="bg-blue-50 border border-blue-100 rounded-lg p-6 mb-6">
                     <h4 className="text-md font-semibold text-blue-900 mb-4">Optional Documents</h4>
@@ -967,30 +1016,17 @@ export default function PartII({ formData, addItem, removeItem, updateArrayField
                     </div> */}
             <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Immovable Property Return (PDF Document)
+                    Health Checkup Report (PDF Document) - Age: {age > 0 ? age : 'N/A'} {isHealthCheckupMandatory ? <span className="text-red-500">*</span> : <span className="text-gray-400 font-normal ml-1">(Optional)</span>}
                 </label>
-                <FileUpload
-                    value={teachingData?.immovable_property_return}
-                    onChange={(val) => updateField('teaching', 'immovable_property_return', val)}
-                    disabled={readOnly}
-                    temporaryPdf={true}
-                />
-                {errors?.immovable_property_return && (
-                    <p className="text-red-500 text-sm mt-1">
-                        {errors.immovable_property_return}
-                    </p>
+                {isHealthCheckupMandatory && (
+                    <p className="text-xs text-gray-500 mb-2">Mandatory as your age is above 40 years.</p>
                 )}
-            </div>
-
-            <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Health Checkup Report (PDF Document)
-                </label>
                 <FileUpload
                     value={teachingData?.health_checkup_file}
                     onChange={(val) => updateField('teaching', 'health_checkup_file', val)}
                     disabled={readOnly}
                     temporaryPdf={true}
+                    required={isHealthCheckupMandatory}
                 />
                 {errors?.health_checkup_file && (
                     <p className="text-red-500 text-sm mt-1">
@@ -1152,7 +1188,7 @@ export default function PartII({ formData, addItem, removeItem, updateArrayField
 
                 {/* 1.2 Total of hours/periods provided in time table vs actually taken */}
                 <div>
-                    <h4 className="text-md font-semibold text-gray-800 mb-2">1.2 Total Number of hours/ periods provided in the time table</h4>
+                    <h4 className="text-md font-semibold text-gray-800 mb-2">1.2 Total Number of hours/ periods provided in the time table <span className="text-sm font-normal text-gray-500">(Only numbers allowed)</span></h4>
                     <div className="bg-gray-50 border border-gray-200 rounded-lg p-6 mb-4">
                         <div className="font-semibold mb-2">a) Provided in the academic year</div>
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -1182,7 +1218,7 @@ export default function PartII({ formData, addItem, removeItem, updateArrayField
 
                 {/* 1.3 Work load per week */}
                 <div>
-                    <h4 className="text-md font-semibold text-gray-800 mb-2">1.3 Work load per week</h4>
+                    <h4 className="text-md font-semibold text-gray-800 mb-2">1.3 Work load per week <span className="text-sm font-normal text-gray-500">(Only numbers allowed)</span></h4>
                     <div className="bg-gray-50 border border-gray-200 rounded-lg p-6 mb-4">
                         <div className="font-semibold mb-2 text-indigo-800">For odd semester</div>
                         <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
@@ -1230,11 +1266,19 @@ export default function PartII({ formData, addItem, removeItem, updateArrayField
                 <DynamicTableSection
                     title="2) Visit of faculty to other institution for taking Experts’ Lectures/other academic work"
                     data={teachingData?.faculty_visits_other_institutions || []}
-                    uniqueKey="description"
+                    uniqueKey="title_of_activity"
                     {...createHandlers('teaching', 'faculty_visits_other_institutions')}
                     readOnly={readOnly}
-                    initialItem={{ description: '' }}
-                    fields={[{ label: 'Description', key: 'description', fullWidth: true, required: true, placeholder: 'Enter details of visit' }]}
+                    initialItem={{ institution: '', nature_of_visit: '', title_of_activity: '', role_of_faculty: '', date_of_visit: '', mode: '', level: '' }}
+                    fields={[
+                        { label: 'Institution/Organisation Visited', key: 'institution', required: true, placeholder: 'Enter institution' },
+                        { label: 'Nature of Visit/Academic Engagement', key: 'nature_of_visit', required: true, placeholder: 'e.g. Expert Lecture' },
+                        { label: 'Title/Topic of Activity', key: 'title_of_activity', required: true, placeholder: 'Enter topic' },
+                        { label: 'Role of Faculty Member', key: 'role_of_faculty', required: true, placeholder: 'e.g. Keynote Speaker' },
+                        { label: 'Date(s) of Visit', key: 'date_of_visit', required: true, placeholder: 'e.g. 15-Aug-2023 to 17-Aug-2023' },
+                        { label: 'Mode', key: 'mode', type: 'select', options: ['Physical', 'Online', 'Hybrid'], required: true },
+                        { label: 'Level', key: 'level', type: 'select', options: ['International', 'National', 'State', 'Institutional'], required: true }
+                    ]}
                 />
 
                 {/* 3) Details of teaching methods employed */}
@@ -1275,7 +1319,7 @@ export default function PartII({ formData, addItem, removeItem, updateArrayField
 
                 {/* 4.1 Details of Tutorials/tests held */}
                 <div>
-                    <h4 className="text-md font-semibold text-gray-800 mb-2">4.1 Details of Tutorials/ tests held during the academic year</h4>
+                    <h4 className="text-md font-semibold text-gray-800 mb-2">4.1 Details of Tutorials/ tests held during the academic year <span className="text-sm font-normal text-gray-500">(Only numbers allowed)</span></h4>
                     <div className="bg-gray-50 border border-gray-200 rounded-lg p-6 mb-4">
                         <div className="font-semibold mb-2">Under-graduate Courses (Odd Semester)</div>
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">

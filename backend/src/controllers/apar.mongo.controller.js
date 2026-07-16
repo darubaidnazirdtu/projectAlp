@@ -20,7 +20,7 @@ import { FacultyProfile } from "../models/facultyProfile.model.js";
 import { createNotification, notifyHeads } from "./notification.controller.js";
 import { v4 as uuidv4 } from 'uuid'; // Assuming uuid is available or use generic ID generator
 import { normalizeQualifications } from '../utils/qualification.util.js';
-import { createDocumentPath, createAdditionalDocumentPath, deleteObject, isAparObjectPath, uploadLocalFile } from '../services/minio.service.js';
+import { createDocumentPath, createAdditionalDocumentPath, createProfileDepartmentDocumentPath, deleteObject, isAparObjectPath, uploadLocalFile } from '../services/minio.service.js';
 import {
     getCompletedTemporaryDocument,
     getTemporaryDocument,
@@ -552,8 +552,19 @@ const getForm = asyncHandler(async (req, res) => {
     let form;
     if (ay) {
         // Fetch user/faculty details for auto-population (needed for creation)
-        const facultyProfile = await Faculty.findOne({ faculty_id });
+        const legacyFaculty = await Faculty.findOne({ faculty_id });
         const userProfile = await User.findOne({ user_id: faculty_id });
+        const actualProfile = await FacultyProfile.findOne({ faculty_id: new RegExp(`^${faculty_id}$`, 'i') }).lean();
+        
+        let facultyProfile = legacyFaculty ? legacyFaculty.toObject() : {};
+        if (actualProfile) {
+            if (actualProfile.basic_info?.full_name) facultyProfile.name = actualProfile.basic_info.full_name;
+            if (actualProfile.contact_info?.email_address) facultyProfile.email = actualProfile.contact_info.email_address;
+            if (actualProfile.professional_info?.designation) facultyProfile.designation = actualProfile.professional_info.designation;
+            if (actualProfile.basic_info?.date_of_birth) facultyProfile.date_of_birth = actualProfile.basic_info.date_of_birth;
+            if (actualProfile.contact_info?.mobile_number) facultyProfile.phone = actualProfile.contact_info.mobile_number;
+            if (actualProfile.professional_info?.date_of_joining) facultyProfile.joining_date = actualProfile.professional_info.date_of_joining;
+        }
 
         // Check if form exists first (User request)
         form = await AparForm.findOne({ faculty_id, ay });
@@ -608,26 +619,32 @@ const getForm = asyncHandler(async (req, res) => {
 
         // Only persist changes for editable (Draft-like) statuses
         if (form.status === 'Draft' || form.status === 'check_submit_status' || !form.status) {
-            // Check if personal info needs update (for existing drafts that missed it)
+            // Sync personal info to ensure it reflects latest profile changes
             if (facultyProfile) {
                 if (!form.personal) form.personal = {};
                 let pChanged = false;
-                if (!form.personal.name && facultyProfile.name) { form.personal.name = facultyProfile.name; pChanged = true; }
-                if (!form.personal.email && facultyProfile.email) { form.personal.email = facultyProfile.email; pChanged = true; }
-                if (!form.personal.designation && facultyProfile.designation) { form.personal.designation = facultyProfile.designation; pChanged = true; }
-                if (!form.personal.date_of_birth && facultyProfile.date_of_birth) { form.personal.date_of_birth = facultyProfile.date_of_birth; pChanged = true; }
-                if (!form.personal.phone && facultyProfile.phone) { form.personal.phone = facultyProfile.phone; pChanged = true; }
+
+                const updateIfChanged = (key, val) => {
+                    if (val !== undefined && String(form.personal[key]) !== String(val)) {
+                        form.personal[key] = val;
+                        pChanged = true;
+                    }
+                };
+
+                updateIfChanged('name', facultyProfile.name);
+                updateIfChanged('email', facultyProfile.email);
+                updateIfChanged('designation', facultyProfile.designation);
+                updateIfChanged('date_of_birth', facultyProfile.date_of_birth);
+                updateIfChanged('phone', facultyProfile.phone);
+                updateIfChanged('joining_date', facultyProfile.joining_date);
+
                 const normalizedQuals = normalizeQualifications({
                     ...(form.personal || {}),
                     ...(facultyProfile || {}),
                 });
                 ['qualification_undergraduate', 'qualification_postgraduate', 'qualification_phd'].forEach((field) => {
-                    if (!form.personal[field] && normalizedQuals[field]) {
-                        form.personal[field] = normalizedQuals[field];
-                        pChanged = true;
-                    }
+                    updateIfChanged(field, normalizedQuals[field]);
                 });
-                if (!form.personal.joining_date && facultyProfile.joining_date) { form.personal.joining_date = facultyProfile.joining_date; pChanged = true; }
 
                 // Backfill Officers
                 if (!form.reporting_officer_id && userProfile?.reporting_officer_id) { form.reporting_officer_id = userProfile.reporting_officer_id; pChanged = true; }
@@ -888,7 +905,8 @@ const checkDraftDuplicates = (data) => {
 
 const documentFieldNames = new Set([
     'link', 'link_to_paper', 'link_to_publication', 'evidence_link',
-    'certificate_link', 'link_to_patent', 'immovable_property_return', 'health_checkup_file'
+    'certificate_link', 'link_to_patent', 'immovable_property_return', 'health_checkup_file',
+    'description_of_duties_department_proof', 'description_of_duties_admin_proof'
 ]);
 
 const collectAparObjectPaths = (value, result = new Set()) => {
@@ -928,9 +946,17 @@ const resolveAparDocuments = async (formData, { ownerId, facultyName, academicYe
             if (!temporary) throw new ApiError(400, 'The selected PDF has expired. Please select it again.');
 
             const isAdditional = key === 'immovable_property_return' || key === 'health_checkup_file';
-            const objectPath = isAdditional
-                ? createAdditionalDocumentPath(facultyName, academicYear, value.originalName)
-                : createDocumentPath(facultyName, academicYear);
+            const isDepartmentDuty = key === 'description_of_duties_department_proof' || key === 'description_of_duties_admin_proof';
+            
+            let objectPath;
+            if (isAdditional) {
+                objectPath = createAdditionalDocumentPath(facultyName, academicYear, value.originalName);
+            } else if (isDepartmentDuty) {
+                const department = formData?.personal?.department_id || 'Department';
+                objectPath = createProfileDepartmentDocumentPath(facultyName, department, value.originalName);
+            } else {
+                objectPath = createDocumentPath(facultyName, academicYear);
+            }
             temporaryIds.push(value.tempId);
             await uploadLocalFile({
                 filePath: temporary.filePath,
