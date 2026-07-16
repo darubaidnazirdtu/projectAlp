@@ -3,6 +3,8 @@ import { z } from 'zod';
 const nullableString = z.string().trim().optional().nullable();
 const dateLike = z.preprocess((val) => val ? new Date(val) : null, z.date().optional().nullable());
 const requiredDateLike = z.preprocess((val) => val ? new Date(val) : null, z.date({ required_error: 'Date is required' }));
+const nullableNumber = z.preprocess((val) => (val === '' ? null : val), z.number().optional().nullable());
+const nullableInt = z.preprocess((val) => (val === '' ? null : val), z.number().int().optional().nullable());
 
 const qualificationSchema = z.object({
   degree: nullableString,
@@ -10,9 +12,20 @@ const qualificationSchema = z.object({
   field_of_study: nullableString,
   institution_name: nullableString,
   university_board: nullableString,
-  year_of_passing: z.number().int().min(1900).max(new Date().getFullYear()).optional().nullable(),
+  year_of_passing: z.preprocess((val) => (val === '' ? null : val), z.number().int().min(1900).max(new Date().getFullYear()).optional().nullable()),
+  status: nullableString,
+  start_date: dateLike,
+  end_date: dateLike,
   percentage_cgpa: nullableString,
-  certificate_url: nullableString
+  certificate_url: z.union([
+    z.string().trim(),
+    z.object({ tempId: z.string().trim() })
+  ]).optional().nullable(),
+  exam_name: nullableString,
+  other_exam_name: nullableString,
+  exam_subject: nullableString,
+  conducting_org: nullableString,
+  year_of_qualification: z.preprocess((val) => (val === '' ? null : val), z.number().int().min(1900).max(new Date().getFullYear()).optional().nullable())
 });
 
 export const upsertProfileSchema = z.object({
@@ -26,7 +39,8 @@ export const upsertProfileSchema = z.object({
       gender: z.string().trim().min(1, 'Gender is required'),
       date_of_birth: requiredDateLike,
       nationality: z.string().trim().min(1, 'Nationality is required'),
-      marital_status: z.string().trim().min(1, 'Marital Status is required')
+      marital_status: z.string().trim().min(1, 'Marital Status is required'),
+      pan_card: z.string().trim().min(1, 'PAN No is required')
     }),
     contact_info: z.object({
       mobile_number: nullableString,
@@ -53,7 +67,7 @@ export const upsertProfileSchema = z.object({
       date_of_continuous_employment: requiredDateLike,
       employment_type: z.string().trim().min(1, 'Employment Type is required'),
       present_grade: nullableString,
-      years_of_experience: z.number().min(0).max(70).optional().nullable(),
+      years_of_experience: z.preprocess((val) => (val === '' ? null : val), z.number().min(0).max(70).optional().nullable()),
       current_courses: z.array(z.string().trim()).optional(),
       office_location: nullableString,
       office_contact_number: nullableString
@@ -66,7 +80,8 @@ export const upsertProfileSchema = z.object({
       google_scholar_profile: nullableString,
       researchgate_profile: nullableString,
       orcid_id: nullableString,
-      scopus_author_id: nullableString
+      scopus_author_id: nullableString,
+      vidwan_id: nullableString
     }).optional()
   })
 });

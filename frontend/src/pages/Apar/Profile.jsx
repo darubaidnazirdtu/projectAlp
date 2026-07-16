@@ -4,13 +4,23 @@ import { toast } from 'sonner';
 import AparShellHeader from '../../components/AparShellHeader.jsx';
 import FileUpload from '../../components/FileUpload.jsx';
 import { FiUser, FiMapPin, FiBriefcase, FiBookOpen, FiLink, FiCheckCircle, FiAlertCircle } from 'react-icons/fi';
+import { Api } from '../../api/Api.js';
+
+const api = new Api();
+
+const getDocumentUrl = (path) => {
+    if (typeof path === 'string' && /^(document|profilepicture|additional documents|profile)\//.test(path)) {
+        return `${api.client.defaults.baseURL}/apar/mongo/document?path=${encodeURIComponent(path)}`;
+    }
+    return path;
+};
 
 export default function Profile() {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   
   // Education form state
-  const emptyEdu = { degree: '', course: '', field_of_study: '', institution_name: '', university_board: '', year_of_passing: '', percentage_cgpa: '' };
+  const emptyEdu = { degree: '', course: '', field_of_study: '', institution_name: '', university_board: '', year_of_passing: '', status: '', start_date: '', end_date: '', percentage_cgpa: '', certificate_url: '', exam_name: '', other_exam_name: '', exam_subject: '', conducting_org: '', year_of_qualification: '' };
   const [eduForm, setEduForm] = useState(emptyEdu);
   const [eduFormErrors, setEduFormErrors] = useState({});
   const [editEduIndex, setEditEduIndex] = useState(-1);
@@ -33,6 +43,7 @@ export default function Profile() {
   const [errors, setErrors] = useState({});
   const [sameAddress, setSameAddress] = useState(false);
   const [newSpec, setNewSpec] = useState('');
+  const [isOtherNationality, setIsOtherNationality] = useState(false);
 
   const GENDER_OPTIONS = ['Male', 'Female', 'Other', 'Prefer not to say'];
   const MARITAL_STATUS_OPTIONS = ['Single', 'Married', 'Divorced', 'Widowed', 'Other'];
@@ -43,8 +54,8 @@ export default function Profile() {
     'Andaman and Nicobar Islands','Chandigarh','Dadra and Nagar Haveli and Daman and Diu','Delhi','Jammu and Kashmir','Ladakh','Lakshadweep','Puducherry'
   ];
   const DESIGNATIONS = ['Professor','Associate Professor','Assistant Professor'];
-  const DEGREE_OPTIONS = ['10th', 'Diploma', '12th', 'Graduation', 'Master', 'PhD', 'Post Doc'];
-  const DEGREE_ORDER = { '10th': 1, 'Diploma': 2, '12th': 3, 'Graduation': 4, 'Master': 5, 'PhD': 6, 'Post Doc': 7 };
+  const DEGREE_OPTIONS = ['10th', 'Diploma', '12th', 'Graduation', 'Post Graduation', 'M.Phil', 'Competitive Exams', 'PhD', 'Post Doc', 'Others'];
+  const DEGREE_ORDER = { '10th': 1, 'Diploma': 2, '12th': 3, 'Graduation': 4, 'Post Graduation': 5, 'M.Phil': 6, 'Competitive Exams': 7, 'PhD': 8, 'Post Doc': 9, 'Others': 10 };
   const PRESENT_GRADE_OPTIONS = Array.from({ length: 11 }, (_, i) => 10 + i); // 10..20
 
   const inputBase = 'w-full px-4 py-2.5 bg-gray-50/50 border border-gray-200/60 rounded-xl focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-400 focus:bg-white transition-all duration-300 text-gray-800 placeholder-gray-400 shadow-[inset_0_2px_4px_rgba(0,0,0,0.02)]';
@@ -351,6 +362,9 @@ export default function Profile() {
             (DEGREE_ORDER[a.degree] || 99) - (DEGREE_ORDER[b.degree] || 99)
           );
         }
+        if (fixed.basic_info?.nationality && fixed.basic_info.nationality !== 'Indian') {
+          setIsOtherNationality(true);
+        }
         console.info('[Profile] Loaded profile payload', fixed);
         setProfile(fixed);
       } catch (e) {
@@ -402,21 +416,52 @@ export default function Profile() {
   const validateEduForm = () => {
     const errs = {};
     if (!eduForm.degree) errs.degree = 'Degree is required';
-    if (!eduForm.course) errs.course = 'Course is required';
-    if (!eduForm.field_of_study) errs.field_of_study = 'Field of Study is required';
-    if (!eduForm.institution_name) errs.institution_name = 'Institution is required';
-    if (!eduForm.university_board) errs.university_board = 'University/Board is required';
-    if (!eduForm.year_of_passing) {
-        errs.year_of_passing = 'Year of Passing is required';
+    if (eduForm.degree === 'Competitive Exams') {
+        if (!eduForm.exam_name) errs.exam_name = 'Type of Exam is required';
+        if (eduForm.exam_name === 'Others' && !eduForm.other_exam_name) errs.other_exam_name = 'Please specify the exam name';
+        if (!eduForm.exam_subject) errs.exam_subject = 'Subject is required';
+        if (!eduForm.conducting_org) errs.conducting_org = 'Conducting Organization is required';
+        if (!eduForm.year_of_qualification) errs.year_of_qualification = 'Year of Qualification is required';
+        if (!eduForm.percentage_cgpa) errs.percentage_cgpa = 'Score / Rank / Percentile is required';
     } else {
-        const yp = validateField(`educational_qualifications.0.year_of_passing`, eduForm.year_of_passing);
-        if (yp) errs.year_of_passing = yp;
+        if (!eduForm.course) errs.course = 'Course is required';
+        if (!eduForm.field_of_study) errs.field_of_study = 'Field of Study is required';
+        if (!eduForm.institution_name) errs.institution_name = 'Institution is required';
+        if (!eduForm.university_board) errs.university_board = 'University/Board is required';
+        
+        if (eduForm.degree === 'PhD' || eduForm.degree === 'Post Doc') {
+            if (!eduForm.status) errs.status = 'Status is required';
+            else {
+                if (eduForm.status === 'Ongoing' && !eduForm.start_date) errs.start_date = 'Start Date is required';
+                if (eduForm.status === 'Completed') {
+                    if (!eduForm.start_date) errs.start_date = 'Start Date is required';
+                    if (!eduForm.end_date) errs.end_date = 'End Date is required';
+                    if (eduForm.start_date && eduForm.end_date && new Date(eduForm.start_date) >= new Date(eduForm.end_date)) {
+                        errs.end_date = 'End date must be after start date';
+                    }
+                }
+            }
+            if (eduForm.status !== 'Ongoing') {
+                if (!eduForm.percentage_cgpa) errs.percentage_cgpa = 'Percentage/CGPA is required';
+            }
+        } else {
+            if (!eduForm.start_date) errs.start_date = 'Start Date is required';
+            if (!eduForm.end_date) errs.end_date = 'End Date is required';
+            if (eduForm.start_date && eduForm.end_date && new Date(eduForm.start_date) >= new Date(eduForm.end_date)) {
+                errs.end_date = 'End date must be after start date';
+            }
+            if (!eduForm.percentage_cgpa) errs.percentage_cgpa = 'Percentage/CGPA is required';
+        }
     }
-    if (!eduForm.percentage_cgpa) {
-        errs.percentage_cgpa = 'Percentage/CGPA is required';
-    } else {
+
+    if (eduForm.percentage_cgpa) {
         const pc = validateField(`educational_qualifications.0.percentage_cgpa`, eduForm.percentage_cgpa);
         if (pc) errs.percentage_cgpa = pc;
+    }
+
+    const isOngoingPhdOrPostDoc = (eduForm.degree === 'PhD' || eduForm.degree === 'Post Doc') && eduForm.status === 'Ongoing';
+    if (!isOngoingPhdOrPostDoc && !eduForm.certificate_url) {
+        errs.certificate_url = 'Document upload is required';
     }
     setEduFormErrors(errs);
     return Object.keys(errs).length === 0;
@@ -446,12 +491,12 @@ export default function Profile() {
     e.preventDefault();
     // Final validation
     const pathsToValidate = [
-      'basic_info.full_name','basic_info.aadhaar_card','basic_info.gender','basic_info.date_of_birth','basic_info.nationality','basic_info.marital_status','basic_info.caste_category',
+      'basic_info.full_name','basic_info.aadhaar_card','basic_info.pan_card','basic_info.gender','basic_info.date_of_birth','basic_info.nationality','basic_info.marital_status','basic_info.caste_category',
       'contact_info.mobile_number','contact_info.email_address','contact_info.current_address','contact_info.city','contact_info.state','contact_info.postal_code','contact_info.emergency_contact_number','contact_info.emergency_contact_name',
       'contact_info.permanent_address','contact_info.permanent_city','contact_info.permanent_state','contact_info.permanent_postal_code',
       'professional_info.faculty_staff_id','professional_info.designation','professional_info.department','professional_info.date_of_joining','professional_info.years_of_experience','professional_info.office_contact_number',
       'professional_info.date_of_continuous_employment','professional_info.present_grade','professional_info.specialization',
-      'social_links.google_scholar_profile','social_links.researchgate_profile','social_links.orcid_id','social_links.scopus_author_id'
+      'social_links.google_scholar_profile','social_links.researchgate_profile','social_links.orcid_id','social_links.scopus_author_id','social_links.vidwan_id'
     ];
     const newErrors = {};
     for (const pth of pathsToValidate) {
@@ -466,6 +511,18 @@ export default function Profile() {
       const pc = validateField(`educational_qualifications.${idx}.percentage_cgpa`, q?.percentage_cgpa);
       if (pc) newErrors[`educational_qualifications.${idx}.percentage_cgpa`] = pc;
     });
+    
+    const requiredDegrees = ['10th', 'Graduation', 'Post Graduation'];
+    const hasRequired = requiredDegrees.every(req => 
+      (profile.educational_qualifications || []).some(q => q.degree === req)
+    );
+    if (!hasRequired) {
+      setEducationError('10th, Graduation, and Post Graduation are mandatory qualifications.');
+      newErrors['educational_qualifications'] = 'Missing mandatory qualifications';
+    } else {
+      setEducationError('');
+    }
+
     setErrors(newErrors);
     if (Object.keys(newErrors).length) {
       console.warn('[Profile] Validation failed before save', newErrors);
@@ -635,6 +692,11 @@ export default function Profile() {
                 {errors['basic_info.aadhaar_card'] && <div className={errorText}>{errors['basic_info.aadhaar_card']}</div>}
               </div>
               <div>
+                <label className={labelBase}>PAN No <span className="text-red-500">*</span></label>
+                <input className={`${inputBase} ${errors['basic_info.pan_card'] ? 'border-red-500' : ''}`} value={profile.basic_info?.pan_card || ''} onChange={(e) => update('basic_info.pan_card', e.target.value.toUpperCase().replace(/[^A-Z0-9]/g, '').slice(0, 10))} maxLength={10} required placeholder="10-character PAN" />
+                {errors['basic_info.pan_card'] && <div className={errorText}>{errors['basic_info.pan_card']}</div>}
+              </div>
+              <div>
                 <label className={labelBase}>Gender <span className="text-red-500">*</span></label>
                 <select
                   className={`${inputBase} ${errors['basic_info.gender'] ? 'border-red-500' : ''}`}
@@ -654,13 +716,39 @@ export default function Profile() {
               </div>
               <div>
                 <label className={labelBase}>Nationality <span className="text-red-500">*</span></label>
-                <input
-                  className={`${inputBase} ${errors['basic_info.nationality'] ? 'border-red-500' : ''}`}
-                  value={profile.basic_info?.nationality || ''}
-                  onChange={(e) => update('basic_info.nationality', sanitizeAlpha(e.target.value))}
+                <select
+                  className={`${inputBase} ${errors['basic_info.nationality'] && !isOtherNationality ? 'border-red-500' : ''}`}
+                  value={isOtherNationality ? 'Other' : (profile.basic_info?.nationality === 'Indian' ? 'Indian' : '')}
+                  onChange={(e) => {
+                    const val = e.target.value;
+                    if (val === 'Indian') {
+                      setIsOtherNationality(false);
+                      update('basic_info.nationality', 'Indian');
+                    } else if (val === 'Other') {
+                      setIsOtherNationality(true);
+                      update('basic_info.nationality', '');
+                    } else {
+                      setIsOtherNationality(false);
+                      update('basic_info.nationality', '');
+                    }
+                  }}
                   required
-                  placeholder="e.g. Indian"
-                />
+                >
+                  <option value="">Select</option>
+                  <option value="Indian">Indian</option>
+                  <option value="Other">Other</option>
+                </select>
+                {isOtherNationality && (
+                  <div className="mt-2">
+                    <input
+                      className={`${inputBase} ${errors['basic_info.nationality'] ? 'border-red-500' : ''}`}
+                      value={profile.basic_info?.nationality || ''}
+                      onChange={(e) => update('basic_info.nationality', sanitizeAlpha(e.target.value))}
+                      required
+                      placeholder="Specify your nationality"
+                    />
+                  </div>
+                )}
                 {errors['basic_info.nationality'] && <div className={errorText}>{errors['basic_info.nationality']}</div>}
               </div>
               <div>
@@ -858,7 +946,7 @@ export default function Profile() {
                         else if (path.endsWith('office_location')) v = sanitizeAlphaNumLoose(raw);
                         else if (path.endsWith('office_contact_number')) v = sanitizePhone(raw);
                         else if (path.endsWith('years_of_experience')) v = sanitizeNumeric(raw);
-                        update(path, type==='number' ? (v === '' ? '' : Number(v)) : v);
+                        update(path, type==='number' ? (v === '' ? null : Number(v)) : v);
                       }}
                     />
                   )}
@@ -935,19 +1023,32 @@ export default function Profile() {
                         <th className="px-6 py-4 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">Degree</th>
                         <th className="px-6 py-4 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">Course</th>
                         <th className="px-6 py-4 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">Institution</th>
-                        <th className="px-6 py-4 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">Year</th>
+                        <th className="px-6 py-4 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">Duration</th>
                         <th className="px-6 py-4 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">Score</th>
+                        <th className="px-6 py-4 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">Certificate</th>
                         <th className="px-6 py-4 text-right text-xs font-bold text-gray-500 uppercase tracking-wider">Actions</th>
                       </tr>
                     </thead>
                     <tbody className="bg-white/40 divide-y divide-gray-100/80 backdrop-blur-sm">
                       {profile.educational_qualifications.map((q, idx) => (
                         <tr key={idx} className="hover:bg-gray-50/50 transition-colors">
-                          <td className="px-6 py-4 whitespace-nowrap text-sm font-bold text-gray-900">{q.degree}</td>
-                          <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-600">{q.course}</td>
-                          <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-600">{q.institution_name}</td>
-                          <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-600">{q.year_of_passing}</td>
+                          <td className="px-6 py-4 whitespace-nowrap text-sm font-bold text-gray-900">{q.degree}{(q.degree === 'PhD' || q.degree === 'Post Doc') && q.status ? ` (${q.status})` : ''}</td>
+                          <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-600">{q.degree === 'Competitive Exams' ? (q.exam_name === 'Others' ? q.other_exam_name : q.exam_name) : q.course}</td>
+                          <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-600">{q.degree === 'Competitive Exams' ? q.conducting_org : q.institution_name}</td>
+                          <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-600">
+                            {q.degree === 'Competitive Exams' ? q.year_of_qualification : (
+                              <>
+                                {q.start_date ? String(q.start_date).substring(0,4) : ''} 
+                                {q.end_date ? ` - ${String(q.end_date).substring(0,4)}` : (q.status === 'Ongoing' ? ' - Present' : '')}
+                              </>
+                            )}
+                          </td>
                           <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-600">{q.percentage_cgpa}</td>
+                          <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-blue-600">
+                            {q.certificate_url && typeof q.certificate_url === 'string' && (
+                              <a href={getDocumentUrl(q.certificate_url)} target="_blank" rel="noopener noreferrer">View</a>
+                            )}
+                          </td>
                           <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                             <button type="button" onClick={() => handleEditQualification(idx)} className="text-indigo-600 hover:text-indigo-800 bg-indigo-50 px-3 py-1.5 rounded-lg mr-2 transition-colors">Edit</button>
                             <button type="button" onClick={() => handleRemoveQualification(idx)} className="text-red-600 hover:text-red-800 bg-red-50 px-3 py-1.5 rounded-lg transition-colors">Remove</button>
@@ -972,45 +1073,169 @@ export default function Profile() {
                 <div className="absolute top-0 left-0 w-1.5 h-full bg-indigo-500"></div>
                 <h3 className="text-lg font-bold text-gray-900 mb-5">{editEduIndex >= 0 ? 'Edit Qualification' : 'Add Qualification'}</h3>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
-                  {[
-                    ['degree','Degree', 'Select Degree'],
-                    ['course','Course', 'e.g. B.Tech, M.Tech'],
-                    ['field_of_study','Field of Study', 'e.g. Computer Science'],
-                    ['institution_name','Institution Name', 'e.g. DTU'],
-                    ['university_board','University/Board', 'e.g. Delhi University'],
-                    ['year_of_passing','Year of Passing', 'e.g. 2020'],
-                    ['percentage_cgpa','Percentage/CGPA', 'e.g. 85.5% or 8.5 CGPA']
-                  ].map(([k,label,placeholder]) => (
-                    <div key={k}>
-                      <label className={labelBase}>{label} <span className="text-red-500">*</span></label>
-                      {k === 'degree' ? (
-                        <select
-                          className={`${inputBase} ${eduFormErrors[k] ? 'border-red-500 focus:border-red-500 focus:ring-red-500/20' : ''}`}
-                          value={eduForm[k] || ''}
-                          onChange={(e) => {
-                             setEduForm({...eduForm, degree: e.target.value});
-                             if (eduFormErrors.degree) setEduFormErrors({...eduFormErrors, degree: null});
-                          }}
-                        >
-                          <option value="">Select</option>
-                          {(eduForm.degree && !DEGREE_OPTIONS.includes(eduForm.degree)) ? (
-                            <option value={eduForm.degree}>{eduForm.degree}</option>
-                          ) : null}
-                          {DEGREE_OPTIONS.map(d => <option key={d} value={d}>{d}</option>)}
+                  <div key="degree">
+                    <label className={labelBase}>Degree <span className="text-red-500">*</span></label>
+                    <select
+                      className={`${inputBase} ${eduFormErrors.degree ? 'border-red-500 focus:border-red-500 focus:ring-red-500/20' : ''}`}
+                      value={eduForm.degree || ''}
+                      onChange={(e) => {
+                         setEduForm({...eduForm, degree: e.target.value});
+                         if (eduFormErrors.degree) setEduFormErrors({...eduFormErrors, degree: null});
+                      }}
+                    >
+                      <option value="">Select</option>
+                      {(eduForm.degree && !DEGREE_OPTIONS.includes(eduForm.degree)) ? (
+                        <option value={eduForm.degree}>{eduForm.degree}</option>
+                      ) : null}
+                      {DEGREE_OPTIONS.map(d => <option key={d} value={d}>{d}</option>)}
+                    </select>
+                    {eduFormErrors.degree && <div className={errorText}>{eduFormErrors.degree}</div>}
+                  </div>
+
+                  {eduForm.degree === 'Competitive Exams' ? (
+                    <>
+                      <div>
+                        <label className={labelBase}>Type of Exam <span className="text-red-500">*</span></label>
+                        <select className={`${inputBase} ${eduFormErrors.exam_name ? 'border-red-500 focus:border-red-500' : ''}`} value={eduForm.exam_name || ''} onChange={(e) => {
+                            setEduForm({...eduForm, exam_name: e.target.value});
+                            if (eduFormErrors.exam_name) setEduFormErrors({...eduFormErrors, exam_name: null});
+                        }}>
+                           <option value="">Select Exam</option>
+                           {['GATE', 'UGC NET', 'CSIR NET', 'ICAR NET', 'SLET', 'SET', 'JRF', 'GRE', 'TOEFL', 'IELTS', 'CAT', 'Others'].map(ex => <option key={ex} value={ex}>{ex}</option>)}
                         </select>
-                      ) : (
-                        <input className={`${inputBase} ${eduFormErrors[k] ? 'border-red-500 focus:border-red-500 focus:ring-red-500/20' : ''}`} value={eduForm[k] || ''} placeholder={placeholder} onChange={(e) => {
-                          let v = e.target.value;
-                          if (k === 'year_of_passing') v = sanitizeNumeric(v);
-                          else if (k === 'percentage_cgpa') v = sanitizePercent(v);
-                          else v = sanitizeAlphaNumLoose(v);
-                          setEduForm({...eduForm, [k]: k==='year_of_passing' ? (v === '' ? '' : Number(v)) : v});
-                          if (eduFormErrors[k]) setEduFormErrors({...eduFormErrors, [k]: null});
-                        }} />
+                        {eduFormErrors.exam_name && <div className={errorText}>{eduFormErrors.exam_name}</div>}
+                      </div>
+
+                      {eduForm.exam_name === 'Others' && (
+                        <div>
+                          <label className={labelBase}>Other Exam Name <span className="text-red-500">*</span></label>
+                          <input className={`${inputBase} ${eduFormErrors.other_exam_name ? 'border-red-500 focus:border-red-500' : ''}`} value={eduForm.other_exam_name || ''} placeholder="e.g. UPSC" onChange={(e) => {
+                              setEduForm({...eduForm, other_exam_name: e.target.value.replace(/[^A-Za-z0-9 .,-/]+/g, '').slice(0, 100)});
+                              if (eduFormErrors.other_exam_name) setEduFormErrors({...eduFormErrors, other_exam_name: null});
+                          }} />
+                          {eduFormErrors.other_exam_name && <div className={errorText}>{eduFormErrors.other_exam_name}</div>}
+                        </div>
                       )}
-                      {eduFormErrors[k] && <div className={errorText}>{eduFormErrors[k]}</div>}
+
+                      <div>
+                        <label className={labelBase}>Subject <span className="text-red-500">*</span></label>
+                        <input className={`${inputBase} ${eduFormErrors.exam_subject ? 'border-red-500 focus:border-red-500' : ''}`} value={eduForm.exam_subject || ''} placeholder="e.g. Computer Science" onChange={(e) => {
+                            setEduForm({...eduForm, exam_subject: e.target.value.replace(/[^A-Za-z0-9 .,-/]+/g, '').slice(0, 100)});
+                            if (eduFormErrors.exam_subject) setEduFormErrors({...eduFormErrors, exam_subject: null});
+                        }} />
+                        {eduFormErrors.exam_subject && <div className={errorText}>{eduFormErrors.exam_subject}</div>}
+                      </div>
+
+                      <div>
+                        <label className={labelBase}>Conducting Organization <span className="text-red-500">*</span></label>
+                        <input className={`${inputBase} ${eduFormErrors.conducting_org ? 'border-red-500 focus:border-red-500' : ''}`} value={eduForm.conducting_org || ''} placeholder="e.g. IIT Bombay" onChange={(e) => {
+                            setEduForm({...eduForm, conducting_org: e.target.value.replace(/[^A-Za-z0-9 .,-/]+/g, '').slice(0, 100)});
+                            if (eduFormErrors.conducting_org) setEduFormErrors({...eduFormErrors, conducting_org: null});
+                        }} />
+                        {eduFormErrors.conducting_org && <div className={errorText}>{eduFormErrors.conducting_org}</div>}
+                      </div>
+
+                      <div>
+                        <label className={labelBase}>Year of Qualification <span className="text-red-500">*</span></label>
+                        <input className={`${inputBase} ${eduFormErrors.year_of_qualification ? 'border-red-500 focus:border-red-500' : ''}`} value={eduForm.year_of_qualification || ''} placeholder="e.g. 2020" onChange={(e) => {
+                            const v = e.target.value.replace(/[^0-9]+/g, '');
+                            setEduForm({...eduForm, year_of_qualification: v === '' ? null : Number(v)});
+                            if (eduFormErrors.year_of_qualification) setEduFormErrors({...eduFormErrors, year_of_qualification: null});
+                        }} />
+                        {eduFormErrors.year_of_qualification && <div className={errorText}>{eduFormErrors.year_of_qualification}</div>}
+                      </div>
+                      
+                      <div>
+                        <label className={labelBase}>Score / Rank / Percentile <span className="text-red-500">*</span></label>
+                        <input className={`${inputBase} ${eduFormErrors.percentage_cgpa ? 'border-red-500 focus:border-red-500 focus:ring-red-500/20' : ''}`} value={eduForm.percentage_cgpa || ''} placeholder="e.g. AIR 120" onChange={(e) => {
+                          setEduForm({...eduForm, percentage_cgpa: e.target.value.replace(/[^A-Za-z0-9 .,-/]+/g, '').slice(0, 100)});
+                          if (eduFormErrors.percentage_cgpa) setEduFormErrors({...eduFormErrors, percentage_cgpa: null});
+                        }} />
+                        {eduFormErrors.percentage_cgpa && <div className={errorText}>{eduFormErrors.percentage_cgpa}</div>}
+                      </div>
+                    </>
+                  ) : (
+                    <>
+                      {[
+                        ['course','Course', 'e.g. B.Tech, M.Tech'],
+                        ['field_of_study','Field of Study', 'e.g. Computer Science'],
+                        ['institution_name','Institution Name', 'e.g. DTU'],
+                        ['university_board','University/Board', 'e.g. Delhi University']
+                      ].map(([k,label,placeholder]) => (
+                        <div key={k}>
+                          <label className={labelBase}>{label} <span className="text-red-500">*</span></label>
+                          <input className={`${inputBase} ${eduFormErrors[k] ? 'border-red-500 focus:border-red-500 focus:ring-red-500/20' : ''}`} value={eduForm[k] || ''} placeholder={placeholder} onChange={(e) => {
+                            let v = e.target.value;
+                            v = v.replace(/[^A-Za-z0-9 .,-/]+/g, '').slice(0, 200);
+                            setEduForm({...eduForm, [k]: v});
+                            if (eduFormErrors[k]) setEduFormErrors({...eduFormErrors, [k]: null});
+                          }} />
+                          {eduFormErrors[k] && <div className={errorText}>{eduFormErrors[k]}</div>}
+                        </div>
+                      ))}
+
+                      {(eduForm.degree === 'PhD' || eduForm.degree === 'Post Doc') && (
+                        <div>
+                          <label className={labelBase}>Status <span className="text-red-500">*</span></label>
+                          <select className={`${inputBase} ${eduFormErrors.status ? 'border-red-500 focus:border-red-500' : ''}`} value={eduForm.status || ''} onChange={(e) => {
+                              setEduForm({...eduForm, status: e.target.value});
+                              if (eduFormErrors.status) setEduFormErrors({...eduFormErrors, status: null});
+                          }}>
+                             <option value="">Select</option>
+                             <option value="Ongoing">Ongoing</option>
+                             <option value="Completed">Completed</option>
+                          </select>
+                          {eduFormErrors.status && <div className={errorText}>{eduFormErrors.status}</div>}
+                        </div>
+                      )}
+
+                      { (eduForm.degree && ( (eduForm.degree !== 'PhD' && eduForm.degree !== 'Post Doc') || ((eduForm.degree === 'PhD' || eduForm.degree === 'Post Doc') && eduForm.status) )) && (
+                        <div>
+                          <label className={labelBase}>Start Date <span className="text-red-500">*</span></label>
+                          <input type="date" className={`${inputBase} ${eduFormErrors.start_date ? 'border-red-500 focus:border-red-500' : ''}`} value={eduForm.start_date ? String(eduForm.start_date).substring(0,10) : ''} onChange={(e) => {
+                              setEduForm({...eduForm, start_date: e.target.value});
+                              if (eduFormErrors.start_date) setEduFormErrors({...eduFormErrors, start_date: null});
+                          }} />
+                          {eduFormErrors.start_date && <div className={errorText}>{eduFormErrors.start_date}</div>}
+                        </div>
+                      )}
+
+                      { (eduForm.degree && ( (eduForm.degree !== 'PhD' && eduForm.degree !== 'Post Doc') || ((eduForm.degree === 'PhD' || eduForm.degree === 'Post Doc') && eduForm.status === 'Completed') )) && (
+                        <div>
+                          <label className={labelBase}>End Date <span className="text-red-500">*</span></label>
+                          <input type="date" className={`${inputBase} ${eduFormErrors.end_date ? 'border-red-500 focus:border-red-500' : ''}`} value={eduForm.end_date ? String(eduForm.end_date).substring(0,10) : ''} onChange={(e) => {
+                              setEduForm({...eduForm, end_date: e.target.value});
+                              if (eduFormErrors.end_date) setEduFormErrors({...eduFormErrors, end_date: null});
+                          }} />
+                          {eduFormErrors.end_date && <div className={errorText}>{eduFormErrors.end_date}</div>}
+                        </div>
+                      )}
+
+                      { (!eduForm.degree || (eduForm.degree !== 'PhD' && eduForm.degree !== 'Post Doc') || ((eduForm.degree === 'PhD' || eduForm.degree === 'Post Doc') && eduForm.status !== 'Ongoing')) && (
+                        <div>
+                          <label className={labelBase}>Percentage/CGPA <span className="text-red-500">*</span></label>
+                          <input className={`${inputBase} ${eduFormErrors.percentage_cgpa ? 'border-red-500 focus:border-red-500 focus:ring-red-500/20' : ''}`} value={eduForm.percentage_cgpa || ''} placeholder="e.g. 85.5% or 8.5 CGPA" onChange={(e) => {
+                            let v = e.target.value;
+                            v = v.replace(/[^0-9.]+/g, '').slice(0, 6);
+                            setEduForm({...eduForm, percentage_cgpa: v});
+                            if (eduFormErrors.percentage_cgpa) setEduFormErrors({...eduFormErrors, percentage_cgpa: null});
+                          }} />
+                          {eduFormErrors.percentage_cgpa && <div className={errorText}>{eduFormErrors.percentage_cgpa}</div>}
+                        </div>
+                      )}
+                    </>
+                  )}
+
+                  <div className="sm:col-span-2">
+                    <label className={labelBase}>Certificate/Degree Upload {!(!eduForm.degree || (eduForm.degree === 'PhD' || eduForm.degree === 'Post Doc') && eduForm.status === 'Ongoing') && <span className="text-red-500">*</span>}</label>
+                    <div className={eduFormErrors.certificate_url ? 'border border-red-500 rounded-lg p-1' : ''}>
+                      <FileUpload value={eduForm.certificate_url} onChange={(val) => {
+                          setEduForm({...eduForm, certificate_url: val});
+                          if (eduFormErrors.certificate_url) setEduFormErrors({...eduFormErrors, certificate_url: null});
+                      }} temporaryPdf={true} />
                     </div>
-                  ))}
+                    {eduFormErrors.certificate_url && <div className={errorText}>{eduFormErrors.certificate_url}</div>}
+                  </div>
                 </div>
                 <div className="flex justify-end gap-3 mt-6 pt-5 border-t border-indigo-100/50">
                   <button type="button" onClick={() => setShowEduForm(false)} className="px-5 py-2.5 text-sm font-bold text-gray-700 bg-white border border-gray-200/80 rounded-xl hover:bg-gray-50 hover:shadow-sm transition-all">Cancel</button>
@@ -1033,7 +1258,8 @@ export default function Profile() {
                 ['social_links.google_scholar_profile','Google Scholar Profile', true, 'URL to Google Scholar'],
                 ['social_links.researchgate_profile','ResearchGate Profile', true, 'URL to ResearchGate'],
                 ['social_links.scopus_author_id','Scopus Author ID', true, 'e.g. 571934'],
-                ['social_links.orcid_id','ORCID ID', false, 'e.g. 0000-0000-0000-000X']
+                ['social_links.orcid_id','ORCID ID', false, 'e.g. 0000-0000-0000-000X'],
+                ['social_links.vidwan_id','Vidwan ID', false, 'e.g. 123456']
               ].map(([path,label,required,placeholder]) => (
                 <div key={path}>
                   <label className={labelBase}>{label} {required && <span className="text-red-500">*</span>}</label>

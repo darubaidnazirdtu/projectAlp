@@ -46,6 +46,10 @@ export const createProfilePicturePath = (facultyName, originalName) => {
     return `profilepicture/${safeSegment(facultyName, 'faculty')}/${uuidv4()}${extension}`;
 };
 
+export const createProfileEducationDocumentPath = (facultyName) => (
+    `profile/${safeSegment(facultyName, 'faculty')}/education/${uuidv4()}.pdf`
+);
+
 export const createDocumentPath = (facultyName, academicYear) => (
     `document/${safeSegment(facultyName, 'faculty')}/${safeSegment(academicYear, 'academic_year')}/${uuidv4()}.pdf`
 );
@@ -77,5 +81,5 @@ export const getObject = async (objectPath) => {
 };
 
 export const isAparObjectPath = (value) => (
-    typeof value === 'string' && /^(profilepicture|document|additional documents)\//.test(value)
+    typeof value === 'string' && /^(profilepicture|profile|document|additional documents)\//.test(value)
 );

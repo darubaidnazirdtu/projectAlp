@@ -34,7 +34,7 @@ const FileUpload = ({ value, onChange, disabled, required = false, temporaryPdf 
         try {
             // A persisted PDF is removed before its replacement is uploaded. The
             // API clears the APAR reference and deletes the object as one action.
-            if (temporaryPdf && typeof value === 'string' && /^(document|additional documents)\//.test(value)) {
+            if (temporaryPdf && typeof value === 'string' && /^(document|additional documents|profile)\//.test(value)) {
                 await deleteSavedPdf(value);
                 onChange('');
             }
@@ -87,7 +87,7 @@ const FileUpload = ({ value, onChange, disabled, required = false, temporaryPdf 
                     console.warn('Temporary PDF cleanup failed:', error);
                 }
             }
-        } else if (temporaryPdf && typeof value === 'string' && /^(document|additional documents)\//.test(value)) {
+        } else if (temporaryPdf && typeof value === 'string' && /^(document|additional documents|profile)\//.test(value)) {
             try {
                 await deleteSavedPdf(value);
             } catch (error) {

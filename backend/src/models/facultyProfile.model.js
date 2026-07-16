@@ -7,8 +7,16 @@ const QualificationSchema = new mongoose.Schema({
   institution_name: { type: String, trim: true },
   university_board: { type: String, trim: true },
   year_of_passing: { type: Number },
+  status: { type: String, trim: true },
+  start_date: { type: Date },
+  end_date: { type: Date },
   percentage_cgpa: { type: String, trim: true },
-  certificate_url: { type: String, trim: true }
+  certificate_url: { type: String, trim: true },
+  exam_name: { type: String, trim: true },
+  other_exam_name: { type: String, trim: true },
+  exam_subject: { type: String, trim: true },
+  conducting_org: { type: String, trim: true },
+  year_of_qualification: { type: Number }
 }, { _id: true });
 
 const FacultyProfileSchema = new mongoose.Schema({
@@ -22,7 +30,8 @@ const FacultyProfileSchema = new mongoose.Schema({
     gender: { type: String, trim: true },
     date_of_birth: { type: Date },
     nationality: { type: String, trim: true },
-    marital_status: { type: String, trim: true }
+    marital_status: { type: String, trim: true },
+    pan_card: { type: String, trim: true }
   },
 
   contact_info: {
@@ -65,7 +74,8 @@ const FacultyProfileSchema = new mongoose.Schema({
     google_scholar_profile: { type: String, trim: true },
     researchgate_profile: { type: String, trim: true },
     orcid_id: { type: String, trim: true },
-    scopus_author_id: { type: String, trim: true }
+    scopus_author_id: { type: String, trim: true },
+    vidwan_id: { type: String, trim: true }
   }
 }, {
   timestamps: true,

@@ -4,6 +4,8 @@ import { ApiResponse } from '../utils/api-response.js';
 import { FacultyProfile } from '../models/facultyProfile.model.js';
 import { Faculty, User } from '../models/index.js';
 import { assertFacultyAccess, getCurrentFacultyId } from '../utils/apar-access.js';
+import { getTemporaryDocument, recordCompletedTemporaryDocument, removeTemporaryDocument, discardTemporaryDocument } from '../services/apar-temp-document.service.js';
+import { uploadLocalFile, createProfileEducationDocumentPath } from '../services/minio.service.js';
 
 const sanitizeProfile = (doc) => {
   if (!doc) return null;
@@ -95,6 +97,34 @@ export const upsertSelfProfile = asyncHandler(async (req, res) => {
     update.professional_info.faculty_staff_id = facultyId;
   }
 
+  const temporaryIds = [];
+
+  if (Array.isArray(update.educational_qualifications)) {
+    for (const qual of update.educational_qualifications) {
+      if (qual.certificate_url && typeof qual.certificate_url === 'object' && qual.certificate_url.tempId) {
+        const tempId = qual.certificate_url.tempId;
+        temporaryIds.push(tempId);
+        const temp = getTemporaryDocument(tempId, req.user.id);
+        if (temp) {
+          const facultyName = update.basic_info?.full_name || 'faculty';
+          const objectPath = createProfileEducationDocumentPath(facultyName);
+          await uploadLocalFile({
+            filePath: temp.filePath,
+            objectPath,
+            contentType: 'application/pdf'
+          });
+          recordCompletedTemporaryDocument(tempId, req.user.id, objectPath);
+          await removeTemporaryDocument(tempId);
+          qual.certificate_url = objectPath;
+        } else {
+          qual.certificate_url = '';
+        }
+      }
+    }
+  }
+
+  try {
+
   const doc = await FacultyProfile.findOneAndUpdate(
     { faculty_id: facultyId },
     { $set: { ...update, faculty_id: facultyId } },
@@ -102,6 +132,10 @@ export const upsertSelfProfile = asyncHandler(async (req, res) => {
   ).lean();
 
   res.status(200).json(new ApiResponse(200, { profile: sanitizeProfile(doc) }, 'Profile saved'));
+} catch (e) {
+  await Promise.allSettled(temporaryIds.map(tempId => discardTemporaryDocument(tempId)));
+  throw e;
+}
 });
 
 export const getProfileByFaculty = asyncHandler(async (req, res) => {
