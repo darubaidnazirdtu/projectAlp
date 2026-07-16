@@ -645,7 +645,9 @@ export default function DynamicTableSection({
                                                     {(item[f.key] || []).length === 0 && <span className="text-gray-400 text-xs">-</span>}
                                                 </div>
                                             ) : (
-                                                <div className="whitespace-pre-wrap" title={item[f.key]}>{item[f.key]}</div>
+                                                <div className="whitespace-pre-wrap" title={typeof item[f.key] === 'object' && item[f.key] !== null ? JSON.stringify(item[f.key]) : item[f.key]}>
+                                                    {typeof item[f.key] === 'object' && item[f.key] !== null ? JSON.stringify(item[f.key]) : item[f.key]}
+                                                </div>
                                             )}
                                         </td>
                                     )})}
