@@ -1264,7 +1264,7 @@ export default function PartII({ formData, addItem, removeItem, updateArrayField
 
                 {/* 2) Visit of faculty to other institution */}
                 <DynamicTableSection
-                    title="2) Visit of faculty to other institution for taking Experts’ Lectures/other academic work"
+                    title="2.1 Visit of faculty to other institution for taking Experts’ Lectures/other academic work"
                     data={teachingData?.faculty_visits_other_institutions || []}
                     uniqueKey="title_of_activity"
                     {...createHandlers('teaching', 'faculty_visits_other_institutions')}
@@ -1283,7 +1283,7 @@ export default function PartII({ formData, addItem, removeItem, updateArrayField
 
                 {/* 3) Details of teaching methods employed */}
                 <DynamicTableSection
-                    title="3) Details of teaching methods employed by you (Lectures, Tutorials, Seminars, Practicals etc.)"
+                    title="3.1 Details of teaching methods employed by you (Lectures, Tutorials, Seminars, Practicals etc.)"
                     data={teachingData?.teaching_methods || []}
                     uniqueKey="description"
                     {...createHandlers('teaching', 'teaching_methods')}
@@ -1294,7 +1294,7 @@ export default function PartII({ formData, addItem, removeItem, updateArrayField
 
                 {/* ICT Tools */}
                 <DynamicTableSection
-                    title="3.1) ICT Tools and Resources Used"
+                    title="3.2 ICT Tools and Resources Used"
                     data={teachingData?.ict_tools || []}
                     uniqueKey="description"
                     {...createHandlers('teaching', 'ict_tools')}
@@ -1308,7 +1308,7 @@ export default function PartII({ formData, addItem, removeItem, updateArrayField
 
                 {/* Student Centric Methods */}
                 <DynamicTableSection
-                    title="3.2) Student Centric Methods (Experiential/Participative/Problem Solving)"
+                    title="3.3 Student Centric Methods (Experiential/Participative/Problem Solving)"
                     data={teachingData?.student_centric_methods || []}
                     uniqueKey="description"
                     {...createHandlers('teaching', 'student_centric_methods')}

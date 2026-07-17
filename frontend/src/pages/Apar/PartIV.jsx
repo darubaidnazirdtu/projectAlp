@@ -34,7 +34,7 @@ export default function PartIV({ formData, addItem, removeItem, updateArrayItem,
 
             <div className="space-y-6">
                 <DynamicTableSection
-                    title="1) a) Curriculum Development"
+                    title="1.1 Curriculum Development"
                     data={corporate.curriculum_development || []}
                     uniqueKey="description"
                     {...createHandlers('corporate', 'curriculum_development')}
@@ -44,7 +44,7 @@ export default function PartIV({ formData, addItem, removeItem, updateArrayItem,
                 />
 
                 <DynamicTableSection
-                    title="1) b) Course Development OR Courses Developed"
+                    title="1.2 Course Development OR Courses Developed"
                     data={corporate.course_development_details || []}
                     uniqueKey="description"
                     {...createHandlers('corporate', 'course_development_details')}
@@ -54,7 +54,7 @@ export default function PartIV({ formData, addItem, removeItem, updateArrayItem,
                 />
 
                 <DynamicTableSection
-                    title="2) Laboratory Development and experimental set up"
+                    title="2.1 Laboratory Development and experimental set up"
                     data={corporate.lab_development || []}
                     uniqueKey="description"
                     {...createHandlers('corporate', 'lab_development')}
@@ -64,7 +64,7 @@ export default function PartIV({ formData, addItem, removeItem, updateArrayItem,
                 />
 
                 <DynamicTableSection
-                    title="3) a) Cultural / Extracurricular Activities"
+                    title="3.1 Cultural / Extracurricular Activities"
                     data={corporate.cultural_activities || []}
                     uniqueKey="description"
                     {...createHandlers('corporate', 'cultural_activities')}
@@ -74,7 +74,7 @@ export default function PartIV({ formData, addItem, removeItem, updateArrayItem,
                 />
 
                 <DynamicTableSection
-                    title="3) b) Sports / Community / Extension Services / N.S.S"
+                    title="3.2 Sports / Community / Extension Services / N.S.S"
                     data={corporate.sports_community || []}
                     uniqueKey="description"
                     {...createHandlers('corporate', 'sports_community')}
@@ -84,7 +84,7 @@ export default function PartIV({ formData, addItem, removeItem, updateArrayItem,
                 />
 
                 <DynamicTableSection
-                    title="3) c) i) Administrative Assignment (University Level)"
+                    title="3.3 Administrative Assignment (University Level)"
                     data={corporate.admin_assignment_university || []}
                     uniqueKey="description"
                     {...createHandlers('corporate', 'admin_assignment_university')}
@@ -94,7 +94,7 @@ export default function PartIV({ formData, addItem, removeItem, updateArrayItem,
                 />
 
                 <DynamicTableSection
-                    title="3) c) ii) Administrative Assignment (Department Level)"
+                    title="3.4 Administrative Assignment (Department Level)"
                     data={corporate.admin_assignment_department || []}
                     uniqueKey="description"
                     {...createHandlers('corporate', 'admin_assignment_department')}
@@ -104,7 +104,7 @@ export default function PartIV({ formData, addItem, removeItem, updateArrayItem,
                 />
 
                 <DynamicTableSection
-                    title="3) c) iii) Administrative Assignment (External)"
+                    title="3.5 Administrative Assignment (External)"
                     data={corporate.admin_assignment_external || []}
                     uniqueKey="description"
                     {...createHandlers('corporate', 'admin_assignment_external')}
@@ -114,7 +114,7 @@ export default function PartIV({ formData, addItem, removeItem, updateArrayItem,
                 />
 
                 <DynamicTableSection
-                    title="3) d) Any Other"
+                    title="3.6 Any Other"
                     data={corporate.any_other || []}
                     uniqueKey="description"
                     {...createHandlers('corporate', 'any_other')}
