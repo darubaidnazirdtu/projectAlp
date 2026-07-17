@@ -337,6 +337,7 @@ const AparFormSchema = new mongoose.Schema({
             thesis_title: String,
             thesis_type: String,
             supervisor_name: String, // Often auto-filled but good to have
+            supervision_location: String,
             date_of_registration: Date,
             date_of_defence: Date,
             date_of_result_notification: Date,

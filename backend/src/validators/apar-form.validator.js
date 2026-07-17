@@ -313,13 +313,15 @@
 //     thesis_type: optionalString,
 //     supervisor_name: optionalString,
 //     supervisor_id: optionalString,
+//     supervision_location: optionalString,
 //     date_of_registration: optionalString,
 //     date_of_defence: optionalString,
 //     date_of_result_notification: optionalString,
 //     academic_year: optionalString,
 //     remarks: optionalString,
 //     link: optionalString,
-//     department_id: optionalString
+//     department_id: optionalString,
+//     co_supervisors: z.array(z.any()).optional()
 //   })).optional(),
 //   mous: z.array(z.object({
 //     mou_id: optionalString,
@@ -901,6 +903,7 @@ const researchSchema = z.object({
     thesis_type: optionalString,
     supervisor_name: optionalString,
     supervisor_id: optionalString,
+    supervision_location: optionalString,
     date_of_registration: optionalString,
     date_of_defence: optionalString,
     date_of_result_notification: optionalString,
