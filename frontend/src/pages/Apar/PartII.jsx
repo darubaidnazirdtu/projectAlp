@@ -720,7 +720,7 @@ const validateSingleCourse = (course) => {
 };
 
 
-export default function PartII({ formData, addItem, removeItem, updateArrayField, updateArrayItem, updateAssessment, updateField, readOnly }) {
+export default function PartII({ formData, academicYear, addItem, removeItem, updateArrayField, updateArrayItem, updateAssessment, updateField, readOnly, triggerSave }) {
     // Safely extract teaching data to prevent crashes
     const teachingData = formData?.teaching || {};
     const coursesTaught = teachingData?.courses_taught || [];
@@ -738,6 +738,31 @@ export default function PartII({ formData, addItem, removeItem, updateArrayField
     const timeTable = teachingData?.time_table || { provided: {}, actual: {} };
     const workloadWeek = teachingData?.workload_week || { odd_semester: {}, even_semester: {} };
     const tutorialsTests = teachingData?.tutorials_tests || { ug_odd: {}, ug_even: {}, pg_odd: {}, pg_even: {} };
+
+    const calculatedAcademicYearStr = (() => {
+        const start = formData?.personal?.report_start_date;
+        const end = formData?.personal?.report_end_date;
+        if (!start || !end) return '';
+        const startYear = new Date(start).getFullYear();
+        const endYear = new Date(end).getFullYear();
+        if (!Number.isFinite(startYear) || !Number.isFinite(endYear)) return '';
+        return `${startYear}-${String(endYear).slice(-2)}`;
+    })();
+    const academicYearStr = academicYear || calculatedAcademicYearStr || 'unknown_ay';
+
+    const handleDirectUpload = (field, val) => {
+        updateField('teaching', field, val);
+        if (triggerSave) {
+            const nextData = {
+                ...formData,
+                teaching: {
+                    ...(formData?.teaching || {}),
+                    [field]: val
+                }
+            };
+            triggerSave(nextData);
+        }
+    };
 
     let age = 0;
     if (formData?.personal?.date_of_birth) {
@@ -970,9 +995,10 @@ export default function PartII({ formData, addItem, removeItem, updateArrayField
                             </label>
                             <FileUpload
                                 value={teachingData?.description_of_duties_department_proof}
-                                onChange={(val) => updateField('teaching', 'description_of_duties_department_proof', val)}
+                                onChange={(val) => handleDirectUpload('description_of_duties_department_proof', val)}
                                 disabled={readOnly}
-                                temporaryPdf={true}
+                                directMinio={true}
+                                academicYear={academicYearStr}
                                 required={true}
                             />
                             {errors?.description_of_duties_department_proof && (
@@ -989,9 +1015,10 @@ export default function PartII({ formData, addItem, removeItem, updateArrayField
                             </label>
                             <FileUpload
                                 value={teachingData?.description_of_duties_admin_proof}
-                                onChange={(val) => updateField('teaching', 'description_of_duties_admin_proof', val)}
+                                onChange={(val) => handleDirectUpload('description_of_duties_admin_proof', val)}
                                 disabled={readOnly}
-                                temporaryPdf={true}
+                                directMinio={true}
+                                academicYear={academicYearStr}
                                 required={true}
                             />
                             {errors?.description_of_duties_admin_proof && (
@@ -1023,9 +1050,10 @@ export default function PartII({ formData, addItem, removeItem, updateArrayField
                 )}
                 <FileUpload
                     value={teachingData?.health_checkup_file}
-                    onChange={(val) => updateField('teaching', 'health_checkup_file', val)}
+                    onChange={(val) => handleDirectUpload('health_checkup_file', val)}
                     disabled={readOnly}
-                    temporaryPdf={true}
+                    directMinio={true}
+                    academicYear={academicYearStr}
                     required={isHealthCheckupMandatory}
                 />
                 {errors?.health_checkup_file && (

@@ -31,7 +31,10 @@ const containsDocumentPath = (value, documentPath) => {
 export const uploadTemporaryDocument = asyncHandler(async (req, res) => {
     const file = req.file;
     if (!file?.filename) throw new ApiError(400, 'A PDF file is required');
-    recordPendingTemporaryDocument(file.filename, req.user.id);
+    
+    const facultyId = await resolveToReadableId(req.user?.userId || req.user?.faculty_id || req.user?.id);
+    console.log(`[UPLOAD TEMP] Resolving user ${req.user?.id} to facultyId: ${facultyId} for tempId: ${file.filename}`);
+    recordPendingTemporaryDocument(file.filename, facultyId);
 
     return res.status(201).json(new ApiResponse(201, {
         tempId: file.filename,
@@ -41,9 +44,44 @@ export const uploadTemporaryDocument = asyncHandler(async (req, res) => {
     }, 'PDF saved temporarily. It will be uploaded when the entry is saved.'));
 });
 
+import fs from 'node:fs';
+import { uploadLocalFile } from '../services/minio.service.js';
+
+export const uploadDirectMinioDocument = asyncHandler(async (req, res) => {
+    const file = req.file;
+    if (!file?.filename) throw new ApiError(400, 'A PDF file is required');
+    
+    const facultyId = await resolveToReadableId(req.user?.userId || req.user?.faculty_id || req.user?.id);
+    let academicYear = req.body.ay || req.body.academic_year || req.query.ay || req.user?.academicYear || 'unknown_ay';
+    
+    const safeAy = String(academicYear).replace(/[^a-zA-Z0-9-]/g, '_');
+    const safeFac = String(facultyId).replace(/[^a-zA-Z0-9-]/g, '_');
+    const basename = path.basename(file.originalname, path.extname(file.originalname)).replace(/[^a-zA-Z0-9.-]/g, '_');
+    const safeName = `${basename}-${Date.now()}${path.extname(file.originalname)}`;
+    
+    const minioPath = `optionaldocuments/${safeAy}/${safeFac}/${safeName}`;
+    
+    await uploadLocalFile({ 
+        filePath: file.path, 
+        objectPath: minioPath, 
+        contentType: file.mimetype 
+    });
+    
+    try {
+        fs.unlinkSync(file.path);
+    } catch (e) {}
+
+    return res.status(201).json(new ApiResponse(201, {
+        url: minioPath,
+        originalName: path.basename(file.originalname)
+    }, 'File uploaded directly to MinIO successfully.'));
+});
+
 export const deleteTemporaryDocument = asyncHandler(async (req, res) => {
     const tempId = String(req.query.tempId || '');
-    if (!getTemporaryDocument(tempId, req.user.id)) {
+    const facultyId = await resolveToReadableId(req.user?.userId || req.user?.faculty_id || req.user?.id);
+    
+    if (!getTemporaryDocument(tempId, facultyId)) {
         throw new ApiError(404, 'Temporary PDF was not found');
     }
     await discardTemporaryDocument(tempId);

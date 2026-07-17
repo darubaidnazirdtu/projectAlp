@@ -1410,7 +1410,12 @@ export default function AparForm() {
                 formData: dataToSave
             };
 
-            await AparFormGradedService.saveDraft(payload);
+            const res = await AparFormGradedService.saveDraft(payload);
+            
+            if (res && (res.personal || res.teaching || res.research)) {
+                setFormData(prev => ({ ...prev, ...res }));
+            }
+
             if (!silent) toast.success('Progress saved and synced to profile');
             return true;
         } catch (e) {
@@ -2303,7 +2308,7 @@ export default function AparForm() {
 
                             <div id="apar-step-2" className={currentStep === 2 ? 'block animate-fade-in' : 'hidden print:block'}>
                                 <div className="shadow-xl rounded-2xl overflow-hidden bg-white">
-                                    <PartII formData={formData} addItem={addItem} removeItem={requestDelete} updateArrayField={updateArrayField} updateArrayItem={updateArrayItem} updateAssessment={updateAssessment} updateField={updateField} readOnly={isReadOnlyMode()} />
+                                    <PartII formData={formData} academicYear={activeAparAcademicYear} addItem={addItem} removeItem={requestDelete} updateArrayField={updateArrayField} updateArrayItem={updateArrayItem} updateAssessment={updateAssessment} updateField={updateField} readOnly={isReadOnlyMode()} triggerSave={(nextData) => handleSaveDraft(true, nextData)} />
                                 </div>
                             </div>
 
@@ -2352,7 +2357,7 @@ export default function AparForm() {
                                             </div>
                                             <div>
                                                 <h4 className="text-xl font-bold text-gray-900 border-b-2 border-indigo-200 pb-2 mb-6 mt-8">Part II: Self Appraisal</h4>
-                                                <PartII formData={formData} addItem={() => {}} removeItem={() => {}} updateArrayField={() => {}} updateArrayItem={() => {}} updateAssessment={() => {}} updateField={() => {}} readOnly={true} />
+                                                <PartII formData={formData} academicYear={activeAparAcademicYear} addItem={() => {}} removeItem={() => {}} updateArrayField={() => {}} updateArrayItem={() => {}} updateAssessment={() => {}} updateField={() => {}} readOnly={true} />
                                             </div>
                                             <div>
                                                 <h4 className="text-xl font-bold text-gray-900 border-b-2 border-indigo-200 pb-2 mb-6 mt-8">Part III: Research & Development</h4>

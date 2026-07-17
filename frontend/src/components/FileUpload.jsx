@@ -3,7 +3,7 @@ import { Api } from '../api/Api';
 import { FiUpload, FiEye, FiTrash2, FiLoader } from 'react-icons/fi';
 import { toast } from 'sonner';
 
-const FileUpload = ({ value, onChange, disabled, required = false, temporaryPdf = false }) => {
+const FileUpload = ({ value, onChange, disabled, required = false, temporaryPdf = false, directMinio = false, academicYear = '' }) => {
     const [uploading, setUploading] = useState(false);
     const fileInputRef = useRef(null);
     const api = new Api(); // Use default base URL
@@ -16,12 +16,12 @@ const FileUpload = ({ value, onChange, disabled, required = false, temporaryPdf 
         const file = e.target.files[0];
         if (!file) return;
 
-        if (temporaryPdf && (file.type !== 'application/pdf' || !file.name.toLowerCase().endsWith('.pdf'))) {
+        if ((temporaryPdf || directMinio) && (file.type !== 'application/pdf' || !file.name.toLowerCase().endsWith('.pdf'))) {
             toast.error('Only PDF files are allowed');
             e.target.value = '';
             return;
         }
-        if (temporaryPdf && file.size > 50 * 1024 * 1024) {
+        if ((temporaryPdf || directMinio) && file.size > 50 * 1024 * 1024) {
             toast.error('PDF must be 50 MB or smaller');
             e.target.value = '';
             return;
@@ -30,17 +30,27 @@ const FileUpload = ({ value, onChange, disabled, required = false, temporaryPdf 
         setUploading(true);
         const formData = new FormData();
         formData.append('file', file);
+        if (directMinio && academicYear) {
+            formData.append('ay', academicYear);
+        }
 
         try {
             // A persisted PDF is removed before its replacement is uploaded. The
             // API clears the APAR reference and deletes the object as one action.
-            if (temporaryPdf && typeof value === 'string' && /^(document|additional documents|profile)\//.test(value)) {
+            if ((temporaryPdf || directMinio) && typeof value === 'string' && /^(document|additional documents|profile|optionaldocuments)\//.test(value)) {
                 await deleteSavedPdf(value);
                 onChange('');
             }
 
+            let endpoint = '/upload';
+            if (temporaryPdf) {
+                endpoint = '/apar/mongo/documents/temp';
+            } else if (directMinio) {
+                endpoint = '/apar/mongo/documents/direct';
+            }
+
             // Use Api.post and let axios set the multipart boundary header
-            const result = await api.post(temporaryPdf ? '/apar/mongo/documents/temp' : '/upload', formData, { 'Content-Type': undefined });
+            const result = await api.post(endpoint, formData, { 'Content-Type': undefined });
 
             // Api.post unwraps the response to `data` so `result` should be the controller's `data`
             if (temporaryPdf && result?.tempId) {
@@ -87,7 +97,7 @@ const FileUpload = ({ value, onChange, disabled, required = false, temporaryPdf 
                     console.warn('Temporary PDF cleanup failed:', error);
                 }
             }
-        } else if (temporaryPdf && typeof value === 'string' && /^(document|additional documents|profile)\//.test(value)) {
+        } else if ((temporaryPdf || directMinio) && typeof value === 'string' && /^(document|additional documents|profile|optionaldocuments)\//.test(value)) {
             try {
                 await deleteSavedPdf(value);
             } catch (error) {
@@ -97,12 +107,12 @@ const FileUpload = ({ value, onChange, disabled, required = false, temporaryPdf 
             }
         }
         onChange('');
-        if (temporaryPdf) toast.success('PDF deleted');
+        if (temporaryPdf || directMinio) toast.success('PDF deleted');
     };
 
     const isTemporary = Boolean(value && typeof value === 'object' && value.tempId);
     const displayName = isTemporary ? value.originalName || 'Selected PDF' : null;
-    const viewUrl = typeof value === 'string' && /^(document|profile|profilepicture|additional documents)\//.test(value)
+    const viewUrl = typeof value === 'string' && /^(document|profile|profilepicture|additional documents|optionaldocuments)\//.test(value)
         ? `${api.client.defaults.baseURL}/apar/mongo/document?path=${encodeURIComponent(value)}`
         : value;
 
