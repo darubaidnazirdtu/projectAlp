@@ -1131,15 +1131,15 @@ export default function PartII({ formData, addItem, removeItem, updateArrayField
                                         </select>
                                     </div>
                                     <div>
-                                        <label htmlFor="lectures-sch-temp" className="block text-sm font-medium text-gray-700 mb-1">Total lectures Scheduled <span className="text-red-500">*</span></label>
+                                        <label htmlFor="lectures-sch-temp" className="block text-sm font-medium text-gray-700 mb-1">Total lectures Scheduled (hours per week) <span className="text-red-500">*</span></label>
                                         <input id="lectures-sch-temp" type="number" min="0" required={(tempCourse.course_type || 'Theory') !== 'Practical'} disabled={readOnly || (tempCourse.course_type || 'Theory') === 'Practical'} value={tempCourse.total_lectures_scheduled || ''} onChange={(e) => setTempCourse(prev => ({ ...prev, total_lectures_scheduled: e.target.value, extra_lectures_engaged: (Number(e.target.value) === Number(prev.total_lectures_engaged) ? prev.extra_lectures_engaged : '') }))} className="w-full bg-gray-50 border border-gray-200 text-gray-900 rounded-lg shadow-sm focus:ring-2 focus:ring-indigo-500/30 focus:border-indigo-500 hover:border-indigo-300 transition-all duration-200 px-4 py-2.5 disabled:bg-gray-100 disabled:text-gray-500" />
                                     </div>
                                     <div>
-                                        <label htmlFor="lectures-eng-temp" className="block text-sm font-medium text-gray-700 mb-1">Total lectures engaged <span className="text-red-500">*</span></label>
+                                        <label htmlFor="lectures-eng-temp" className="block text-sm font-medium text-gray-700 mb-1">Total lectures engaged (hours per week) <span className="text-red-500">*</span></label>
                                         <input id="lectures-eng-temp" type="number" min="0" max={tempCourse.total_lectures_scheduled || ''} required={(tempCourse.course_type || 'Theory') !== 'Practical'} disabled={readOnly || (tempCourse.course_type || 'Theory') === 'Practical'} value={tempCourse.total_lectures_engaged || ''} onChange={(e) => setTempCourse(prev => ({ ...prev, total_lectures_engaged: e.target.value, extra_lectures_engaged: (Number(e.target.value) === Number(prev.total_lectures_scheduled) ? prev.extra_lectures_engaged : '') }))} onBlur={() => handleEngagedBlurTemp(courseEngagementLimits[0])} className="w-full bg-gray-50 border border-gray-200 text-gray-900 rounded-lg shadow-sm focus:ring-2 focus:ring-indigo-500/30 focus:border-indigo-500 hover:border-indigo-300 transition-all duration-200 px-4 py-2.5 disabled:bg-gray-100 disabled:text-gray-500" />
                                     </div>
                                     <div>
-                                        <label htmlFor="extra-lectures-eng-temp" className="block text-sm font-medium text-gray-700 mb-1">Extra lectures engaged (Optional)</label>
+                                        <label htmlFor="extra-lectures-eng-temp" className="block text-sm font-medium text-gray-700 mb-1">Extra lectures engaged (hours per week) (Optional)</label>
                                         <input id="extra-lectures-eng-temp" type="number" min="0" disabled={readOnly || (tempCourse.course_type || 'Theory') === 'Practical' || !tempCourse.total_lectures_scheduled || !tempCourse.total_lectures_engaged || Number(tempCourse.total_lectures_scheduled) !== Number(tempCourse.total_lectures_engaged)} value={tempCourse.extra_lectures_engaged || ''} onChange={(e) => setTempCourse(prev => ({ ...prev, extra_lectures_engaged: e.target.value }))} className="w-full bg-gray-50 border border-gray-200 text-gray-900 rounded-lg shadow-sm focus:ring-2 focus:ring-indigo-500/30 focus:border-indigo-500 hover:border-indigo-300 transition-all duration-200 px-4 py-2.5 disabled:bg-gray-100 disabled:text-gray-500" />
                                     </div>
                                     
@@ -1188,7 +1188,7 @@ export default function PartII({ formData, addItem, removeItem, updateArrayField
 
                 {/* 1.2 Total of hours/periods provided in time table vs actually taken */}
                 <div>
-                    <h4 className="text-md font-semibold text-gray-800 mb-2">1.2 Total Number of hours/ periods provided in the time table <span className="text-sm font-normal text-gray-500">(Only numbers allowed)</span></h4>
+                    <h4 className="text-md font-semibold text-gray-800 mb-2">1.2 Total Number of hours/ periods per week provided in the time table <span className="text-sm font-normal text-gray-500">(Only numbers allowed)</span></h4>
                     <div className="bg-gray-50 border border-gray-200 rounded-lg p-6 mb-4">
                         <div className="font-semibold mb-2">a) Provided in the academic year</div>
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -1218,7 +1218,7 @@ export default function PartII({ formData, addItem, removeItem, updateArrayField
 
                 {/* 1.3 Work load per week */}
                 <div>
-                    <h4 className="text-md font-semibold text-gray-800 mb-2">1.3 Work load per week <span className="text-sm font-normal text-gray-500">(Only numbers allowed)</span></h4>
+                    <h4 className="text-md font-semibold text-gray-800 mb-2">1.3 Work load(hours) per week <span className="text-sm font-normal text-gray-500">(Only numbers allowed)</span></h4>
                     <div className="bg-gray-50 border border-gray-200 rounded-lg p-6 mb-4">
                         <div className="font-semibold mb-2 text-indigo-800">For odd semester</div>
                         <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">

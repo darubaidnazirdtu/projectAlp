@@ -602,7 +602,7 @@ export default function PartIII({ formData, academicYear, addItem, removeItem, u
                     />
 
                     <DynamicTableSection
-                        title="ii) Research guidance"
+                        title="ii) Sponsored Research guidance"
                         data={formData.research.research_guidance || []}
                         uniqueKey="description"
                         {...createHandlers('research_guidance')}
