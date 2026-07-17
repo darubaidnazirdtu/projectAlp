@@ -971,8 +971,11 @@ export default function PartII({ formData, academicYear, addItem, removeItem, up
                         uniqueKey="description"
                         {...createHandlers('teaching', 'description_of_duties_department')}
                         readOnly={readOnly}
-                        initialItem={{ description: '' }}
-                        fields={[{ label: 'Description', key: 'description', fullWidth: true, required: true, placeholder: 'Enter duty details' }]}
+                        initialItem={{ description: '', proof: '' }}
+                        fields={[
+                            { label: 'Description', key: 'description', fullWidth: true, required: true, placeholder: 'Enter duty details' },
+                            { label: 'Proof Document', key: 'proof', type: 'file', fullWidth: true, required: true }
+                        ]}
                     />
                     <DynamicTableSection
                         title="Description of Duties (Administration)"
@@ -980,52 +983,12 @@ export default function PartII({ formData, academicYear, addItem, removeItem, up
                         uniqueKey="description"
                         {...createHandlers('teaching', 'description_of_duties_admin')}
                         readOnly={readOnly}
-                        initialItem={{ description: '' }}
-                        fields={[{ label: 'Description', key: 'description', fullWidth: true, required: true, placeholder: 'Enter administration duty details' }]}
+                        initialItem={{ description: '', proof: '' }}
+                        fields={[
+                            { label: 'Description', key: 'description', fullWidth: true, required: true, placeholder: 'Enter administration duty details' },
+                            { label: 'Proof Document', key: 'proof', type: 'file', fullWidth: true, required: true }
+                        ]}
                     />
-                </div>
-
-                {/* Proof of Description of Duties */}
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-4 mb-6">
-                    {/* Department Level Proof */}
-                    {(teachingData?.description_of_duties_department && teachingData.description_of_duties_department.length > 0) && (
-                        <div className="bg-gray-50 border border-gray-200 rounded-lg p-6">
-                            <label className="block text-sm font-medium text-gray-700 mb-1">
-                                Proof for Department Level Duties (PDF Document) <span className="text-red-500">*</span>
-                            </label>
-                            <FileUpload
-                                value={teachingData?.description_of_duties_department_proof}
-                                onChange={(val) => handleDirectUpload('description_of_duties_department_proof', val)}
-                                disabled={readOnly}
-                                directMinio={true}
-                                academicYear={academicYearStr}
-                                required={true}
-                            />
-                            {errors?.description_of_duties_department_proof && (
-                                <p className="text-red-500 text-sm mt-1">{errors.description_of_duties_department_proof}</p>
-                            )}
-                        </div>
-                    )}
-
-                    {/* Administration Proof */}
-                    {(teachingData?.description_of_duties_admin && teachingData.description_of_duties_admin.length > 0) && (
-                        <div className="bg-gray-50 border border-gray-200 rounded-lg p-6">
-                            <label className="block text-sm font-medium text-gray-700 mb-1">
-                                Proof for Administration Duties (PDF Document) <span className="text-red-500">*</span>
-                            </label>
-                            <FileUpload
-                                value={teachingData?.description_of_duties_admin_proof}
-                                onChange={(val) => handleDirectUpload('description_of_duties_admin_proof', val)}
-                                disabled={readOnly}
-                                directMinio={true}
-                                academicYear={academicYearStr}
-                                required={true}
-                            />
-                            {errors?.description_of_duties_admin_proof && (
-                                <p className="text-red-500 text-sm mt-1">{errors.description_of_duties_admin_proof}</p>
-                            )}
-                        </div>
-                    )}
                 </div>
 
                 {/* Mandatory Documents (Schema Alignment) */}

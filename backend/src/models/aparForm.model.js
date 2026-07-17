@@ -54,11 +54,9 @@ const AparFormSchema = new mongoose.Schema({
 
     // Step 2: Self Appraisal & Teaching
     teaching: {
-        description_of_duties_department_proof: String, // URL or data
-        description_of_duties_admin_proof: String, // URL or data
         health_checkup_file: String, // URL or data
-        description_of_duties_department: [{ description: String }],
-        description_of_duties_admin: [{ description: String }],
+        description_of_duties_department: [{ description: String, proof: String }],
+        description_of_duties_admin: [{ description: String, proof: String }],
         courses_taught: [{
             name_of_course: String,
             course_code: String,

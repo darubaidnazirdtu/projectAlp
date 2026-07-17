@@ -905,8 +905,7 @@ const checkDraftDuplicates = (data) => {
 
 const documentFieldNames = new Set([
     'link', 'link_to_paper', 'link_to_publication', 'evidence_link',
-    'certificate_link', 'link_to_patent', 'immovable_property_return', 'health_checkup_file',
-    'description_of_duties_department_proof', 'description_of_duties_admin_proof'
+    'certificate_link', 'link_to_patent', 'immovable_property_return', 'health_checkup_file'
 ]);
 
 const collectAparObjectPaths = (value, result = new Set()) => {
@@ -946,14 +945,10 @@ const resolveAparDocuments = async (formData, { ownerId, facultyName, academicYe
             if (!temporary) throw new ApiError(400, 'The selected PDF has expired. Please select it again.');
 
             const isAdditional = key === 'immovable_property_return' || key === 'health_checkup_file';
-            const isDepartmentDuty = key === 'description_of_duties_department_proof' || key === 'description_of_duties_admin_proof';
             
             let objectPath;
             if (isAdditional) {
                 objectPath = createAdditionalDocumentPath(facultyName, academicYear, value.originalName);
-            } else if (isDepartmentDuty) {
-                const department = formData?.personal?.department_id || 'Department';
-                objectPath = createProfileDepartmentDocumentPath(facultyName, department, value.originalName);
             } else {
                 objectPath = createDocumentPath(facultyName, academicYear);
             }

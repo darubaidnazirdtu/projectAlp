@@ -666,8 +666,8 @@ const personalSchema = z.object({
 
 // Teaching Validation
 const teachingSchema = z.object({
-  description_of_duties_department: z.array(z.object({ description: optionalString })).optional(),
-  description_of_duties_admin: z.array(z.object({ description: optionalString })).optional(),
+  description_of_duties_department: z.array(z.object({ description: optionalString, proof: optionalString })).optional(),
+  description_of_duties_admin: z.array(z.object({ description: optionalString, proof: optionalString })).optional(),
   courses_taught: z.array(z.object({
     name_of_course: optionalString,
     course_code: optionalString,
