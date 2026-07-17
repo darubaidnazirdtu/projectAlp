@@ -337,17 +337,15 @@ const AparFormSchema = new mongoose.Schema({
             thesis_title: String,
             thesis_type: String,
             supervisor_name: String, // Often auto-filled but good to have
-            registration_year: String,
+            date_of_registration: Date,
             date_of_defence: Date,
             date_of_result_notification: Date,
-            result_outcome: String,
             academic_year: String,
             remarks: String,
             link: String,
             department_id: String,
             co_supervisors: [],
-            committee_members: [],
-            external_examiners: []
+            committee_members: []
         }],
 
         // 12. MoUs -> Collaboration (type: 'mou')
