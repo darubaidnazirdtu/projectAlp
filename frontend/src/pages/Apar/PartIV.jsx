@@ -74,7 +74,7 @@ export default function PartIV({ formData, addItem, removeItem, updateArrayItem,
                 />
 
                 <DynamicTableSection
-                    title="3.2 Sports / Community / Extension Services / N.S.S"
+                    title="3.2) Sports / Community / Extension Services / N.S.S"
                     data={corporate.sports_community || []}
                     uniqueKey="description"
                     {...createHandlers('corporate', 'sports_community')}

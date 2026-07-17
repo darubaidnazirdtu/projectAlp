@@ -941,7 +941,7 @@ export default function PartII({ formData, addItem, removeItem, updateArrayField
                 {/* Description of Duties */}
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <DynamicTableSection
-                        title="Description of Duties (Department Level)"
+                        title="1.1) Description of Duties (Department Level)"
                         data={teachingData?.description_of_duties_department || []}
                         uniqueKey="description"
                         {...createHandlers('teaching', 'description_of_duties_department')}
@@ -950,7 +950,7 @@ export default function PartII({ formData, addItem, removeItem, updateArrayField
                         fields={[{ label: 'Description', key: 'description', fullWidth: true, required: true, placeholder: 'Enter duty details' }]}
                     />
                     <DynamicTableSection
-                        title="Description of Duties (Administration)"
+                        title="1.2) Description of Duties (Administration)"
                         data={teachingData?.description_of_duties_admin || []}
                         uniqueKey="description"
                         {...createHandlers('teaching', 'description_of_duties_admin')}
@@ -1036,11 +1036,9 @@ export default function PartII({ formData, addItem, removeItem, updateArrayField
             </div>
                 </div>
 
-                {/* 1.1 Courses taught at various levels */}
+                {/* 2.1 Courses taught at various levels */}
                 <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">1.1 Courses taught at various levels </label>
-
-                    {/* <h4 className="text-md font-semibold text-gray-800 mb-2">1.1 Courses taught at various levels</h4> */}
+                    <h4 className="block text-lg font-semibold text-gray-800 mb-2">2.1) Courses taught at various levels</h4>
                     <div className="space-y-4">
                         {editingCourseIndex === null ? (
                             <div className="bg-white border border-gray-200 rounded-lg overflow-hidden">
@@ -1146,28 +1144,28 @@ export default function PartII({ formData, addItem, removeItem, updateArrayField
                                     </div>
                                     
                                     <div>
-                                        <label htmlFor="tut-sch-temp" className="block text-sm font-medium text-gray-700 mb-1">Tutorials Scheduled <span className="text-red-500">*</span></label>
+                                        <label htmlFor="tut-sch-temp" className="block text-sm font-medium text-gray-700 mb-1">Tutorials Scheduled (hours per week)<span className="text-red-500">*</span></label>
                                         <input id="tut-sch-temp" type="number" min="0" required disabled={readOnly} value={tempCourse.tutorials_scheduled || ''} onChange={(e) => setTempCourse(prev => ({ ...prev, tutorials_scheduled: e.target.value, extra_tutorials_engaged: (Number(e.target.value) === Number(prev.tutorials_engaged) ? prev.extra_tutorials_engaged : '') }))} className="w-full bg-gray-50 border border-gray-200 text-gray-900 rounded-lg shadow-sm focus:ring-2 focus:ring-indigo-500/30 focus:border-indigo-500 hover:border-indigo-300 transition-all duration-200 px-4 py-2.5" />
                                     </div>
                                     <div>
-                                        <label htmlFor="tut-eng-temp" className="block text-sm font-medium text-gray-700 mb-1">Tutorials engaged <span className="text-red-500">*</span></label>
+                                        <label htmlFor="tut-eng-temp" className="block text-sm font-medium text-gray-700 mb-1">Tutorials engaged (hours per week)<span className="text-red-500">*</span></label>
                                         <input id="tut-eng-temp" type="number" min="0" max={tempCourse.tutorials_scheduled || ''} required disabled={readOnly} value={tempCourse.tutorials_engaged || ''} onChange={(e) => setTempCourse(prev => ({ ...prev, tutorials_engaged: e.target.value, extra_tutorials_engaged: (Number(e.target.value) === Number(prev.tutorials_scheduled) ? prev.extra_tutorials_engaged : '') }))} onBlur={() => handleEngagedBlurTemp(courseEngagementLimits[1])} className="w-full bg-gray-50 border border-gray-200 text-gray-900 rounded-lg shadow-sm focus:ring-2 focus:ring-indigo-500/30 focus:border-indigo-500 hover:border-indigo-300 transition-all duration-200 px-4 py-2.5" />
                                     </div>
                                     <div>
-                                        <label htmlFor="extra-tut-eng-temp" className="block text-sm font-medium text-gray-700 mb-1">Extra tutorials engaged (Optional)</label>
+                                        <label htmlFor="extra-tut-eng-temp" className="block text-sm font-medium text-gray-700 mb-1">Extra tutorials engaged (hours per week) (Optional)</label>
                                         <input id="extra-tut-eng-temp" type="number" min="0" disabled={readOnly || !tempCourse.tutorials_scheduled || !tempCourse.tutorials_engaged || Number(tempCourse.tutorials_scheduled) !== Number(tempCourse.tutorials_engaged)} value={tempCourse.extra_tutorials_engaged || ''} onChange={(e) => setTempCourse(prev => ({ ...prev, extra_tutorials_engaged: e.target.value }))} className="w-full bg-gray-50 border border-gray-200 text-gray-900 rounded-lg shadow-sm focus:ring-2 focus:ring-indigo-500/30 focus:border-indigo-500 hover:border-indigo-300 transition-all duration-200 px-4 py-2.5 disabled:bg-gray-100 disabled:text-gray-500" />
                                     </div>
 
                                     <div>
-                                        <label htmlFor="labs-sch-temp" className="block text-sm font-medium text-gray-700 mb-1">Labs Scheduled <span className="text-red-500">*</span></label>
+                                        <label htmlFor="labs-sch-temp" className="block text-sm font-medium text-gray-700 mb-1">Labs Scheduled (hours per week) <span className="text-red-500">*</span></label>
                                         <input id="labs-sch-temp" type="number" min="0" required={(tempCourse.course_type || 'Theory') === 'Practical'} disabled={readOnly || (tempCourse.course_type || 'Theory') === 'Theory'} value={tempCourse.labs_scheduled || ''} onChange={(e) => setTempCourse(prev => ({ ...prev, labs_scheduled: e.target.value, extra_labs_engaged: (Number(e.target.value) === Number(prev.labs_engaged) ? prev.extra_labs_engaged : '') }))} className="w-full bg-gray-50 border border-gray-200 text-gray-900 rounded-lg shadow-sm focus:ring-2 focus:ring-indigo-500/30 focus:border-indigo-500 hover:border-indigo-300 transition-all duration-200 px-4 py-2.5 disabled:bg-gray-100 disabled:text-gray-500" />
                                     </div>
                                     <div>
-                                        <label htmlFor="labs-eng-temp" className="block text-sm font-medium text-gray-700 mb-1">Labs engaged <span className="text-red-500">*</span></label>
+                                        <label htmlFor="labs-eng-temp" className="block text-sm font-medium text-gray-700 mb-1">Labs engaged (hours per week) <span className="text-red-500">*</span></label>
                                         <input id="labs-eng-temp" type="number" min="0" max={tempCourse.labs_scheduled || ''} required={(tempCourse.course_type || 'Theory') === 'Practical'} disabled={readOnly || (tempCourse.course_type || 'Theory') === 'Theory'} value={tempCourse.labs_engaged || ''} onChange={(e) => setTempCourse(prev => ({ ...prev, labs_engaged: e.target.value, extra_labs_engaged: (Number(e.target.value) === Number(prev.labs_scheduled) ? prev.extra_labs_engaged : '') }))} onBlur={() => handleEngagedBlurTemp(courseEngagementLimits[2])} className="w-full bg-gray-50 border border-gray-200 text-gray-900 rounded-lg shadow-sm focus:ring-2 focus:ring-indigo-500/30 focus:border-indigo-500 hover:border-indigo-300 transition-all duration-200 px-4 py-2.5 disabled:bg-gray-100 disabled:text-gray-500" />
                                     </div>
                                     <div>
-                                        <label htmlFor="extra-labs-eng-temp" className="block text-sm font-medium text-gray-700 mb-1">Extra labs engaged (Optional)</label>
+                                        <label htmlFor="extra-labs-eng-temp" className="block text-sm font-medium text-gray-700 mb-1">Extra labs engaged (hours per week) (Optional)</label>
                                         <input id="extra-labs-eng-temp" type="number" min="0" disabled={readOnly || (tempCourse.course_type || 'Theory') === 'Theory' || !tempCourse.labs_scheduled || !tempCourse.labs_engaged || Number(tempCourse.labs_scheduled) !== Number(tempCourse.labs_engaged)} value={tempCourse.extra_labs_engaged || ''} onChange={(e) => setTempCourse(prev => ({ ...prev, extra_labs_engaged: e.target.value }))} className="w-full bg-gray-50 border border-gray-200 text-gray-900 rounded-lg shadow-sm focus:ring-2 focus:ring-indigo-500/30 focus:border-indigo-500 hover:border-indigo-300 transition-all duration-200 px-4 py-2.5 disabled:bg-gray-100 disabled:text-gray-500" />
                                     </div>
                                 </div>
@@ -1188,9 +1186,9 @@ export default function PartII({ formData, addItem, removeItem, updateArrayField
                     </div>
                 </div>
 
-                {/* 1.2 Total of hours/periods provided in time table vs actually taken */}
+                {/* 2.2 Total of hours/periods provided in time table vs actually taken */}
                 <div>
-                    <h4 className="text-md font-semibold text-gray-800 mb-2">1.2 Total Number of hours/ periods per week provided in the time table <span className="text-sm font-normal text-gray-500">(Only numbers allowed)</span></h4>
+                    <h4 className="block text-lg font-semibold text-gray-800 mb-2">2.2) Total Number of hours/ periods per week provided in the time table <span className="text-sm font-normal text-gray-500">(Only numbers allowed)</span></h4>
                     <div className="bg-gray-50 border border-gray-200 rounded-lg p-6 mb-4">
                         <div className="font-semibold mb-2">a) Provided in the academic year</div>
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -1218,9 +1216,9 @@ export default function PartII({ formData, addItem, removeItem, updateArrayField
                     </div>
                 </div>
 
-                {/* 1.3 Work load per week */}
+                {/* 2.3 Work load per week */}
                 <div>
-                    <h4 className="text-md font-semibold text-gray-800 mb-2">1.3 Work load(hours) per week <span className="text-sm font-normal text-gray-500">(Only numbers allowed)</span></h4>
+                    <h4 className="block text-lg font-semibold text-gray-800 mb-2">2.3) Work load(hours) per week <span className="text-sm font-normal text-gray-500">(Only numbers allowed)</span></h4>
                     <div className="bg-gray-50 border border-gray-200 rounded-lg p-6 mb-4">
                         <div className="font-semibold mb-2 text-indigo-800">For odd semester</div>
                         <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
@@ -1264,9 +1262,9 @@ export default function PartII({ formData, addItem, removeItem, updateArrayField
                     </div>
                 </div>
 
-                {/* 2) Visit of faculty to other institution */}
+                {/* 3.1) Visit of faculty to other institution */}
                 <DynamicTableSection
-                    title="2.1 Visit of faculty to other institution for taking Experts’ Lectures/other academic work"
+                    title="3.1) Visit of faculty to other institution for taking Experts’ Lectures/other academic work"
                     data={teachingData?.faculty_visits_other_institutions || []}
                     uniqueKey="title_of_activity"
                     {...createHandlers('teaching', 'faculty_visits_other_institutions')}
@@ -1285,7 +1283,7 @@ export default function PartII({ formData, addItem, removeItem, updateArrayField
 
                 {/* 3) Details of teaching methods employed */}
                 <DynamicTableSection
-                    title="3.1 Details of teaching methods employed by you (Lectures, Tutorials, Seminars, Practicals etc.)"
+                    title="4.1) Details of teaching methods employed by you (Lectures, Tutorials, Seminars, Practicals etc.)"
                     data={teachingData?.teaching_methods || []}
                     uniqueKey="description"
                     {...createHandlers('teaching', 'teaching_methods')}
@@ -1296,7 +1294,7 @@ export default function PartII({ formData, addItem, removeItem, updateArrayField
 
                 {/* ICT Tools */}
                 <DynamicTableSection
-                    title="3.2 ICT Tools and Resources Used"
+                    title="4.2) ICT Tools and Resources Used"
                     data={teachingData?.ict_tools || []}
                     uniqueKey="description"
                     {...createHandlers('teaching', 'ict_tools')}
@@ -1310,7 +1308,7 @@ export default function PartII({ formData, addItem, removeItem, updateArrayField
 
                 {/* Student Centric Methods */}
                 <DynamicTableSection
-                    title="3.3 Student Centric Methods (Experiential/Participative/Problem Solving)"
+                    title="4.3) Student Centric Methods (Experiential/Participative/Problem Solving)"
                     data={teachingData?.student_centric_methods || []}
                     uniqueKey="description"
                     {...createHandlers('teaching', 'student_centric_methods')}
@@ -1319,9 +1317,9 @@ export default function PartII({ formData, addItem, removeItem, updateArrayField
                     fields={[{ label: 'Description', key: 'description', fullWidth: true, required: true, placeholder: 'Enter student centric method details' }]}
                 />
 
-                {/* 4.1 Details of Tutorials/tests held */}
+                {/* 5.1 Details of Tutorials/tests held */}
                 <DynamicTableSection
-                    title="4.1 Details of Tutorials/ tests held during the academic year (Only numbers allowed)"
+                    title="5.1) Details of Tutorials/ tests held during the academic year (Only numbers allowed)"
                     data={Array.isArray(teachingData?.tutorials_tests) ? teachingData.tutorials_tests : []}
                     uniqueKey=""
                     {...createHandlers('teaching', 'tutorials_tests')}
@@ -1337,9 +1335,9 @@ export default function PartII({ formData, addItem, removeItem, updateArrayField
                     ]}
                 />
 
-                {/* 4.2 academic planning */}
+                {/* 5.2 academic planning */}
                 <DynamicTableSection
-                    title="4.2 Details of academic planning/ presentation of lectures during the session"
+                    title="5.2) Details of academic planning/ presentation of lectures during the session"
                     data={teachingData?.academic_planning || []}
                     uniqueKey="description"
                     {...createHandlers('teaching', 'academic_planning')}
