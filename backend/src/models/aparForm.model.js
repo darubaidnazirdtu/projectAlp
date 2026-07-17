@@ -328,6 +328,7 @@ const AparFormSchema = new mongoose.Schema({
         }],
 
         // 11. PhD Supervision -> PhdDefence
+        is_eligible_supervisor: String,
         phd_supervision: [{
             defence_id: String, // Alternate key
             student_id: String,

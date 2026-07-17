@@ -273,8 +273,24 @@ export default function PartIII({ formData, academicYear, addItem, removeItem, u
             />
 
             {/* PhD Supervision */}
-            < DynamicTableSection
-                title="Details of PhD Supervision / Defence"
+            <div className="pt-6 border-t border-gray-100 space-y-8">
+                <div>
+                    <div className="flex items-center space-x-4 mb-4">
+                        <label className="text-md font-semibold text-gray-800">Are you an Eligible Supervisor?</label>
+                        <select
+                            className="p-2 border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500"
+                            value={formData.research?.is_eligible_supervisor || 'No'}
+                            onChange={(e) => updateField('research', 'is_eligible_supervisor', e.target.value)}
+                            disabled={readOnly}
+                        >
+                            <option value="Yes">Yes</option>
+                            <option value="No">No</option>
+                        </select>
+                    </div>
+
+                    {formData.research?.is_eligible_supervisor === 'Yes' && (
+                        <DynamicTableSection
+                            title="Details of PhD Supervision / Defence"
                 data={formData.research.phd_supervision || []}
                 uniqueKey="thesis_title"
                 {...createHandlers('phd_supervision')}
@@ -328,6 +344,9 @@ export default function PartIII({ formData, academicYear, addItem, removeItem, u
                     }
                 ]}
             />
+                    )}
+                </div>
+            </div>
 
             {/* Awards */}
             < DynamicTableSection

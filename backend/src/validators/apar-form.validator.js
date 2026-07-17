@@ -892,6 +892,7 @@ const researchSchema = z.object({
     academic_year: optionalString,
     department_id: optionalString
   })).optional(),
+  is_eligible_supervisor: optionalString,
   phd_supervision: z.array(z.object({
     defence_id: optionalString,
     student_id: optionalString,
