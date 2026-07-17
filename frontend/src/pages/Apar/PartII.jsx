@@ -1318,58 +1318,22 @@ export default function PartII({ formData, addItem, removeItem, updateArrayField
                 />
 
                 {/* 4.1 Details of Tutorials/tests held */}
-                <div>
-                    <h4 className="text-md font-semibold text-gray-800 mb-2">4.1 Details of Tutorials/ tests held during the academic year <span className="text-sm font-normal text-gray-500">(Only numbers allowed)</span></h4>
-                    <div className="bg-gray-50 border border-gray-200 rounded-lg p-6 mb-4">
-                        <div className="font-semibold mb-2">Under-graduate Courses (Odd Semester)</div>
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-                            <div>
-                                <label className="block text-sm text-gray-700 mb-1">Number of tests held<span className="text-red-500">*</span></label>
-                                <input type="number" min="0" required disabled={readOnly} value={tutorialsTests?.ug_odd?.number_of_tests || ''} onChange={(e) => { updateField('teaching', 'tutorials_tests', { ...tutorialsTests, ug_odd: { ...tutorialsTests.ug_odd, number_of_tests: e.target.value } }); }} className="w-full bg-gray-50 border border-gray-200 text-gray-900 rounded-lg shadow-sm focus:ring-2 focus:ring-indigo-500/30 focus:border-indigo-500 hover:border-indigo-300 transition-all duration-200 px-4 py-2.5 disabled:bg-gray-100 disabled:text-gray-500" />
-                            </div>
-                            <div>
-                                <label className="block text-sm text-gray-700 mb-1">Assignment Assigned<span className="text-red-500">*</span></label>
-                                <input type="number" min="0" required disabled={readOnly} value={tutorialsTests?.ug_odd?.assignment_checked || ''} onChange={(e) => { updateField('teaching', 'tutorials_tests', { ...tutorialsTests, ug_odd: { ...tutorialsTests.ug_odd, assignment_checked: e.target.value } }); }} className="w-full bg-gray-50 border border-gray-200 text-gray-900 rounded-lg shadow-sm focus:ring-2 focus:ring-indigo-500/30 focus:border-indigo-500 hover:border-indigo-300 transition-all duration-200 px-4 py-2.5 disabled:bg-gray-100 disabled:text-gray-500" />
-                            </div>
-                        </div>
-
-                        <div className="font-semibold mb-2">Under-graduate Courses (Even Semester)</div>
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-                            <div>
-                                <label className="block text-sm text-gray-700 mb-1">Number of tests held<span className="text-red-500">*</span></label>
-                                <input type="number" min="0" required disabled={readOnly} value={tutorialsTests?.ug_even?.number_of_tests || ''} onChange={(e) => { updateField('teaching', 'tutorials_tests', { ...tutorialsTests, ug_even: { ...tutorialsTests.ug_even, number_of_tests: e.target.value } }); }} className="w-full bg-gray-50 border border-gray-200 text-gray-900 rounded-lg shadow-sm focus:ring-2 focus:ring-indigo-500/30 focus:border-indigo-500 hover:border-indigo-300 transition-all duration-200 px-4 py-2.5 disabled:bg-gray-100 disabled:text-gray-500" />
-                            </div>
-                            <div>
-                                <label className="block text-sm text-gray-700 mb-1">Assignment Assigned<span className="text-red-500">*</span></label>
-                                <input type="number" min="0" required disabled={readOnly} value={tutorialsTests?.ug_even?.assignment_checked || ''} onChange={(e) => { updateField('teaching', 'tutorials_tests', { ...tutorialsTests, ug_even: { ...tutorialsTests.ug_even, assignment_checked: e.target.value } }); }} className="w-full bg-gray-50 border border-gray-200 text-gray-900 rounded-lg shadow-sm focus:ring-2 focus:ring-indigo-500/30 focus:border-indigo-500 hover:border-indigo-300 transition-all duration-200 px-4 py-2.5 disabled:bg-gray-100 disabled:text-gray-500" />
-                            </div>
-                        </div>
-
-                        <div className="font-semibold mb-2">Post-graduate Courses (Odd Semester)</div>
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-                            <div>
-                                <label className="block text-sm text-gray-700 mb-1">Number of tests held<span className="text-red-500">*</span></label>
-                                <input type="number" min="0" required disabled={readOnly} value={tutorialsTests?.pg_odd?.number_of_tests || ''} onChange={(e) => { updateField('teaching', 'tutorials_tests', { ...tutorialsTests, pg_odd: { ...tutorialsTests.pg_odd, number_of_tests: e.target.value } }); }} className="w-full bg-gray-50 border border-gray-200 text-gray-900 rounded-lg shadow-sm focus:ring-2 focus:ring-indigo-500/30 focus:border-indigo-500 hover:border-indigo-300 transition-all duration-200 px-4 py-2.5 disabled:bg-gray-100 disabled:text-gray-500" />
-                            </div>
-                            <div>
-                                <label className="block text-sm text-gray-700 mb-1">Assignment Assigned<span className="text-red-500">*</span></label>
-                                <input type="number" min="0" required disabled={readOnly} value={tutorialsTests?.pg_odd?.assignment_checked || ''} onChange={(e) => { updateField('teaching', 'tutorials_tests', { ...tutorialsTests, pg_odd: { ...tutorialsTests.pg_odd, assignment_checked: e.target.value } }); }} className="w-full bg-gray-50 border border-gray-200 text-gray-900 rounded-lg shadow-sm focus:ring-2 focus:ring-indigo-500/30 focus:border-indigo-500 hover:border-indigo-300 transition-all duration-200 px-4 py-2.5 disabled:bg-gray-100 disabled:text-gray-500" />
-                            </div>
-                        </div>
-
-                        <div className="font-semibold mb-2">Post-graduate Courses (Even Semester)</div>
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            <div>
-                                <label className="block text-sm text-gray-700 mb-1">Number of tests held<span className="text-red-500">*</span></label>
-                                <input type="number" min="0" required disabled={readOnly} value={tutorialsTests?.pg_even?.number_of_tests || ''} onChange={(e) => { updateField('teaching', 'tutorials_tests', { ...tutorialsTests, pg_even: { ...tutorialsTests.pg_even, number_of_tests: e.target.value } }); }} className="w-full bg-gray-50 border border-gray-200 text-gray-900 rounded-lg shadow-sm focus:ring-2 focus:ring-indigo-500/30 focus:border-indigo-500 hover:border-indigo-300 transition-all duration-200 px-4 py-2.5 disabled:bg-gray-100 disabled:text-gray-500" />
-                            </div>
-                            <div>
-                                <label className="block text-sm text-gray-700 mb-1">Assignment Assigned<span className="text-red-500">*</span></label>
-                                <input type="number" min="0" required disabled={readOnly} value={tutorialsTests?.pg_even?.assignment_checked || ''} onChange={(e) => { updateField('teaching', 'tutorials_tests', { ...tutorialsTests, pg_even: { ...tutorialsTests.pg_even, assignment_checked: e.target.value } }); }} className="w-full bg-gray-50 border border-gray-200 text-gray-900 rounded-lg shadow-sm focus:ring-2 focus:ring-indigo-500/30 focus:border-indigo-500 hover:border-indigo-300 transition-all duration-200 px-4 py-2.5 disabled:bg-gray-100 disabled:text-gray-500" />
-                            </div>
-                        </div>
-                    </div>
-                </div>
+                <DynamicTableSection
+                    title="4.1 Details of Tutorials/ tests held during the academic year (Only numbers allowed)"
+                    data={Array.isArray(teachingData?.tutorials_tests) ? teachingData.tutorials_tests : []}
+                    uniqueKey=""
+                    {...createHandlers('teaching', 'tutorials_tests')}
+                    readOnly={readOnly}
+                    initialItem={{ course_name: '', course_code: '', semester: '', degree_type: '', number_of_tests: '', assignment_checked: '' }}
+                    fields={[
+                        { label: 'Course Name', key: 'course_name', type: 'select', options: [...new Set(coursesTaught.map(c => c.name_of_course).filter(Boolean))], required: true },
+                        { label: 'Course Code', key: 'course_code', type: 'select', options: [...new Set(coursesTaught.map(c => c.course_code).filter(Boolean))], required: true },
+                        { label: 'Semester', key: 'semester', type: 'select', options: ['Odd', 'Even'], required: true },
+                        { label: 'Degree Type', key: 'degree_type', type: 'select', options: ['UG', 'PG'], required: true },
+                        { label: 'Number of tests held', key: 'number_of_tests', type: 'number', required: true, placeholder: 'Enter number' },
+                        { label: 'Assignment Assigned', key: 'assignment_checked', type: 'number', required: true, placeholder: 'Enter number' }
+                    ]}
+                />
 
                 {/* 4.2 academic planning */}
                 <DynamicTableSection

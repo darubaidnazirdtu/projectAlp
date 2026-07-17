@@ -102,7 +102,7 @@ const FileUpload = ({ value, onChange, disabled, required = false, temporaryPdf 
 
     const isTemporary = Boolean(value && typeof value === 'object' && value.tempId);
     const displayName = isTemporary ? value.originalName || 'Selected PDF' : null;
-    const viewUrl = typeof value === 'string' && /^(document|profilepicture|additional documents)\//.test(value)
+    const viewUrl = typeof value === 'string' && /^(document|profile|profilepicture|additional documents)\//.test(value)
         ? `${api.client.defaults.baseURL}/apar/mongo/document?path=${encodeURIComponent(value)}`
         : value;
 

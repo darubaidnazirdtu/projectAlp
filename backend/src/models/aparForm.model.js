@@ -97,12 +97,14 @@ const AparFormSchema = new mongoose.Schema({
         }],
         ict_tools: [{ description: String, room_no: String }],
         student_centric_methods: [{ description: String }],
-        tutorials_tests: {
-            ug_odd: { number_of_tests: String, assignment_checked: String },
-            ug_even: { number_of_tests: String, assignment_checked: String },
-            pg_odd: { number_of_tests: String, assignment_checked: String },
-            pg_even: { number_of_tests: String, assignment_checked: String }
-        },
+        tutorials_tests: [{
+            course_name: String,
+            course_code: String,
+            semester: String,
+            degree_type: String,
+            number_of_tests: String,
+            assignment_checked: String
+        }],
         academic_planning: [{ description: String }]
     },
 

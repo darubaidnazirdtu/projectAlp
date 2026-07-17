@@ -714,24 +714,14 @@ const teachingSchema = z.object({
   faculty_visits_other_institutions: z.array(z.object({ description: optionalString })).optional(),
   ict_tools: z.array(z.object({ description: optionalString, room_no: optionalString })).optional(),
   student_centric_methods: z.array(z.object({ description: optionalString })).optional(),
-  tutorials_tests: z.object({
-    ug_odd: z.object({
-      number_of_tests: optionalString,
-      assignment_checked: optionalString
-    }).optional(),
-    ug_even: z.object({
-      number_of_tests: optionalString,
-      assignment_checked: optionalString
-    }).optional(),
-    pg_odd: z.object({
-      number_of_tests: optionalString,
-      assignment_checked: optionalString
-    }).optional(),
-    pg_even: z.object({
-      number_of_tests: optionalString,
-      assignment_checked: optionalString
-    }).optional()
-  }).optional(),
+  tutorials_tests: z.array(z.object({
+    course_name: optionalString,
+    course_code: optionalString,
+    semester: optionalString,
+    degree_type: optionalString,
+    number_of_tests: optionalString,
+    assignment_checked: optionalString
+  })).optional(),
   academic_planning: z.array(z.object({ description: optionalString })).optional()
 });
 
