@@ -1038,7 +1038,9 @@ export default function PartII({ formData, addItem, removeItem, updateArrayField
 
                 {/* 1.1 Courses taught at various levels */}
                 <div>
-                    <h4 className="text-md font-semibold text-gray-800 mb-2">1.1 Courses taught at various levels</h4>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">1.1 Courses taught at various levels </label>
+
+                    {/* <h4 className="text-md font-semibold text-gray-800 mb-2">1.1 Courses taught at various levels</h4> */}
                     <div className="space-y-4">
                         {editingCourseIndex === null ? (
                             <div className="bg-white border border-gray-200 rounded-lg overflow-hidden">
