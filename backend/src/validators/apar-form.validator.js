@@ -151,7 +151,6 @@
 //     doi: optionalString,
 //     indexing: optionalString,
 //     impact_factor: optionalString,
-//     citation_count: optionalString,
 //     is_ugc_care_listed: optionalString,
 //     link: optionalString,
 //     link_to_paper: optionalString,
@@ -202,11 +201,10 @@
 //     funding_type: optionalString,
 //     sanction_number: optionalString,
 //     year_of_sanction: optionalString,
-//     amount: optionalString,
+//     total_amount_sanctioned: optionalString,
+//     total_amount_used_this_year: optionalString,
 //     start_date: optionalString,
 //     end_date: optionalString,
-//     status: optionalString,
-//     outcome: optionalString,
 //     remarks: optionalString,
 //     academic_year: optionalString,
 //     department_id: optionalString
@@ -791,11 +789,10 @@ const researchSchema = z.object({
     funding_type: optionalString,
     sanction_number: optionalString,
     year_of_sanction: optionalString,
-    amount: optionalString,
+    total_amount_sanctioned: optionalString,
+    total_amount_used_this_year: optionalString,
     start_date: optionalString,
     end_date: optionalString,
-    status: optionalString,
-    outcome: optionalString,
     remarks: optionalString,
     academic_year: optionalString,
     department_id: optionalString
@@ -1113,14 +1110,7 @@ const requiredRemarksSchema = z.object({
 export const aparFormSchema = requestSchema(z.object({
   ay: requiredString('Academic Year'),
   faculty_id: requiredString('Faculty ID'),
-  formData: z.object({
-    personal: personalSchema,
-    teaching: teachingSchema.optional(),
-    research: researchSchema.optional(),
-    corporate: corporateSchema.optional(),
-    assessment: assessmentSchema.optional(),
-    remarks: remarksSchema.optional()
-  }).optional()
+  formData: z.any().optional()
 }));
 
 // Schema for saving draft (very lenient - only required fields)

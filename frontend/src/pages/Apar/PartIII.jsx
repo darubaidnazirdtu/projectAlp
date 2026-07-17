@@ -76,9 +76,8 @@ export default function PartIII({ formData, academicYear, addItem, removeItem, u
                     academic_year: resolvedAcademicYear,
                     start_date: '',
                     end_date: '',
-                    amount: '',
-                    status: '',
-                    outcome: '',
+                    total_amount_sanctioned: '',
+                    total_amount_used_this_year: '',
                     remarks: '',
                     link: '',
                     faculty_involved: [],
@@ -87,7 +86,7 @@ export default function PartIII({ formData, academicYear, addItem, removeItem, u
                 fields={[
                     { label: 'Research Title', key: 'title_research', fullWidth: true, required: true, placeholder: 'Enter research title' },
                     { label: 'Role', key: 'role', type: 'select', options: ['Principal Investigator', 'Co-Principal Investigator', 'Research Collaborator'] ,required: true, placeholder: 'Select Role'},
-                    { label: 'Project Type', key: 'type_of_project', type: 'select', options: ['Research', 'Consultancy', 'Innovation', 'Startup', 'Other'], required: true, placeholder: 'Select type' },
+                    { label: 'Project Type', key: 'type_of_project', type: 'select', options: ['Sponsored Research', 'Innovation', 'Startup', 'Other'], required: true, placeholder: 'Select type' },
                     { label: 'Funding Agency', key: 'funding_agency_name', required: true, placeholder: 'Enter funding agency' },
                     { label: 'Funding Type', key: 'funding_type', type: 'select', options: ['Government', 'Non-Government', 'Industry'], required: true, placeholder: 'Select funding type' },
                     { label: 'Sanction Number', key: 'sanction_number', placeholder: 'Enter sanction number' },
@@ -120,11 +119,10 @@ export default function PartIII({ formData, academicYear, addItem, removeItem, u
     validationMessage: 'End Date must be greater than or equal to Start Date'
 },
                     
-                    { label: 'Amount (INR)', key: 'amount', type: 'number', min: 0, placeholder: 'Enter amount' },
-                    { label: 'Status', key: 'status', type: 'select', options: ['Ongoing', 'Completed', 'Submitted'], required: true, placeholder: 'Select status' },
-                    { label: 'Outcome', key: 'outcome', placeholder: 'Describe outcome' },
+                    { label: 'Total Amount Sanctioned', key: 'total_amount_sanctioned', type: 'number', min: 0, placeholder: 'Enter total amount sanctioned', required: true },
+                    { label: 'Total Amount Used in this academic year', key: 'total_amount_used_this_year', type: 'number', min: 0, placeholder: 'Enter total amount used', required: true },
                     { label: 'Remarks', key: 'remarks', placeholder: 'Enter remarks' },
-                    { label: 'PDF', key: 'link', type: 'file' },
+                    { label: 'Proof of Sanction Letter', key: 'link', type: 'file', required: true },
                     {
                         label: 'Faculty Involved', key: 'faculty_involved', type: 'objectList', subFields: [
                             { label: 'Faculty ID', key: 'faculty_id', type: 'entitySelect', entityType: 'faculty', required: true, defaultValue: user?.faculty_id },
@@ -133,14 +131,8 @@ export default function PartIII({ formData, academicYear, addItem, removeItem, u
                     },
                     {
                         label: 'Students Involved', key: 'students_involved', type: 'objectList', subFields: [
-                            { label: 'Student ID', key: 'student_id', type: 'entitySelect', entityType: 'student',  required: true },
+                            { label: 'Name', key: 'name', required: true, placeholder: 'Enter student name' }, { label: 'Roll No', key: 'roll_no', required: true, placeholder: 'Enter roll no' },
                             { label: 'Role', key: 'role', type: 'select', options: ['Research Assistant', 'Intern', 'Contributor'], required: true }
-                        ]
-                    },
-                    {
-                        label: 'External Collaborators', key: 'external_collaborators', type: 'objectList', subFields: [
-                            { label: 'Name', key: 'name', required: true }, { label: 'Role', key: 'role', type: 'select', options: ['Principal Investigator', 'Co-PI', 'Research Collaborator', 'Other'],required: true },
-                            { label: 'Affiliation', key: 'affiliation' }, { label: 'Email', key: 'email',required: true, type: 'email', placeholder: 'Enter email' }
                         ]
                     }
                 ]}
@@ -153,31 +145,27 @@ export default function PartIII({ formData, academicYear, addItem, removeItem, u
                 uniqueKey="title"
                 {...createHandlers('journals')}
                 readOnly={readOnly}
-                initialItem={{ title: '', author_names: '', name_of_journal: '', volume: '', issue: '', issn: '', page_numbers: '', year_of_publication: '', indexing: '', doi: '', link_to_paper: '' }}
+                initialItem={{ title: '', author_names: '', name_of_journal: '', publisher: '', other_publisher: '', volume: '', issue: '', issn: '', page_numbers: '', year_of_publication: '', indexing: '', impact_factor: '', doi: '', link_to_paper: '' }}
                 fields={[
                     { label: 'Title', key: 'title', fullWidth: true, required: true, placeholder: 'Enter paper title' },
                     { label: 'Authors', key: 'author_names', required: true, placeholder: 'Enter author names' },
                     { label: 'Journal', key: 'name_of_journal', required: true, placeholder: 'Enter journal name' },
-                    { label: 'Volume', key: 'volume', type: 'number', min: 0, placeholder: 'Volume' },
-                    { label: 'Issue', key: 'issue', placeholder: 'Issue' },
-                    { label: 'ISSN', key: 'issn', placeholder: 'Enter ISSN' },
-                    { label: 'Pages', key: 'page_numbers',type: 'number', min: 0, placeholder: 'Page numbers' },
+                    { label: 'Publisher', key: 'publisher', type: 'select', options: ['Elsevier', 'Springer', 'Wiley', 'IEEE', 'Taylor & Francis', 'MDPI', 'Others'], required: true, placeholder: 'Select publisher' },
+                    { label: 'Other Publisher Name', key: 'other_publisher', requiredIf: (item) => item.publisher === 'Others', showIf: (item) => item.publisher === 'Others', placeholder: 'Enter publisher name' },
+                    { label: 'Volume', key: 'volume', type: 'number', min: 0, required: true, placeholder: 'Volume' },
+                    { label: 'Issue', key: 'issue', required: true, placeholder: 'Issue' },
+                    { label: 'ISSN', key: 'issn', required: true, placeholder: 'Enter ISSN' },
+                    { label: 'Pages', key: 'page_numbers',type: 'number', min: 0, required: true, placeholder: 'Page numbers' },
                     { label: 'Month-Year', key: 'year_of_publication',type: 'monthYear', ...academicCycleMonthYearBounds, required: true, placeholder: 'e.g., 02-2026' },
-                    { label: 'Indexing', key: 'indexing', placeholder: 'Indexing' },
-                    { label: 'Impact Factor', key: 'impact_factor', type: 'number', min: 0, placeholder: 'IF' },
-                    { label: 'Citation Count', key: 'citation_count', type: 'number', min: 0, placeholder: 'Citations' },
-                    { label: 'UGC Listed', key: 'is_ugc_care_listed', type: 'select', options: ['Yes', 'No'], required: true, placeholder: 'Select' },
-                    { label: 'Status', key: 'paper_status', type: 'select', options: ['Published', 'Presented', 'Accepted', 'Under Review'], required: true, placeholder: 'Select status' },
-                    { label: 'DOI', key: 'doi', placeholder: 'DOI' },
-                    { label: 'Paper PDF', key: 'link_to_paper', type: 'file' },
-                    { label: 'Proof PDF', key: 'link', type: 'file' },
-                    { label: 'Faculty Members', key: 'faculty_members', type: 'objectList', subFields: [{ label: 'Faculty ID', key: 'faculty_id', type: 'entitySelect', entityType: 'faculty', defaultValue: user?.faculty_id }] },
-                    { label: 'Students', key: 'students', type: 'objectList', subFields: [{ label: 'Student ID', key: 'student_id', type: 'entitySelect', entityType: 'student' }] },
-                    {
-                        label: 'External Contributors', key: 'external_contributors', type: 'objectList', subFields: [
-                            { label: 'Name', key: 'name',required: true }, { label: 'Role', key: 'role', required: true }, { label: 'Affiliation', key: 'affiliation' }
-                        ]
-                    }
+                    { label: 'Indexing', key: 'indexing', type: 'select', options: ['SCI', 'SCIE', 'Scopus', 'Web of Science', 'PubMed', 'UGC Care', 'Google Scholar', 'Other'], required: true, placeholder: 'Select Indexing' },
+                    { label: 'Impact Factor', key: 'impact_factor', type: 'number', min: 0, required: true, placeholder: 'IF' },
+                    { label: 'DOI', key: 'doi', required: true, placeholder: 'DOI' },
+                    { label: 'First Page of Published Paper', key: 'link_to_paper', type: 'file', required: true },
+                    { label: 'Co-Author', key: 'faculty_members', type: 'objectList', subFields: [{ label: 'Faculty ID', key: 'faculty_id', type: 'entitySelect', entityType: 'faculty', defaultValue: user?.faculty_id }] },
+                    { label: 'Students', key: 'students', type: 'objectList', subFields: [
+                        { label: 'Name', key: 'name', required: true, placeholder: 'Enter student name' },
+                        { label: 'Roll No', key: 'roll_no', required: true, placeholder: 'Enter roll no' }
+                    ] }
                 ]}
             />
 
@@ -220,7 +208,7 @@ export default function PartIII({ formData, academicYear, addItem, removeItem, u
                     { label: 'Affiliation', key: 'same_institute_affiliation', type: 'boolean' },
                     { label: 'PDF', key: 'link_to_publication', type: 'file' },
                     { label: 'Faculty Members', key: 'faculty_members', type: 'objectList', subFields: [{ label: 'Faculty ID', key: 'faculty_id', type: 'entitySelect', entityType: 'faculty', defaultValue: user?.faculty_id }] },
-                    { label: 'Students', key: 'students', type: 'objectList', subFields: [{ label: 'Student ID', key: 'student_id', type: 'entitySelect', entityType: 'student' }] },
+                    { label: 'Students', key: 'students', type: 'objectList', subFields: [{ label: 'Name', key: 'name', required: true, placeholder: 'Enter student name' }, { label: 'Roll No', key: 'roll_no', required: true, placeholder: 'Enter roll no' }] },
                     {
                         label: 'External Contributors', key: 'external_contributors', type: 'objectList', subFields: [
                             { label: 'Name', key: 'name',required: true }, { label: 'Role', key: 'role',required: true }, { label: 'Affiliation', key: 'affiliation' }
@@ -275,7 +263,7 @@ export default function PartIII({ formData, academicYear, addItem, removeItem, u
                     { label: 'Award Received', key: 'award_received', placeholder: 'Award details' },
                     { label: 'PDF', key: 'link_to_paper', type: 'file' },
                     { label: 'Faculty Members', key: 'faculty_members', type: 'objectList', subFields: [{ label: 'Faculty ID', key: 'faculty_id', type: 'entitySelect', entityType: 'faculty' }] },
-                    { label: 'Students', key: 'students', type: 'objectList', subFields: [{ label: 'Student ID', key: 'student_id', type: 'entitySelect', entityType: 'student' }] },
+                    { label: 'Students', key: 'students', type: 'objectList', subFields: [{ label: 'Name', key: 'name', required: true, placeholder: 'Enter student name' }, { label: 'Roll No', key: 'roll_no', required: true, placeholder: 'Enter roll no' }] },
                     {
                         label: 'External Contributors', key: 'external_contributors', type: 'objectList', subFields: [
                             { label: 'Name', key: 'name',required: true }, { label: 'Role', key: 'role',required: true }, { label: 'Affiliation', key: 'affiliation'}
@@ -462,7 +450,7 @@ export default function PartIII({ formData, academicYear, addItem, removeItem, u
                     },
                     {
                         label: 'Students Involved', key: 'students_involved', type: 'objectList', subFields: [
-                            { label: 'Student ID', key: 'student_id', type: 'entitySelect', entityType: 'student', required: true },
+                            { label: 'Name', key: 'name', required: true, placeholder: 'Enter student name' }, { label: 'Roll No', key: 'roll_no', required: true, placeholder: 'Enter roll no' },
                             { label: 'Role', key: 'role', required: true }
                         ]
                     },
@@ -493,7 +481,7 @@ export default function PartIII({ formData, academicYear, addItem, removeItem, u
                     { label: 'Pub PDF', key: 'link_to_publication', type: 'file' },
                     { label: 'Proof PDF', key: 'link', type: 'file' },
                     { label: 'Faculty IDs', key: 'faculty_ids', type: 'objectList', subFields: [{ label: 'Faculty ID', key: 'faculty_id', type: 'entitySelect', entityType: 'faculty' }] },
-                    { label: 'Student IDs', key: 'student_ids', type: 'objectList', subFields: [{ label: 'Student ID', key: 'student_id', type: 'entitySelect', entityType: 'student' }] },
+                    { label: 'Student IDs', key: 'student_ids', type: 'objectList', subFields: [{ label: 'Name', key: 'name', required: true, placeholder: 'Enter student name' }, { label: 'Roll No', key: 'roll_no', required: true, placeholder: 'Enter roll no' }] },
                     {
                         label: 'External Contributors', key: 'external_contributors', type: 'objectList', subFields: [
                             { label: 'Name', key: 'name',required: true }, { label: 'Role', key: 'role', required: true }, { label: 'Affiliation', key: 'affiliation' }
@@ -668,7 +656,7 @@ export default function PartIII({ formData, academicYear, addItem, removeItem, u
                             { label: 'Award Date', key: 'date_of_award', type: 'date' },
                             { label: 'PDF', key: 'link_to_patent', type: 'file' },
                             { label: 'Faculty Members', key: 'faculty_members', type: 'objectList', subFields: [{ label: 'Faculty ID', key: 'faculty_id', type: 'entitySelect', entityType: 'faculty' }] },
-                            { label: 'Students', key: 'students', type: 'objectList', subFields: [{ label: 'Student ID', key: 'student_id', type: 'entitySelect', entityType: 'student' }] },
+                            { label: 'Students', key: 'students', type: 'objectList', subFields: [{ label: 'Name', key: 'name', required: true, placeholder: 'Enter student name' }, { label: 'Roll No', key: 'roll_no', required: true, placeholder: 'Enter roll no' }] },
                             {
                                 label: 'External Inventors', key: 'external_inventors', type: 'objectList', subFields: [
                                     { label: 'Name', key: 'name', required: true }, { label: 'Role', key: 'role', required: true }, { label: 'Affiliation', key: 'affiliation' }
@@ -702,18 +690,18 @@ export default function PartIII({ formData, academicYear, addItem, removeItem, u
                             },
                             {
                                 label: 'Students Involved', key: 'students_involved', type: 'objectList', subFields: [
-                                    { label: 'Student ID', key: 'student_id', type: 'entitySelect', entityType: 'student', required: true },
+                                    { label: 'Name', key: 'name', required: true, placeholder: 'Enter student name' }, { label: 'Roll No', key: 'roll_no', required: true, placeholder: 'Enter roll no' },
                                     { label: 'Role', key: 'role', required: true }
                                 ]
                             },
                             {
                                 label: 'External Collaborators', key: 'external_collaborators', type: 'objectList', subFields: [
-                                    { label: 'Name', key: 'name', required: true }, { label: 'Role', key: 'role', required: true }, { label: 'Affiliation', key: 'affiliation' }, { label: 'Email', key: 'email', type: 'email' }
+                                    { label: 'Name', key: 'name', required: true }, { label: 'Role', key: 'role', required: true }, { label: 'Affiliation', key: 'affiliation' }
                                 ]
                             },
                             {
                                 label: 'External Consultants', key: 'external_consultants', type: 'objectList', subFields: [
-                                    { label: 'Name', key: 'name', required: true }, { label: 'Role', key: 'role', required: true }, { label: 'Affiliation', key: 'affiliation' }, { label: 'Email', key: 'email', type: 'email' }
+                                    { label: 'Name', key: 'name', required: true }, { label: 'Role', key: 'role', required: true }, { label: 'Affiliation', key: 'affiliation' }
                                 ]
                             }
                         ]}
@@ -746,3 +734,4 @@ export default function PartIII({ formData, academicYear, addItem, removeItem, u
         </div >
     );
 }
+

@@ -307,7 +307,7 @@ export default function DynamicTableSection({
         return null;
     };
 
-    const handleSave = () => {
+    const handleSave = async () => {
         // Validation: Check for duplicates if uniqueKey is provided
         if (uniqueKey && tempItem[uniqueKey]) {
             const isDuplicate = data.some((item, idx) => {
@@ -430,14 +430,46 @@ export default function DynamicTableSection({
 
         const itemToSave = normalizeMonthYearFields(tempItem);
 
-        if (editingIndex !== null) {
-            // Updated to pass the full item to avoid partial state update race conditions
-            onUpdate(editingIndex, itemToSave);
-        } else {
-            // Add new
-            onAdd(itemToSave);
+        // Upload pending File objects
+        try {
+            for (const key of Object.keys(itemToSave)) {
+                if (itemToSave[key] instanceof File) {
+                    const formData = new FormData();
+                    formData.append('file', itemToSave[key]);
+                    formData.append('folder', 'part3');
+                    
+                    toast.info(`Uploading ${itemToSave[key].name}...`);
+                    const api = new Api();
+                    const result = await api.post('/apar/mongo/documents/direct', formData, { 'Content-Type': undefined });
+                    if (result && result.url) {
+                        itemToSave[key] = result.url;
+                    } else {
+                        throw new Error('Invalid response from server during upload');
+                    }
+                }
+            }
+        } catch (uploadError) {
+            console.error('File upload failed during save:', uploadError);
+            toast.error('Failed to upload file. Please try again.');
+            return;
         }
-        handleCancel();
+
+        try {
+            let success;
+            if (editingIndex !== null) {
+                // Updated to pass the full item to avoid partial state update race conditions
+                success = await onUpdate(editingIndex, itemToSave);
+            } else {
+                // Add new
+                success = await onAdd(itemToSave);
+            }
+            
+            if (success !== false) {
+                handleCancel();
+            }
+        } catch (e) {
+            console.error(e);
+        }
     };
 
     const handleFieldValidation = (fieldKey, value, currentItem) => {
@@ -621,7 +653,7 @@ export default function DynamicTableSection({
                                                         return <span className="text-amber-600 text-xs truncate max-w-[100px] inline-block" title="Pending save">(Pending save)</span>;
                                                     }
                                                     const urlStr = typeof fileVal === 'string' ? fileVal : String(fileVal);
-                                                    const isSavedDoc = /^(document|profilepicture|additional documents)\//.test(urlStr);
+                                                    const isSavedDoc = /^(document|profilepicture|additional documents|optionaldocuments|part3)\//.test(urlStr);
                                                     const viewUrl = isSavedDoc ? `${new Api().client.defaults.baseURL}/apar/mongo/document?path=${encodeURIComponent(urlStr)}` : urlStr;
                                                     return <a href={viewUrl} target="_blank" rel="noreferrer" className="text-indigo-600 hover:underline">View File</a>;
                                                 })()
@@ -654,9 +686,9 @@ export default function DynamicTableSection({
                                     <td className="px-4 py-4 whitespace-nowrap text-right text-sm font-medium">
                                         {!readOnly && (
                                             <div className="flex justify-end gap-2">
-                                                <button onClick={() => handleStartEdit(idx, item)} className="text-indigo-600 hover:text-indigo-900"><FiEdit2 /></button>
+                                                <button type="button" onClick={() => handleStartEdit(idx, item)} className="text-indigo-600 hover:text-indigo-900"><FiEdit2 /></button>
                                                 {onRemove && (
-                                                    <button onClick={() => onRemove(idx)} className="text-red-600 hover:text-red-900"><FiTrash2 /></button>
+                                                    <button type="button" onClick={() => onRemove(idx)} className="text-red-600 hover:text-red-900"><FiTrash2 /></button>
                                                 )}
                                             </div>
                                         )}
@@ -725,13 +757,14 @@ export default function DynamicTableSection({
                                     />
                                 ) : f.type === 'file' ? (
                                     <div>
-                                        <FileUpload
-                                            value={tempItem[f.key] || ''}
-                                            onChange={(url) => handleChange(f.key, typeof url === 'object' ? url : sanitizeForResearchKey(f.key, url, 'url'))}
-                                            disabled={f.disabled || f.readOnly || readOnly}
-                                            required={f.required || (typeof f.requiredIf === 'function' && f.requiredIf(tempItem))}
-                                            temporaryPdf
-                                        />
+                                            <FileUpload
+                                                value={tempItem[f.key] || ''}
+                                                onChange={(url) => handleChange(f.key, typeof url === 'object' ? url : sanitizeForResearchKey(f.key, url, 'url'))}
+                                                disabled={f.disabled || f.readOnly || readOnly}
+                                                required={f.required || (typeof f.requiredIf === 'function' && f.requiredIf(tempItem))}
+                                                directMinio={true}
+                                                deferUpload={true}
+                                            />
                                         {f.description && (
                                             <p className="text-xs text-gray-500 mt-1 italic">{f.description}</p>
                                         )}
@@ -748,6 +781,7 @@ export default function DynamicTableSection({
                                                         {Object.keys(subItem).map(k => subItem[k]).join(', ')}
                                                     </div>
                                                     <button
+                                                        type="button"
                                                         onClick={() => {
                                                             const newList = [...(tempItem[f.key] || [])];
                                                             newList.splice(subIdx, 1);
@@ -934,8 +968,8 @@ export default function DynamicTableSection({
                         )})}
                     </div>
                     <div className="flex justify-end gap-3 mt-6">
-                        <button onClick={handleCancel} className="px-4 py-2 bg-white border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50">Cancel</button>
-                        <button onClick={handleSave} className="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 flex items-center">
+                        <button type="button" onClick={handleCancel} className="px-4 py-2 bg-white border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50">Cancel</button>
+                        <button type="button" onClick={handleSave} className="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 flex items-center">
                             <FiSave className="mr-2" /> Save Entry
                         </button>
                     </div>

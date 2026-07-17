@@ -1784,25 +1784,23 @@ export default function AparForm() {
             toast.error("Please complete the current step before jumping ahead.");
         }
     };
-
     const handlePersonalChange = (e) => {
         const { name, value } = e.target;
         const sanitized = sanitizeForApar(value, `personal.${name}`);
         setFormData(prev => ({ ...prev, personal: { ...prev.personal, [name]: sanitized } }));
     };
 
-    const addItem = (section, field, initialItem) => {
-        setFormData(prev => {
-            const next = {
-                ...prev,
-                [section]: {
-                    ...prev[section],
-                    [field]: [...prev[section][field], initialItem]
-                }
-            };
-            handleSaveDraft(true, next);
-            return next;
-        });
+    const addItem = async (section, field, initialItem) => {
+        const next = {
+            ...formData,
+            [section]: {
+                ...formData[section],
+                [field]: [...(formData[section]?.[field] || []), initialItem]
+            }
+        };
+        const saved = await handleSaveDraft(true, next);
+        if (saved) setFormData(next);
+        return saved;
     };
 
     const removeItem = async (section, field, index) => {
@@ -1834,38 +1832,36 @@ export default function AparForm() {
         return saved;
     };
 
-    const updateArrayField = (section, field, index, key, value) => {
-        setFormData(prev => {
-            const updatedArray = [...prev[section][field]];
-            const sanitized = sanitizeForApar(value, `${section}.${field}.${key}`);
-            updatedArray[index] = { ...updatedArray[index], [key]: sanitized };
-            const next = {
-                ...prev,
-                [section]: {
-                    ...prev[section],
-                    [field]: updatedArray
-                }
-            };
-            handleSaveDraft(true, next);
-            return next;
-        });
+    const updateArrayField = async (section, field, index, key, value) => {
+        const updatedArray = [...(formData[section]?.[field] || [])];
+        const sanitized = sanitizeForApar(value, `${section}.${field}.${key}`);
+        updatedArray[index] = { ...updatedArray[index], [key]: sanitized };
+        const next = {
+            ...formData,
+            [section]: {
+                ...formData[section],
+                [field]: updatedArray
+            }
+        };
+        const saved = await handleSaveDraft(true, next);
+        if (saved) setFormData(next);
+        return saved;
     };
 
-    const updateArrayItem = (section, field, index, newItem) => {
-        setFormData(prev => {
-            const updatedArray = [...prev[section][field]];
-            const sanitizedItem = sanitizeDeep(newItem, `${section}.${field}`);
-            updatedArray[index] = sanitizedItem;
-            const next = {
-                ...prev,
-                [section]: {
-                    ...prev[section],
-                    [field]: updatedArray
-                }
-            };
-            handleSaveDraft(true, next);
-            return next;
-        });
+    const updateArrayItem = async (section, field, index, updatedItem) => {
+        const updatedArray = [...(formData[section]?.[field] || [])];
+        const sanitizedItem = sanitizeDeep(updatedItem, `${section}.${field}`);
+        updatedArray[index] = sanitizedItem;
+        const next = {
+            ...formData,
+            [section]: {
+                ...formData[section],
+                [field]: updatedArray
+            }
+        };
+        const saved = await handleSaveDraft(true, next);
+        if (saved) setFormData(next);
+        return saved;
     };
 
     const updateAssessment = (section, key, value) => {

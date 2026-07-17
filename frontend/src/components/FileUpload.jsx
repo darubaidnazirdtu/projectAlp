@@ -3,7 +3,7 @@ import { Api } from '../api/Api';
 import { FiUpload, FiEye, FiTrash2, FiLoader } from 'react-icons/fi';
 import { toast } from 'sonner';
 
-const FileUpload = ({ value, onChange, disabled, required = false, temporaryPdf = false, directMinio = false, academicYear = '' }) => {
+const FileUpload = ({ value, onChange, disabled, required = false, temporaryPdf = false, directMinio = false, deferUpload = false, academicYear = '' }) => {
     const [uploading, setUploading] = useState(false);
     const fileInputRef = useRef(null);
     const api = new Api(); // Use default base URL
@@ -40,6 +40,12 @@ const FileUpload = ({ value, onChange, disabled, required = false, temporaryPdf 
             if ((temporaryPdf || directMinio) && typeof value === 'string' && /^(document|additional documents|profile|optionaldocuments)\//.test(value)) {
                 await deleteSavedPdf(value);
                 onChange('');
+            }
+
+            if (deferUpload) {
+                onChange(file);
+                setUploading(false);
+                return;
             }
 
             let endpoint = '/upload';
@@ -82,13 +88,19 @@ const FileUpload = ({ value, onChange, disabled, required = false, temporaryPdf 
             toast.error('File upload failed');
         } finally {
             setUploading(false);
-            if (fileInputRef.current) {
+            if (fileInputRef.current && !deferUpload) {
                 fileInputRef.current.value = '';
             }
         }
     };
 
     const handleRemove = async () => {
+        if (value instanceof File) {
+            onChange('');
+            if (fileInputRef.current) fileInputRef.current.value = '';
+            return;
+        }
+
         if (temporaryPdf && value?.tempId) {
             try {
                 await api.delete(`/apar/mongo/documents/temp?tempId=${encodeURIComponent(value.tempId)}`);
@@ -110,8 +122,9 @@ const FileUpload = ({ value, onChange, disabled, required = false, temporaryPdf 
         if (temporaryPdf || directMinio) toast.success('PDF deleted');
     };
 
-    const isTemporary = Boolean(value && typeof value === 'object' && value.tempId);
-    const displayName = isTemporary ? value.originalName || 'Selected PDF' : null;
+    const isFileObject = value instanceof File;
+    const isTemporary = Boolean(!isFileObject && value && typeof value === 'object' && value.tempId);
+    const displayName = isFileObject ? value.name : (isTemporary ? value.originalName || 'Selected PDF' : null);
     const viewUrl = typeof value === 'string' && /^(document|profile|profilepicture|additional documents|optionaldocuments)\//.test(value)
         ? `${api.client.defaults.baseURL}/apar/mongo/document?path=${encodeURIComponent(value)}`
         : value;
@@ -153,7 +166,7 @@ const FileUpload = ({ value, onChange, disabled, required = false, temporaryPdf 
 
             {value && (
                 <div className="flex items-center space-x-2">
-                    {isTemporary ? (
+                    {(isTemporary || isFileObject) ? (
                         <span className="flex items-center px-3 py-2 bg-amber-100 text-amber-800 rounded text-sm">{displayName} (pending save)</span>
                     ) : (
                         <a

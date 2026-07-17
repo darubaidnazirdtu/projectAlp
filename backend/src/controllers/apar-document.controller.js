@@ -59,7 +59,11 @@ export const uploadDirectMinioDocument = asyncHandler(async (req, res) => {
     const basename = path.basename(file.originalname, path.extname(file.originalname)).replace(/[^a-zA-Z0-9.-]/g, '_');
     const safeName = `${basename}-${Date.now()}${path.extname(file.originalname)}`;
     
-    const minioPath = `optionaldocuments/${safeAy}/${safeFac}/${safeName}`;
+    let folder = req.body.folder || `optionaldocuments/${safeAy}`;
+    // Strip trailing slashes to avoid double slashes
+    folder = folder.replace(/\/+$/, '');
+    
+    const minioPath = `${folder}/${safeFac}/${safeName}`;
     
     await uploadLocalFile({ 
         filePath: file.path, 

@@ -87,5 +87,5 @@ export const getObject = async (objectPath) => {
 };
 
 export const isAparObjectPath = (value) => (
-    typeof value === 'string' && /^(profilepicture|profile|document|additional documents|optionaldocuments)\//.test(value)
+    typeof value === 'string' && /^(profilepicture|profile|document|additional documents|optionaldocuments|part3)\//.test(value)
 );

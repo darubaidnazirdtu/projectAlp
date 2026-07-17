@@ -124,14 +124,13 @@ const AparFormSchema = new mongoose.Schema({
             doi: String,
             indexing: String,
             impact_factor: String,
-            citation_count: String, // IQAC: Number
-            is_ugc_care_listed: String, // IQAC: Boolean
+            publisher: String,
+            other_publisher: String,
             link: String,
             link_to_paper: String,
             department_id: String, // IQAC required
             faculty_members: [], // [{ faculty_id, role }]
             students: [], // [{ student_id, role }]
-            external_authors: [] // [{ name, email, affiliation, role }]
         }],
 
         // 2. Research Papers in Conferences -> Publication (type: 'conference')
@@ -190,11 +189,10 @@ const AparFormSchema = new mongoose.Schema({
             funding_type: String,
             sanction_number: String,
             year_of_sanction: String, // IQAC: Number
-            amount: String, // IQAC: Number
+            total_amount_sanctioned: String,
+            total_amount_used_this_year: String,
             start_date: Date,
             end_date: Date,
-            status: String,
-            outcome: String,
             remarks: String,
             link: String,
             academic_year: String,
