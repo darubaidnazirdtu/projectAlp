@@ -91,6 +91,17 @@ textarea {
         #f0fdf4;
 }
 
+.apar-form-root h1,
+.apar-form-root h2,
+.apar-form-root h3,
+.apar-form-root h4,
+.apar-form-root h5,
+.apar-form-root h6,
+.apar-form-root label.font-medium,
+.apar-form-root label.font-semibold {
+    text-transform: uppercase;
+}
+
 .apar-shell-header {
     padding-bottom: 1rem;
     border-bottom: 1px solid #d1fae5;

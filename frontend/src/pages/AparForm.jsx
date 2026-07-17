@@ -2132,7 +2132,7 @@ export default function AparForm() {
     );
 
     return (
-        <div className="apar-page-bg min-h-screen py-8 px-4 sm:px-6 lg:px-8 print:p-0 print:bg-white relative overflow-hidden">
+        <div className="apar-page-bg apar-form-root min-h-screen py-8 px-4 sm:px-6 lg:px-8 print:p-0 print:bg-white relative overflow-hidden">
             {/* Decorative Premium Background */}
             <div className="absolute top-0 left-0 w-full h-full overflow-hidden pointer-events-none z-0 print:hidden">
                 <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-indigo-500/10 rounded-full blur-[120px]"></div>
