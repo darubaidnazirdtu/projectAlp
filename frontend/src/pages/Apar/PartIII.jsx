@@ -81,7 +81,8 @@ export default function PartIII({ formData, academicYear, addItem, removeItem, u
                     remarks: '',
                     link: '',
                     faculty_involved: [],
-                    students_involved: []
+                    students_involved: [],
+                    manpower_details: []
                 }}
                 fields={[
                     { label: 'Research Title', key: 'title_research', fullWidth: true, required: true, placeholder: 'Enter research title' },
@@ -134,6 +135,12 @@ export default function PartIII({ formData, academicYear, addItem, removeItem, u
                             { label: 'Student Name', key: 'name', required: true, placeholder: 'Enter student name' }, { label: 'Student Roll No', key: 'roll_no', required: true, placeholder: 'Enter roll no' },
                             { label: 'Role', key: 'role', type: 'select', options: ['Research Assistant', 'Intern', 'Contributor'], required: true }
                         ]
+                    },
+                    {
+                        label: 'Manpower Details', key: 'manpower_details', type: 'objectList', subFields: [
+                            { label: 'Name of Post', key: 'name_of_post', required: true, placeholder: 'Enter post name' },
+                            { label: 'Number of Posts', key: 'number_of_posts', type: 'number', min: 1, required: true, placeholder: 'Enter number' }
+                        ]
                     }
                 ]}
             />
@@ -163,8 +170,8 @@ export default function PartIII({ formData, academicYear, addItem, removeItem, u
                     { label: 'First Page of Published Paper', key: 'link_to_paper', type: 'file', required: true },
                     { label: 'Co-Author', key: 'faculty_members', type: 'objectList', subFields: [
                         { label: 'Author Type', key: 'author_type', type: 'select', options: ['Internal Author', 'External Author'], required: true, placeholder: 'Select type' },
-                        { label: 'Faculty ID', key: 'faculty_id', type: 'entitySelect', entityType: 'faculty', showIf: (item) => item.author_type !== 'External Author', requiredIf: (item) => item.author_type !== 'External Author' },
-                        { label: 'External Author Name', key: 'name', showIf: (item) => item.author_type === 'External Author', requiredIf: (item) => item.author_type === 'External Author', placeholder: 'Enter name' }
+                        { label: 'Co-Author Name', key: 'name', required: true, placeholder: 'Enter name' },
+                        { label: 'Employee Code', key: 'emp_code', showIf: (item) => item.author_type === 'Internal Author', requiredIf: (item) => item.author_type === 'Internal Author', placeholder: 'Enter employee code' }
                     ] },
                     { label: 'Students', key: 'students', type: 'objectList', subFields: [
                         { label: 'Student Name', key: 'name', required: true, placeholder: 'Enter student name' },
