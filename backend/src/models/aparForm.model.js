@@ -142,12 +142,12 @@ const AparFormSchema = new mongoose.Schema({
             organizer: String,
             venue: String,
             publisher: String,
+            other_publisher: String,
             isbn: String,
             year_of_publication: String, // IQAC: Number
             doi: String,
             indexing: String,
             award_received: String,
-            paper_status: String,
             link: String,
             link_to_paper: String,
             department_id: String,

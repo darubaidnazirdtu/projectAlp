@@ -154,7 +154,8 @@
 //     is_ugc_care_listed: optionalString,
 //     link: optionalString,
 //     link_to_paper: optionalString,
-//     department_id: optionalString
+//     department_id: optionalString,
+//     faculty_members: z.array(z.any()).optional()
 //   })).optional(),
 //   conferences: z.array(z.object({
 //     paper_id: optionalString,
@@ -170,7 +171,6 @@
 //     doi: optionalString,
 //     indexing: optionalString,
 //     award_received: optionalString,
-//     paper_status: optionalString,
 //     link: optionalString,
 //     link_to_paper: optionalString,
 //     department_id: optionalString
@@ -743,7 +743,9 @@ const researchSchema = z.object({
     is_ugc_care_listed: optionalString,
     link: optionalString,
     link_to_paper: optionalString,
-    department_id: optionalString
+    department_id: optionalString,
+    faculty_members: z.array(z.any()).optional(),
+    students: z.array(z.any()).optional()
   })).optional(),
   conferences: z.array(z.object({
     paper_id: optionalString,

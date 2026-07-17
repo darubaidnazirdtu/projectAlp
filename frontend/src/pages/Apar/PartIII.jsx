@@ -161,7 +161,11 @@ export default function PartIII({ formData, academicYear, addItem, removeItem, u
                     { label: 'Impact Factor', key: 'impact_factor', type: 'number', min: 0, required: true, placeholder: 'IF' },
                     { label: 'DOI', key: 'doi', required: true, placeholder: 'DOI' },
                     { label: 'First Page of Published Paper', key: 'link_to_paper', type: 'file', required: true },
-                    { label: 'Co-Author', key: 'faculty_members', type: 'objectList', subFields: [{ label: 'Faculty ID', key: 'faculty_id', type: 'entitySelect', entityType: 'faculty', defaultValue: user?.faculty_id }] },
+                    { label: 'Co-Author', key: 'faculty_members', type: 'objectList', subFields: [
+                        { label: 'Author Type', key: 'author_type', type: 'select', options: ['Internal Author', 'External Author'], required: true, placeholder: 'Select type' },
+                        { label: 'Faculty ID', key: 'faculty_id', type: 'entitySelect', entityType: 'faculty', showIf: (item) => item.author_type !== 'External Author', requiredIf: (item) => item.author_type !== 'External Author' },
+                        { label: 'External Author Name', key: 'name', showIf: (item) => item.author_type === 'External Author', requiredIf: (item) => item.author_type === 'External Author', placeholder: 'Enter name' }
+                    ] },
                     { label: 'Students', key: 'students', type: 'objectList', subFields: [
                         { label: 'Student Name', key: 'name', required: true, placeholder: 'Enter student name' },
                         { label: 'Student Roll No', key: 'roll_no', required: true, placeholder: 'Enter roll no' }
@@ -231,8 +235,8 @@ export default function PartIII({ formData, academicYear, addItem, removeItem, u
                     conference_level: '',
                     organizer: '',
                     venue: '',
-                    paper_status: '',
                     publisher: '',
+                    other_publisher: '',
                     issn: '',
                     isbn: '',
                     volume: '',
@@ -248,18 +252,18 @@ export default function PartIII({ formData, academicYear, addItem, removeItem, u
 
                     { label: 'Title', key: 'title', fullWidth: true, required: true, placeholder: 'Enter title' },
                     { label: 'Conference', key: 'name_of_conference', required: true, placeholder: 'Enter conference name' },
-                    { label: 'Level', key: 'conference_level', type: 'select', options: ['State', 'National', 'International'], required: true, placeholder: 'Select level' },
+                    { label: 'Level', key: 'conference_level', type: 'select', options: ['National', 'International'], required: true, placeholder: 'Select level' },
                     { label: 'Organizer', key: 'organizer', required: true, placeholder: 'Enter organizer' },
                     { label: 'Venue', key: 'venue', required: true, placeholder: 'Enter venue' },
-                    { label: 'Paper Status', key: 'paper_status', type: 'select', options: ['Published', 'Accepted', 'Presented', 'Under Review'], required: true, placeholder: 'Select status' },
-                    { label: 'Publisher', key: 'publisher', placeholder: 'Publisher' },
+                    { label: 'Publisher', key: 'publisher', type: 'select', options: ['Elsevier', 'Springer', 'Wiley', 'IEEE', 'Taylor & Francis', 'MDPI', 'Others'], required: true, placeholder: 'Select publisher' },
+                    { label: 'Other Publisher Name', key: 'other_publisher', requiredIf: (item) => item.publisher === 'Others', showIf: (item) => item.publisher === 'Others', placeholder: 'Enter publisher name' },
                     { label: 'ISSN', key: 'issn', placeholder: 'ISSN' },
                     { label: 'ISBN', key: 'isbn', placeholder: 'ISBN' },
                     { label: 'Volume', key: 'volume', placeholder: 'Volume' },
                     { label: 'Page Numbers', key: 'page_numbers', type: 'number', min: 0, placeholder: 'Pages' },
                     { label: 'Month-Year', key: 'year_of_publication', type: 'monthYear', ...academicCycleMonthYearBounds, required: true, placeholder: 'e.g., 02-2026' },
                     { label: 'DOI', key: 'doi', placeholder: 'DOI' },
-                    { label: 'Indexing', key: 'indexing', placeholder: 'Indexing' },
+                    { label: 'Indexing', key: 'indexing', type: 'select', options: ['SCI', 'SCIE', 'Scopus', 'Web of Science', 'PubMed', 'UGC Care', 'Google Scholar', 'Other'], required: true, placeholder: 'Select Indexing' },
                     { label: 'Award Received', key: 'award_received', placeholder: 'Award details' },
                     { label: 'PDF', key: 'link_to_paper', type: 'file' },
                     { label: 'Faculty Members', key: 'faculty_members', type: 'objectList', subFields: [{ label: 'Faculty ID', key: 'faculty_id', type: 'entitySelect', entityType: 'faculty' }] },
@@ -335,6 +339,7 @@ export default function PartIII({ formData, academicYear, addItem, removeItem, u
                         label: 'Co-Supervisors', key: 'co_supervisors', type: 'objectList', subFields: [
                             { label: 'Faculty Name', key: 'name', required: true, placeholder: 'Enter name' },
                             { label: 'Emp Code', key: 'emp_code', required: true, placeholder: 'Enter emp code' },
+                            { label: 'Supervision Location', key: 'supervision_location', type: 'select', options: ['Internal (Within University)', 'External (Outside University)'], required: true, placeholder: 'Select location' },
                             { label: 'Role', key: 'role', type: 'select', options: ['Co-Supervisor 1', 'Co-Supervisor 2', 'Other'], required: true }
                         ]
                     }
