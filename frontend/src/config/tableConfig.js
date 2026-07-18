@@ -46,77 +46,53 @@ const rawResources = [
     updateFunctionName: 'updateBooksChaptersPublished',
     deleteFunctionName: 'deleteBooksChaptersPublished',
     getByIdFunctionName: 'getBooksChaptersPublishedById',
-    submission: {
-      payloadType: 'formData',
-      fileUploadKey: 'doc',
-      signature: 'formDataWithHeaders',
-    },
+    submission: { payloadType: 'json' },
     columns: [
-      // { header: 'Publication ID', accessor: 'publication_id' },
       { header: 'Department ID', accessor: 'department_id', required: true, type: 'entitySelect', entityType: 'department' },
-      {
-        header: 'Publication Type',
-        accessor: 'publication_type',
-        type: 'select',
-        options: ['Book', 'Chapter'],
-        required: true,
-        placeholder: 'Select publication type'
-      },
-      { header: 'Title of Book', accessor: 'title_of_book', requiredIf: (item) => item.publication_type === 'Book', placeholder: 'Enter book title' },
-      { header: 'Title of Chapter', accessor: 'title_of_chapter', requiredIf: (item) => item.publication_type === 'Chapter', placeholder: 'Enter chapter title (if applicable)' },
-      {
-        header: 'Role',
-        accessor: 'role',
-        type: 'select',
-        options: ['Author', 'Co-Author', 'Editor'],
-        placeholder: 'Select Role',
-        required: true
-      },
-      { header: 'Year', accessor: 'year', type: 'year', required: true, min: 1900, max: 2099, placeholder: 'e.g., 2024' },
+      { header: 'Publication Type', accessor: 'publication_type', type: 'select', options: ['Book', 'Chapter'], required: true, placeholder: 'Select type' },
+      { header: 'Title of Book', accessor: 'title_of_book', required: true, placeholder: 'Enter book title' },
+      { header: 'Title of Chapter', accessor: 'title_of_chapter', required: true, placeholder: 'Enter chapter title' },
+      { header: 'Role', accessor: 'role', type: 'select', options: ['Author', 'Co-Author', 'Editor'], required: true, placeholder: 'Select role' },
+      { header: 'Year', accessor: 'year', type: 'monthYear', required: true, placeholder: 'e.g., 02-2026' },
       ACADEMIC_YEAR_FIELD,
-      { header: 'ISBN', accessor: 'isbn_number', placeholder: 'e.g., 978-3-16-148410-0' },
-      { header: 'Publisher', accessor: 'name_of_publisher', required: true, placeholder: 'Enter publisher name' },
-      {
-        header: 'Publisher Type',
-        accessor: 'publisher_type',
-        type: 'select',
-        options: ['National', 'International'],
-        placeholder: 'Select Type'
-      },
-      { header: 'DOI', accessor: 'doi', placeholder: 'e.g., 10.1000/xyz123' },
-      { header: 'Indexing', accessor: 'indexing', placeholder: 'e.g., Scopus, WoS' },
-      { header: 'Affiliation', accessor: 'same_institute_affiliation', type: 'boolean', required: true },
-      { header: 'PDF', accessor: 'link_to_publication', type: 'hyperlink', fileKey: 'doc' , description: 'Upload cover page and index showing publisher info (Max 5MB PDF)' },
+      { header: 'ISBN', accessor: 'isbn_number', required: true, placeholder: 'ISBN' },
+      { header: 'Publisher', accessor: 'name_of_publisher', required: true, placeholder: 'Enter publisher' },
+      { header: 'Publisher Type', accessor: 'publisher_type', type: 'select', options: ['National', 'International'], required: true, placeholder: 'Select type' },
+      { header: 'DOI', accessor: 'doi', required: true, placeholder: 'DOI' },
+      { header: 'Indexing', accessor: 'indexing', type: 'select', options: ['SCI', 'SCIE', 'Scopus', 'Web of Science', 'PubMed', 'UGC Care', 'Google Scholar', 'Other'], required: true, placeholder: 'Select Indexing' },
       {
         header: 'Faculty Members',
-        accessor: 'faculty_ids',
+        accessor: 'faculty_members',
         type: 'objectList',
         subFields: [
-          { header: 'Faculty ID', accessor: 'faculty_id', type: 'entitySelect', entityType: 'faculty' }
+          { header: 'Author Type', accessor: 'author_type', type: 'select', options: ['Internal Author', 'External Author'], required: true, placeholder: 'Select type' },
+          { header: 'Select Faculty (Internal)', accessor: 'faculty_id', type: 'entitySelect', entityType: 'faculty', showIf: (item) => item.author_type === 'Internal Author', requiredIf: (item) => item.author_type === 'Internal Author' },
+          { header: 'Co-Author Name (External)', accessor: 'name', showIf: (item) => item.author_type === 'External Author', requiredIf: (item) => item.author_type === 'External Author', placeholder: 'Enter name' },
+          { header: 'Details (External)', accessor: 'emp_code', showIf: (item) => item.author_type === 'External Author', placeholder: 'Enter details' }
         ],
-        transform: (members) => Array.isArray(members) ? members.map(f => f.faculty_id) : [],
+        transform: (members) => Array.isArray(members) ? members.map(f => f.author_type === 'Internal Author' ? f.faculty_id : f.name).join(', ') : "",
       },
       {
         header: 'Students',
-        accessor: 'student_ids',
+        accessor: 'students',
         type: 'objectList',
         subFields: [
-          { header: 'Student ID', accessor: 'student_id', type: 'entitySelect', entityType: 'student' }
+          { header: 'Student Name', accessor: 'name', required: true, placeholder: 'Enter student name' },
+          { header: 'Student Roll No', accessor: 'roll_no', required: true, placeholder: 'Enter roll no' }
         ],
-        transform: (students) => Array.isArray(students) ? students.map(s => s.student_id) : [],
+        transform: (students) => Array.isArray(students) ? students.map(s => s.name).join(', ') : "",
       },
       {
         header: 'External Contributors',
         accessor: 'external_contributors',
         type: 'objectList',
         subFields: [
-          { header: 'Name', accessor: 'name', required: true, placeholder: 'Enter external contributor name' },
-          { header: 'Email', accessor: 'email', placeholder: 'Enter email address' },
-          { header: 'Affiliation', accessor: 'affiliation', placeholder: 'Enter affiliation' },
-          { header: 'Role', accessor: 'role', type: 'select', options: ['Author', 'Co-Author', 'Editor', 'Other'] }
+          { header: 'Name', accessor: 'name', required: true },
+          { header: 'Role', accessor: 'role', required: true },
+          { header: 'Affiliation', accessor: 'affiliation' }
         ],
-        transform: (externals) => Array.isArray(externals) ? externals.map(e => e.name) : [],
-      },
+        transform: (externals) => Array.isArray(externals) ? externals.map(e => e.name).join(', ') : "",
+      }
     ],
   },
   {
@@ -227,76 +203,44 @@ const rawResources = [
     updateFunctionName: 'updateCollaboration',
     deleteFunctionName: 'deleteCollaboration',
     getByIdFunctionName: 'getCollaborationById',
-    submission: {
-      payloadType: 'formData',
-      fileUploadKey: 'doc',
-      signature: 'payloadAndFile',
-    },
+    submission: { payloadType: 'json' },
     columns: [
-      // { header: 'Activity ID', accessor: 'activity_id' },
       { header: 'Department ID', accessor: 'department_id', required: true, type: 'entitySelect', entityType: 'department' },
-      { header: 'Title of Activity', accessor: 'title_of_activity', required: true, placeholder: 'Enter activity title' },
-      { header: 'Agency Name', accessor: 'name_of_collaborative_agency', required: true, placeholder: 'Enter collaborating agency name' },
-      {
-        header: 'Type',
-        accessor: 'type_of_activity',
-        type: 'select',
-        options: ['Workshop', 'Seminar', 'Industrial Visit', 'Research Collaboration', 'MoU', 'Joint Program', 'Other'],
-        required: true,
-        placeholder: 'Select type'
-      },
-      {
-        header: 'Level',
-        accessor: 'level',
-        type: 'select',
-        options: ['Institutional', 'National', 'International'],
-        required: true,
-        placeholder: 'Select level'
-      },
+      { header: 'Title of Activity', accessor: 'title_of_activity', required: true, placeholder: 'Enter title' },
+      { header: 'Collaborative Agency', accessor: 'name_of_collaborative_agency', required: true, placeholder: 'Enter agency name' },
+      { header: 'Type of Activity', accessor: 'type_of_activity', type: 'select', options: ['Research', 'Student Exchange', 'Faculty Exchange', 'Industry', 'Other'], required: true, placeholder: 'Select type' },
+      { header: 'Nature of Activity', accessor: 'nature_of_activity', required: true, placeholder: 'Enter nature of activity' },
+      { header: 'Number of Participants', accessor: 'number_of_participants', type: 'number', required: true, placeholder: 'Enter number of participants' },
+      { header: 'Source of Financial Support', accessor: 'source_of_financial_support', placeholder: 'Enter source of support (if any)' },
+      { header: 'Funding Amount', accessor: 'funding_amount', type: 'number', placeholder: 'Enter amount (if any)' },
+      { header: 'Duration', accessor: 'duration', required: true, placeholder: 'Enter duration' },
+      { header: 'Level', accessor: 'level', type: 'select', options: ['National', 'International'], required: true, placeholder: 'Select level' },
       { header: 'Start Date', accessor: 'start_date', type: 'date', required: true },
       { header: 'End Date', accessor: 'end_date', type: 'date', required: true },
-      { header: 'Participants', accessor: 'number_of_participants', type: 'number', placeholder: 'Number of participants' },
-      { header: 'Source of Financial Support', accessor: 'source_of_financial_support', placeholder: 'Enter source' },
-      { header: 'Funding Amount', accessor: 'funding_amount', type: 'number', placeholder: 'Amount in INR' },
-      { header: 'Year', accessor: 'year', type: 'number', required: true, placeholder: 'e.g., 2024' },
+      { header: 'Year', accessor: 'year', type: 'year', required: true },
       ACADEMIC_YEAR_FIELD,
-      { header: 'Duration', accessor: 'duration', placeholder: 'e.g., 3 days' },
-      { header: 'Nature of Activity', accessor: 'nature_of_activity', placeholder: 'Describe nature' },
-      { header: 'Outcome', accessor: 'outcome', placeholder: 'Describe outcome' },
-      { header: 'Remarks', accessor: 'remarks', placeholder: 'Additional remarks' },
-      { header: 'PDF', accessor: 'link', type: 'hyperlink', fileKey: 'doc' , description: 'Upload collaboration letter or activity report (Max 5MB PDF)' },
       {
-        header: 'Faculty',
+        header: 'Faculty Associations',
         accessor: 'faculty_associations',
         type: 'objectList',
         subFields: [
-          { header: 'Faculty ID', accessor: 'faculty_id', type: 'entitySelect', entityType: 'faculty' },
-          { header: 'Role', accessor: 'role', type: 'select', options: ['Coordinator', 'Participant', 'Lead Faculty'] }
+          { header: 'Member Type', accessor: 'member_type', type: 'select', options: ['Internal', 'External'], required: true, placeholder: 'Select type' },
+          { header: 'Select Faculty (Internal)', accessor: 'faculty_id', type: 'entitySelect', entityType: 'faculty', showIf: (item) => item.member_type === 'Internal', requiredIf: (item) => item.member_type === 'Internal' },
+          { header: 'Name (External)', accessor: 'name', showIf: (item) => item.member_type === 'External', requiredIf: (item) => item.member_type === 'External', placeholder: 'Enter name' },
+          { header: 'Details (External)', accessor: 'emp_code', showIf: (item) => item.member_type === 'External', placeholder: 'Enter details' }
         ],
-        transform: (members) => Array.isArray(members) ? members.map(f => `${f.faculty_id} (${f.role})`) : [],
+        transform: (members) => Array.isArray(members) ? members.map(f => f.member_type === 'Internal' ? f.faculty_id : f.name).join(', ') : "",
       },
       {
-        header: 'Students',
+        header: 'Student Associations',
         accessor: 'student_associations',
         type: 'objectList',
         subFields: [
-          { header: 'Student ID', accessor: 'student_id', type: 'entitySelect', entityType: 'student' },
-          { header: 'Role', accessor: 'role', type: 'select', options: ['Participant', 'Intern', 'Support Staff'] }
+          { header: 'Student Name', accessor: 'name', required: true, placeholder: 'Enter student name' },
+          { header: 'Student Roll No', accessor: 'roll_no', required: true, placeholder: 'Enter roll no' }
         ],
-        transform: (students) => Array.isArray(students) ? students.map(s => `${s.student_id} (${s.role})`) : [],
-      },
-      {
-        header: 'External Contributors',
-        accessor: 'external_contributors',
-        type: 'objectList',
-        subFields: [
-          { header: 'Name', accessor: 'name', required: true, placeholder: 'Enter external contributor name' },
-          { header: 'Email', accessor: 'email', placeholder: 'Enter email address' },
-          { header: 'Affiliation', accessor: 'affiliation', placeholder: 'Enter affiliation' },
-          { header: 'Role', accessor: 'role', type: 'select', options: ['Coordinator', 'Participant', 'Lead', 'Other'] }
-        ],
-        transform: (externals) => Array.isArray(externals) ? externals.map(e => `${e.name} (${e.role || 'External'})`) : [],
-      },
+        transform: (students) => Array.isArray(students) ? students.map(s => s.name).join(', ') : "",
+      }
     ],
   },
   {
@@ -399,80 +343,57 @@ const rawResources = [
     updateFunctionName: 'updateConferenceResearchPapers',
     deleteFunctionName: 'deleteConferenceResearchPapers',
     getByIdFunctionName: 'getConferenceResearchPapersById',
-    submission: {
-      payloadType: 'formData',
-      fileUploadKey: 'doc',
-      signature: 'formDataWithHeaders',
-    },
+    submission: { payloadType: 'json' },
     columns: [
-      // { header: 'Paper ID', accessor: 'paper_id' },
       { header: 'Department ID', accessor: 'department_id', required: true, type: 'entitySelect', entityType: 'department' },
       { header: 'Title', accessor: 'title', required: true, placeholder: 'Enter paper title' },
-      { header: 'Conference', accessor: 'name_of_conference', required: true, placeholder: 'Enter conference name' },
-      {
-        header: 'Level',
-        accessor: 'conference_level',
-        type: 'select',
-        options: ['State', 'National', 'International'],
-        required: true,
-        placeholder: 'Select level'
-      },
+      { header: 'Conference Name', accessor: 'name_of_conference', required: true, placeholder: 'Enter conference name' },
+      { header: 'Conference Level', accessor: 'conference_level', type: 'select', options: ['National', 'International'], required: true, placeholder: 'Select level' },
       { header: 'Organizer', accessor: 'organizer', required: true, placeholder: 'Enter organizer name' },
-      { header: 'Venue', accessor: 'venue', required: true, placeholder: 'Enter venue' },
-      {
-        header: 'Paper Status',
-        accessor: 'paper_status',
-        type: 'select',
-        options: ['Published', 'Accepted', 'Presented', 'Under Review'],
-        required: true,
-        placeholder: 'Select paper status'
-      },
-      { header: 'Publisher', accessor: 'publisher', placeholder: 'Enter publisher name' },
+      { header: 'Venue', accessor: 'venue', required: true, placeholder: 'Enter venue details' },
+      { header: 'Publisher', accessor: 'publisher', type: 'select', options: ['Elsevier', 'Springer', 'Wiley', 'IEEE', 'Taylor & Francis', 'MDPI', 'Others'], required: true, placeholder: 'Select publisher' },
+      { header: 'Other Publisher Name', accessor: 'other_publisher', requiredIf: (item) => item.publisher === 'Others', showIf: (item) => item.publisher === 'Others', placeholder: 'Enter publisher name' },
       { header: 'ISSN', accessor: 'issn', placeholder: 'e.g., 1234-5678' },
       { header: 'ISBN', accessor: 'isbn', placeholder: 'e.g., 978-3-16-148410-0' },
-      { header: 'Volume', accessor: 'volume', placeholder: 'Enter volume number' },
-      { header: 'Page Numbers', accessor: 'page_numbers', placeholder: 'e.g., 10-25' },
-      { header: 'Year', accessor: 'year_of_publication', type: 'number', required: true, placeholder: 'e.g., 2024' },
+      { header: 'Volume', accessor: 'volume', type: 'number', placeholder: 'Enter volume number' },
+      { header: 'Year', accessor: 'year_of_publication', type: 'monthYear', required: true, placeholder: 'e.g., 02-2026' },
       ACADEMIC_YEAR_FIELD,
-      { header: 'DOI', accessor: 'doi', placeholder: 'e.g., 10.1000/xyz123' },
-      { header: 'Indexing', accessor: 'indexing', placeholder: 'e.g., Scopus, WoS' },
-      { header: 'Award Received', accessor: 'award_received', placeholder: 'Enter award details' },
-      { header: 'PDF', accessor: 'link_to_paper', type: 'hyperlink', fileKey: 'doc' , description: 'Upload abstract or first page of the paper (Max 5MB PDF)' },
+      { header: 'DOI', accessor: 'doi', required: true, placeholder: 'e.g., 10.1000/xyz123' },
+      { header: 'Indexing', accessor: 'indexing', type: 'select', options: ['SCI', 'SCIE', 'Scopus', 'Web of Science', 'PubMed', 'UGC Care', 'Google Scholar', 'Other'], required: true, placeholder: 'Select Indexing' },
+      { header: 'Award Received', accessor: 'award_received', type: 'boolean', placeholder: 'Check if award received' },
       {
         header: 'Faculty Members',
         accessor: 'faculty_members',
         type: 'objectList',
         subFields: [
-          { header: 'Faculty ID', accessor: 'faculty_id', type: 'entitySelect', entityType: 'faculty' }
+          { header: 'Author Type', accessor: 'author_type', type: 'select', options: ['Internal Author', 'External Author'], required: true, placeholder: 'Select type' },
+          { header: 'Select Faculty (Internal)', accessor: 'faculty_id', type: 'entitySelect', entityType: 'faculty', showIf: (item) => item.author_type === 'Internal Author', requiredIf: (item) => item.author_type === 'Internal Author' },
+          { header: 'Co-Author Name (External)', accessor: 'name', showIf: (item) => item.author_type === 'External Author', requiredIf: (item) => item.author_type === 'External Author', placeholder: 'Enter name' },
+          { header: 'Details (External)', accessor: 'emp_code', showIf: (item) => item.author_type === 'External Author', placeholder: 'Enter details' }
         ],
-        transform: (members) =>
-          Array.isArray(members)
-            ? members.map((f) => f.faculty_id)
-            : [],
+        transform: (members) => Array.isArray(members) ? members.map(f => f.author_type === 'Internal Author' ? f.faculty_id : f.name).join(', ') : "",
       },
       {
         header: 'Students',
         accessor: 'students',
         type: 'objectList',
         subFields: [
-          { header: 'Student ID', accessor: 'student_id', type: 'entitySelect', entityType: 'student' }
+          { header: 'Student Name', accessor: 'name', required: true, placeholder: 'Enter student name' },
+          { header: 'Student Roll No', accessor: 'roll_no', required: true, placeholder: 'Enter roll no' }
         ],
-        transform: (students) =>
-          Array.isArray(students)
-            ? students.map((s) => s.student_id)
-            : [],
+        transform: (students) => Array.isArray(students) ? students.map(s => s.name).join(', ') : "",
       },
       {
         header: 'External Contributors',
         accessor: 'external_contributors',
         type: 'objectList',
         subFields: [
-          { header: 'Name', accessor: 'name', required: true, placeholder: 'Enter external contributor name' },
-          { header: 'Email', accessor: 'email', placeholder: 'Enter email address' },
-          { header: 'Affiliation', accessor: 'affiliation', placeholder: 'Enter affiliation' }
+          { header: 'Name', accessor: 'name', required: true },
+          { header: 'Role', accessor: 'role', required: true },
+          { header: 'Affiliation', accessor: 'affiliation' }
         ],
-        transform: (externals) => Array.isArray(externals) ? externals.map(e => e.name) : [],
-      },
+        transform: (externals) => Array.isArray(externals) ? externals.map(e => e.name).join(', ') : "",
+      }
     ],
   },
   {
@@ -664,50 +585,22 @@ const rawResources = [
     updateFunctionName: 'updateEContentDeveloped',
     deleteFunctionName: 'deleteEContentDeveloped',
     getByIdFunctionName: 'getEContentDevelopedById',
-    submission: {
-      payloadType: 'json',
-    },
+    submission: { payloadType: 'json' },
     keyAccessor: 'econtent_id',
     columns: [
-      // { header: 'E-Content ID', accessor: 'econtent_id' },
-      { header: 'Faculty ID', accessor: 'faculty_id', required: true, type: 'entitySelect', entityType: 'faculty' },
-      { header: 'Faculty Name', accessor: 'faculty_name', placeholder: 'Enter faculty name (for display)' },
-      { header: 'Faculty Name', accessor: 'faculty_name', placeholder: 'Enter faculty name (for records / display)' },
       { header: 'Department ID', accessor: 'department_id', required: true, type: 'entitySelect', entityType: 'department' },
-      { header: 'Course ID', accessor: 'course_id', required: true, type: 'entitySelect', entityType: 'course' },
-      { header: 'Module Name', accessor: 'name_of_module', required: true, placeholder: 'Enter module name' },
-      {
-        header: 'Type',
-        accessor: 'type_of_content',
-        type: 'select',
-        options: ['Video', 'Module', 'Quiz', 'PPT', 'Simulation', 'eBook', 'Other'],
-        required: true,
-        placeholder: 'Select content type'
-      },
+      { header: 'Name of Module', accessor: 'name_of_module', required: true, placeholder: 'Enter module name' },
+      { header: 'Type of Content', accessor: 'type_of_content', type: 'select', options: ['Video', 'Audio', 'Text', 'Interactive', 'Other'], required: true, placeholder: 'Select type' },
       { header: 'Platform', accessor: 'platform', required: true, placeholder: 'Enter platform name' },
-      {
-        header: 'Platform Type',
-        accessor: 'platform_type',
-        type: 'select',
-        options: ['LMS', 'MOOC', 'YouTube', 'SWAYAM', 'Internal', 'Other'],
-        required: true,
-        placeholder: 'Select platform type'
-      },
-      { header: 'Launch Date', accessor: 'date_of_launching', type: 'date', required: true },
-      ACADEMIC_YEAR_FIELD,
-      { header: 'Semester', accessor: 'semester', required: true, placeholder: 'e.g., Odd/Even' },
-      {
-        header: 'Target Audience',
-        accessor: 'target_audience',
-        type: 'select',
-        options: ['UG', 'PG', 'PhD', 'Faculty', 'Students', 'Mixed'],
-        required: true,
-        placeholder: 'Select target audience'
-      },
-      { header: 'Duration (Hrs)', accessor: 'duration_hours', type: 'number', placeholder: 'Duration in hours' },
-      { header: 'Learning Outcome', accessor: 'learning_outcome', required: true, placeholder: 'Describe learning outcome' },
-      { header: 'Remarks', accessor: 'remarks', placeholder: 'Additional remarks' },
-      { header: 'Link', accessor: 'link', type: 'hyperlink', placeholder: 'Enter content URL' , description: 'Upload e-content link description or approval document (Max 5MB PDF)' },
+      { header: 'Platform Type', accessor: 'platform_type', type: 'select', options: ['Institutional', 'National', 'International'], required: true, placeholder: 'Select type' },
+      { header: 'Date of Launching', accessor: 'date_of_launching', type: 'date', required: true },
+      { header: 'Target Audience', accessor: 'target_audience', required: true, placeholder: 'Enter target audience' },
+      { header: 'Duration (Hours)', accessor: 'duration_hours', type: 'number', required: true, placeholder: 'Enter duration' },
+      { header: 'Learning Outcome', accessor: 'learning_outcome', type: 'textarea', required: true, placeholder: 'Enter learning outcome' },
+      { header: 'Course Name', accessor: 'course_name', placeholder: 'Enter course name (if applicable)' },
+      { header: 'Course Code', accessor: 'course_code', placeholder: 'Enter course code' },
+      { header: 'Link', accessor: 'link', placeholder: 'Enter link to content' },
+      ACADEMIC_YEAR_FIELD
     ],
   },
   {
@@ -833,71 +726,34 @@ const rawResources = [
     updateFunctionName: 'updateFacultyDevelopmentPrograms',
     deleteFunctionName: 'deleteFacultyDevelopmentPrograms',
     getByIdFunctionName: 'getFacultyDevelopmentProgramsById',
-    submission: {
-      payloadType: 'formData',
-      fileUploadKey: 'doc',
-      signature: 'formDataWithHeaders',
-    },
+    submission: { payloadType: 'json' },
     keyAccessor: 'program_id',
     columns: [
-      // { header: 'Program ID', accessor: 'program_id' },
       { header: 'Department ID', accessor: 'department_id', required: true, type: 'entitySelect', entityType: 'department' },
-      { header: 'Title', accessor: 'program_title', required: true, placeholder: 'Enter program title' },
-      {
-        header: 'Type',
-        accessor: 'type_of_program',
-        type: 'select',
-        options: ['FDP', 'STTP', 'Workshop', 'Seminar', 'Training', 'Orientation', 'Other'],
-        required: true,
-        placeholder: 'Select program type'
-      },
-      {
-        header: 'Level',
-        accessor: 'level',
-        type: 'select',
-        options: ['Institutional', 'National', 'International'],
-        placeholder: 'Select level'
-      },
-      {
-        header: 'Mode',
-        accessor: 'mode',
-        type: 'select',
-        options: ['Online', 'Offline', 'Hybrid'],
-        required: true,
-        placeholder: 'Select mode'
-      },
+      { header: 'Program Title', accessor: 'program_title', required: true, placeholder: 'Enter title' },
+      { header: 'Type of Program', accessor: 'type_of_program', type: 'select', options: ['FDP', 'Workshop', 'Seminar', 'Conference', 'Other'], required: true, placeholder: 'Select type' },
+      { header: 'Level', accessor: 'level', type: 'select', options: ['National', 'International', 'State', 'Institutional'], required: true, placeholder: 'Select level' },
+      { header: 'Mode', accessor: 'mode', type: 'select', options: ['Online', 'Offline', 'Hybrid'], required: true, placeholder: 'Select mode' },
+      { header: 'Duration (Days)', accessor: 'duration_days', type: 'number', required: true, placeholder: 'Enter duration in days' },
+      { header: 'Organising Body', accessor: 'organising_body', required: true, placeholder: 'Enter organising body' },
+      { header: 'Funding Agency', accessor: 'funding_agency', placeholder: 'Enter funding agency (if any)' },
+      { header: 'Venue', accessor: 'venue', required: true, placeholder: 'Enter venue' },
       { header: 'Start Date', accessor: 'start_date', type: 'date', required: true },
       { header: 'End Date', accessor: 'end_date', type: 'date', required: true },
-      { header: 'Duration (Days)', accessor: 'duration_days', type: 'number', placeholder: 'Duration in days' },
-      { header: 'Organising Body', accessor: 'organising_body', placeholder: 'Enter organising body' },
-      { header: 'Funding Agency', accessor: 'funding_agency', placeholder: 'Enter funding agency' },
-      { header: 'Venue', accessor: 'venue', placeholder: 'Enter venue' },
+      { header: 'Outcome', accessor: 'outcome', type: 'textarea', placeholder: 'Enter outcome' },
       ACADEMIC_YEAR_FIELD,
-      { header: 'Outcome', accessor: 'outcome', required: true, placeholder: 'Describe outcome' },
-      { header: 'Remarks', accessor: 'remarks', placeholder: 'Additional remarks' },
-      { header: 'PDF', accessor: 'certificate_link', type: 'hyperlink', fileKey: 'doc' , description: 'Upload relevant supporting document (Max 5MB PDF)' },
       {
-        header: 'Participants (Faculty)',
+        header: 'Faculty Participants',
         accessor: 'faculty_participants',
         type: 'objectList',
         subFields: [
-          { header: 'Faculty ID', accessor: 'faculty_id', type: 'entitySelect', entityType: 'faculty' },
-          { header: 'Role', accessor: 'role', type: 'select', options: ['Participant', 'Coordinator', 'Trainer', 'Other'] }
+          { header: 'Member Type', accessor: 'member_type', type: 'select', options: ['Internal', 'External'], required: true, placeholder: 'Select type' },
+          { header: 'Select Faculty (Internal)', accessor: 'faculty_id', type: 'entitySelect', entityType: 'faculty', showIf: (item) => item.member_type === 'Internal', requiredIf: (item) => item.member_type === 'Internal' },
+          { header: 'Name (External)', accessor: 'name', showIf: (item) => item.member_type === 'External', requiredIf: (item) => item.member_type === 'External', placeholder: 'Enter name' },
+          { header: 'Details (External)', accessor: 'emp_code', showIf: (item) => item.member_type === 'External', placeholder: 'Enter details' }
         ],
-        transform: (members) => Array.isArray(members) ? members.map(f => `${f.faculty_id} (${f.role})`) : [],
-      },
-      {
-        header: 'External Participants',
-        accessor: 'external_participants',
-        type: 'objectList',
-        subFields: [
-          { header: 'Name', accessor: 'name', required: true, placeholder: 'Enter external participant name' },
-          { header: 'Email', accessor: 'email', placeholder: 'Enter email address' },
-          { header: 'Affiliation', accessor: 'affiliation', placeholder: 'Enter affiliation' },
-          { header: 'Role', accessor: 'role', type: 'select', options: ['Participant', 'Trainer', 'Resource Person', 'Other'] }
-        ],
-        transform: (externals) => Array.isArray(externals) ? externals.map(e => `${e.name} (${e.role || 'External'})`) : [],
-      },
+        transform: (members) => Array.isArray(members) ? members.map(f => f.member_type === 'Internal' ? f.faculty_id : f.name).join(', ') : "",
+      }
     ],
   },
   {
@@ -914,44 +770,41 @@ const rawResources = [
     updateFunctionName: 'updateFacultyVisits',
     deleteFunctionName: 'deleteFacultyVisits',
     getByIdFunctionName: 'getFacultyVisitsById',
-    submission: {
-      payloadType: 'formData',
-      fileUploadKey: 'doc',
-      signature: 'formDataWithHeaders',
-    },
+    submission: { payloadType: 'json' },
     keyAccessor: 'visit_id',
     columns: [
-      // { header: 'Visit ID', accessor: 'visit_id' },
-      { header: 'Faculty ID', accessor: 'faculty_id', required: true, type: 'entitySelect', entityType: 'faculty' },
       { header: 'Department ID', accessor: 'department_id', required: true, type: 'entitySelect', entityType: 'department' },
-      { header: 'Organisation', accessor: 'organisation_name', required: true, placeholder: 'Enter organisation name' },
-      { header: 'Faculty Name', accessor: 'faculty_name', placeholder: 'Enter faculty name (for display)' },
-      { header: 'Title', accessor: 'title', required: true, placeholder: 'Enter visit title' },
-      {
-        header: 'Visit Type',
-        accessor: 'visit_type',
-        type: 'select',
-        options: ['Industrial Visit', 'Collaborative Research', 'Guest Lecture', 'Training', 'Conference', 'Workshop', 'Other'],
-        required: true,
-        placeholder: 'Select visit type'
-      },
-      { header: 'Purpose', accessor: 'purpose', required: true, placeholder: 'Describe purpose' },
+      { header: 'Organisation Name', accessor: 'organisation_name', required: true, placeholder: 'Enter organisation name' },
+      { header: 'Title', accessor: 'title', required: true, placeholder: 'Enter title' },
+      { header: 'Visit Type', accessor: 'visit_type', type: 'select', options: ['Academic', 'Research', 'Industry', 'Other'], required: true, placeholder: 'Select type' },
+      { header: 'Purpose', accessor: 'purpose', required: true, placeholder: 'Enter purpose' },
       { header: 'Location', accessor: 'location', required: true, placeholder: 'Enter location' },
-      {
-        header: 'Level',
-        accessor: 'level',
-        type: 'select',
-        options: ['National', 'International'],
-        required: true,
-        placeholder: 'Select level'
-      },
-      { header: 'Funding Agency', accessor: 'funding_agency', placeholder: 'Enter funding agency' },
       { header: 'Start Date', accessor: 'start_date', type: 'date', required: true },
       { header: 'End Date', accessor: 'end_date', type: 'date', required: true },
+      { header: 'Same Institute Affiliation', accessor: 'same_institute_affiliation', type: 'boolean' },
       ACADEMIC_YEAR_FIELD,
-      { header: 'Outcome', accessor: 'outcome', placeholder: 'Describe outcome' },
-      { header: 'Remarks', accessor: 'remarks', placeholder: 'Additional remarks' },
-      { header: 'PDF', accessor: 'link', type: 'hyperlink', fileKey: 'doc' , description: 'Upload visit order, invitation, or certificate (Max 5MB PDF)' },
+      {
+        header: 'Faculty Members',
+        accessor: 'faculty_ids',
+        type: 'objectList',
+        subFields: [
+          { header: 'Member Type', accessor: 'member_type', type: 'select', options: ['Internal', 'External'], required: true, placeholder: 'Select type' },
+          { header: 'Select Faculty (Internal)', accessor: 'faculty_id', type: 'entitySelect', entityType: 'faculty', showIf: (item) => item.member_type === 'Internal', requiredIf: (item) => item.member_type === 'Internal' },
+          { header: 'Name (External)', accessor: 'name', showIf: (item) => item.member_type === 'External', requiredIf: (item) => item.member_type === 'External', placeholder: 'Enter name' },
+          { header: 'Details (External)', accessor: 'emp_code', showIf: (item) => item.member_type === 'External', placeholder: 'Enter details' }
+        ],
+        transform: (members) => Array.isArray(members) ? members.map(f => f.member_type === 'Internal' ? f.faculty_id : f.name).join(', ') : "",
+      },
+      {
+        header: 'Students Involved',
+        accessor: 'student_ids',
+        type: 'objectList',
+        subFields: [
+          { header: 'Student Name', accessor: 'name', required: true, placeholder: 'Enter student name' },
+          { header: 'Student Roll No', accessor: 'roll_no', required: true, placeholder: 'Enter roll no' }
+        ],
+        transform: (students) => Array.isArray(students) ? students.map(s => s.name).join(', ') : "",
+      }
     ],
   },
   {
@@ -1042,85 +895,42 @@ const rawResources = [
     updateFunctionName: 'updateFunctionalMous',
     deleteFunctionName: 'deleteFunctionalMous',
     getByIdFunctionName: 'getFunctionalMousById',
-    submission: {
-      payloadType: 'formData',
-      fileUploadKey: 'doc',
-      signature: 'formDataWithHeaders',
-    },
+    submission: { payloadType: 'json' },
     keyAccessor: 'mou_id',
     columns: [
-      // { header: 'MOU ID', accessor: 'mou_id' },
       { header: 'Department ID', accessor: 'department_id', required: true, type: 'entitySelect', entityType: 'department' },
-      { header: 'Organisation', accessor: 'organisation_name', required: true, placeholder: 'Enter organisation name' },
-      {
-        header: 'Type',
-        accessor: 'type_of_mou',
-        type: 'select',
-        options: ['Academic', 'Research', 'Industry', 'Consultancy', 'Training', 'Other'],
-        required: true,
-        placeholder: 'Select MOU type'
-      },
-      {
-        header: 'Level',
-        accessor: 'level',
-        type: 'select',
-        options: ['Institutional', 'National', 'International'],
-        required: true,
-        placeholder: 'Select level'
-      },
+      { header: 'Organisation Name', accessor: 'organisation_name', required: true, placeholder: 'Enter organisation name' },
+      { header: 'Title', accessor: 'title', required: true, placeholder: 'Enter title' },
+      { header: 'Type of MoU', accessor: 'type_of_mou', type: 'select', options: ['Academic', 'Research', 'Industry', 'Other'], required: true, placeholder: 'Select type' },
+      { header: 'Purpose', accessor: 'purpose', required: true, placeholder: 'Enter purpose' },
+      { header: 'Activities Under MoU', accessor: 'activities_under_mou', type: 'textarea', required: true, placeholder: 'Enter activities' },
+      { header: 'Level', accessor: 'level', type: 'select', options: ['National', 'International'], required: true, placeholder: 'Select level' },
       { header: 'Start Date', accessor: 'start_date', type: 'date', required: true },
-      { header: 'End Date', accessor: 'end_date', type: 'date' },
-      { header: 'Year of Signing', accessor: 'year_of_signing', type: 'number', required: true, placeholder: 'e.g., 2024' },
-      { header: 'Duration', accessor: 'duration', placeholder: 'e.g., 5 years' },
-      { header: 'Purpose', accessor: 'purpose', required: true, placeholder: 'Describe purpose' },
-      {
-        header: 'Activities',
-        accessor: 'activities_under_mou',
-        type: 'objectList',
-        subFields: [
-          { header: 'Activity Title', accessor: 'activity_title', required: true, placeholder: 'Enter activity title' },
-          { header: 'Date', accessor: 'activity_date', type: 'date', placeholder: 'Date of activity' },
-          { header: 'Description', accessor: 'activity_description', placeholder: 'Brief description of activity' }
-        ],
-        transform: (items) => Array.isArray(items) ? items.map(i => i.activity_title).join(', ') : ''
-      },
-      { header: 'Funding Amount', accessor: 'funding_amount', type: 'number', placeholder: 'Amount in INR' },
+      { header: 'End Date', accessor: 'end_date', type: 'date', required: true },
+      { header: 'Year of Signing', accessor: 'year_of_signing', type: 'year', required: true },
       ACADEMIC_YEAR_FIELD,
-      { header: 'Outcome', accessor: 'outcome', placeholder: 'Describe outcome' },
-      { header: 'Remarks', accessor: 'remarks', placeholder: 'Additional remarks' },
-      { header: 'PDF', accessor: 'link', type: 'hyperlink', fileKey: 'doc' , description: 'Upload scanned copy of the MoU (Max 5MB PDF)' },
       {
-        header: 'Faculty',
+        header: 'Faculty Associations',
         accessor: 'faculty_associations',
         type: 'objectList',
         subFields: [
-          { header: 'Faculty ID', accessor: 'faculty_id', type: 'entitySelect', entityType: 'faculty' },
-          { header: 'Role', accessor: 'role', type: 'select', options: ['Coordinator', 'Lead Faculty', 'Participant'] }
+          { header: 'Member Type', accessor: 'member_type', type: 'select', options: ['Internal', 'External'], required: true, placeholder: 'Select type' },
+          { header: 'Select Faculty (Internal)', accessor: 'faculty_id', type: 'entitySelect', entityType: 'faculty', showIf: (item) => item.member_type === 'Internal', requiredIf: (item) => item.member_type === 'Internal' },
+          { header: 'Name (External)', accessor: 'name', showIf: (item) => item.member_type === 'External', requiredIf: (item) => item.member_type === 'External', placeholder: 'Enter name' },
+          { header: 'Details (External)', accessor: 'emp_code', showIf: (item) => item.member_type === 'External', placeholder: 'Enter details' }
         ],
-        transform: (members) => Array.isArray(members) ? members.map(f => `${f.faculty_id} (${f.role})`).join(', ') : "",
+        transform: (members) => Array.isArray(members) ? members.map(f => f.member_type === 'Internal' ? f.faculty_id : f.name).join(', ') : "",
       },
       {
-        header: 'Students',
+        header: 'Student Associations',
         accessor: 'student_associations',
         type: 'objectList',
         subFields: [
-          { header: 'Student ID', accessor: 'student_id', type: 'entitySelect', entityType: 'student' },
-          { header: 'Role', accessor: 'role', type: 'select', options: ['Participant', 'Intern', 'Researcher'] }
+          { header: 'Student Name', accessor: 'name', required: true, placeholder: 'Enter student name' },
+          { header: 'Student Roll No', accessor: 'roll_no', required: true, placeholder: 'Enter roll no' }
         ],
-        transform: (students) => Array.isArray(students) ? students.map(s => `${s.student_id} (${s.role})`).join(', ') : "",
-      },
-      {
-        header: 'External Contributors',
-        accessor: 'external_contributors',
-        type: 'objectList',
-        subFields: [
-          { header: 'Name', accessor: 'name', required: true, placeholder: 'Enter external contributor name' },
-          { header: 'Email', accessor: 'email', placeholder: 'Enter email address' },
-          { header: 'Affiliation', accessor: 'affiliation', placeholder: 'Enter affiliation' },
-          { header: 'Role', accessor: 'role', type: 'select', options: ['Coordinator', 'Lead', 'Participant', 'Other'] }
-        ],
-        transform: (externals) => Array.isArray(externals) ? externals.map(e => `${e.name} (${e.role || 'External'})`).join(', ') : "",
-      },
+        transform: (students) => Array.isArray(students) ? students.map(s => s.name).join(', ') : "",
+      }
     ],
   },
   {
@@ -1191,66 +1001,46 @@ const rawResources = [
     updateFunctionName: 'updateJournalResearchPapers',
     deleteFunctionName: 'deleteJournalResearchPapers',
     getByIdFunctionName: 'getJournalResearchPapersById',
-    submission: {
-      payloadType: 'formData',
-      fileUploadKey: 'doc',
-      signature: 'formDataWithHeaders',
-    },
+    submission: { payloadType: 'json' },
     keyAccessor: 'paper_id',
     columns: [
-      // { header: 'Paper ID', accessor: 'paper_id' },
       { header: 'Title', accessor: 'title', required: true, placeholder: 'Enter paper title' },
       { header: 'Department ID', accessor: 'department_id', required: true, type: 'entitySelect', entityType: 'department' },
       { header: 'Author Names', accessor: 'author_names', placeholder: 'Enter author names' },
       { header: 'Journal', accessor: 'name_of_journal', required: true, placeholder: 'Enter journal name' },
-      { header: 'ISSN', accessor: 'issn', placeholder: 'e.g., 1234-5678' },
-      { header: 'Volume', accessor: 'volume', placeholder: 'Enter volume number' },
-      { header: 'Issue', accessor: 'issue', placeholder: 'Enter issue number' },
-      { header: 'Page Numbers', accessor: 'page_numbers', placeholder: 'e.g., 10-25' },
-      { header: 'Year', accessor: 'year_of_publication', type: 'number', required: true, placeholder: 'e.g., 2024' },
+      { header: 'Publisher', accessor: 'publisher', type: 'select', options: ['Elsevier', 'Springer', 'Wiley', 'IEEE', 'Taylor & Francis', 'MDPI', 'Others'], required: true, placeholder: 'Select publisher' },
+      { header: 'Other Publisher Name', accessor: 'other_publisher', requiredIf: (item) => item.publisher === 'Others', showIf: (item) => item.publisher === 'Others', placeholder: 'Enter publisher name' },
+      { header: 'Volume', accessor: 'volume', type: 'number', required: true, placeholder: 'Enter volume number' },
+      { header: 'Issue', accessor: 'issue', required: true, placeholder: 'Enter issue number' },
+      { header: 'ISSN', accessor: 'issn', required: true, placeholder: 'e.g., 1234-5678' },
+      { header: 'Page Numbers', accessor: 'page_numbers', type: 'number', required: true, placeholder: 'e.g., 10-25' },
+      { header: 'Year', accessor: 'year_of_publication', type: 'monthYear', required: true, placeholder: 'e.g., 02-2026' },
       ACADEMIC_YEAR_FIELD,
-      { header: 'DOI', accessor: 'doi', placeholder: 'e.g., 10.1000/xyz123' },
-      { header: 'Indexing', accessor: 'indexing', placeholder: 'e.g., Scopus, WoS' },
-      { header: 'Impact Factor', accessor: 'impact_factor', type: 'number', placeholder: 'e.g., 3.5' },
-      { header: 'Citation Count', accessor: 'citation_count', type: 'number', placeholder: 'e.g., 15' },
-      { header: 'UGC CARE', accessor: 'is_ugc_care_listed', type: 'boolean' },
-      { header: 'PDF', accessor: 'link_to_paper', type: 'hyperlink', fileKey: 'doc' , description: 'Upload relevant supporting document (Max 5MB PDF)' },
+      { header: 'DOI', accessor: 'doi', required: true, placeholder: 'e.g., 10.1000/xyz123' },
+      { header: 'Indexing', accessor: 'indexing', type: 'select', options: ['SCI', 'SCIE', 'Scopus', 'Web of Science', 'PubMed', 'UGC Care', 'Google Scholar', 'Other'], required: true, placeholder: 'Select Indexing' },
+      { header: 'Impact Factor', accessor: 'impact_factor', type: 'number', required: true, placeholder: 'e.g., 3.5' },
       {
         header: 'Faculty Members',
         accessor: 'faculty_members',
         type: 'objectList',
         subFields: [
-          { header: 'Faculty ID', accessor: 'faculty_id', type: 'entitySelect', entityType: 'faculty' },
+          { header: 'Author Type', accessor: 'author_type', type: 'select', options: ['Internal Author', 'External Author'], required: true, placeholder: 'Select type' },
+          { header: 'Select Faculty (Internal)', accessor: 'faculty_id', type: 'entitySelect', entityType: 'faculty', showIf: (item) => item.author_type === 'Internal Author', requiredIf: (item) => item.author_type === 'Internal Author' },
+          { header: 'Co-Author Name (External)', accessor: 'name', showIf: (item) => item.author_type === 'External Author', requiredIf: (item) => item.author_type === 'External Author', placeholder: 'Enter name' },
+          { header: 'Details (External)', accessor: 'emp_code', showIf: (item) => item.author_type === 'External Author', placeholder: 'Enter details' }
         ],
-        transform: (members) =>
-          Array.isArray(members)
-            ? members.map((f) => `${f.faculty_name || ''} (${f.faculty_id})`).join(', ')
-            : "",
+        transform: (members) => Array.isArray(members) ? members.map(f => f.author_type === 'Internal Author' ? f.faculty_id : f.name).join(', ') : "",
       },
       {
         header: 'Students',
         accessor: 'students',
         type: 'objectList',
         subFields: [
-          { header: 'Student ID', accessor: 'student_id', type: 'entitySelect', entityType: 'student' },
+          { header: 'Student Name', accessor: 'name', required: true, placeholder: 'Enter student name' },
+          { header: 'Student Roll No', accessor: 'roll_no', required: true, placeholder: 'Enter roll no' }
         ],
-        transform: (students) =>
-          Array.isArray(students)
-            ? students.map((s) => `${s.student_name || ''} (${s.student_id})`).join(', ')
-            : "",
-      },
-      {
-        header: 'External Authors',
-        accessor: 'external_authors',
-        type: 'objectList',
-        subFields: [
-          { header: 'Name', accessor: 'name', required: true, placeholder: 'Enter external author name' },
-          { header: 'Email', accessor: 'email', placeholder: 'Enter email address' },
-          { header: 'Affiliation', accessor: 'affiliation', placeholder: 'Enter institution/affiliation' }
-        ],
-        transform: (externals) =>
-          Array.isArray(externals) ? externals.map(e => e.name).join(', ') : "",
-      },
+        transform: (students) => Array.isArray(students) ? students.map(s => s.name).join(', ') : "",
+      }
     ],
   },
   {
@@ -1330,69 +1120,43 @@ const rawResources = [
     updateFunctionName: 'updatePatents',
     deleteFunctionName: 'deletePatents',
     getByIdFunctionName: 'getPatentsById',
-    submission: {
-      payloadType: 'formData',
-      fileUploadKey: 'doc',
-      signature: 'formDataWithHeaders',
-    },
+    submission: { payloadType: 'json' },
     keyAccessor: 'patent_id',
     columns: [
-      // { header: 'Patent ID', accessor: 'patent_id' },
-      { header: 'Title', accessor: 'patent_title', required: true, placeholder: 'Enter patent title' },
-      { header: 'Author Names', accessor: 'author_names', placeholder: 'Enter author names' },
-      { header: 'Application No.', accessor: 'application_number', required: true, placeholder: 'Enter application number' },
-      { header: 'Patent Number', accessor: 'patent_number', placeholder: 'Enter patent number' },
-      {
-        header: 'Status',
-        accessor: 'status',
-        type: 'select',
-        options: ['Filed', 'Published', 'Granted'],
-        required: true,
-        placeholder: 'Select status'
-      },
-      { header: 'Country', accessor: 'country', placeholder: 'Enter country' },
+      { header: 'Department ID', accessor: 'department_id', required: true, type: 'entitySelect', entityType: 'department' },
+      { header: 'Patent Title', accessor: 'patent_title', required: true, placeholder: 'Enter patent title' },
+      { header: 'Author Names', accessor: 'author_names', required: true, placeholder: 'Enter author names' },
+      { header: 'Application Number', accessor: 'application_number', required: true, placeholder: 'Enter application number' },
+      { header: 'Patent Number', accessor: 'patent_number', placeholder: 'Enter patent number (if awarded)' },
+      { header: 'Status', accessor: 'status', type: 'select', options: ['Published', 'Granted'], required: true, placeholder: 'Select status' },
+      { header: 'Country', accessor: 'country', required: true, placeholder: 'Enter country' },
+      { header: 'Centres', accessor: 'centres', required: true, placeholder: 'Enter centres' },
       { header: 'Date of Filing', accessor: 'date_of_filing', type: 'date', required: true },
       { header: 'Date of Award', accessor: 'date_of_award', type: 'date' },
       { header: 'Awarding Agency', accessor: 'patent_awarding_agency', placeholder: 'Enter awarding agency' },
-      { header: 'Department ID', accessor: 'department_id', required: true, type: 'entitySelect', entityType: 'department' },
       ACADEMIC_YEAR_FIELD,
-      { header: 'PDF', accessor: 'link_to_patent', type: 'hyperlink', fileKey: 'doc' , description: 'Upload patent publication or grant certificate (Max 5MB PDF)' },
       {
         header: 'Faculty Members',
         accessor: 'faculty_members',
         type: 'objectList',
         subFields: [
-          { header: 'Faculty ID', accessor: 'faculty_id', type: 'entitySelect', entityType: 'faculty' },
+          { header: 'Member Type', accessor: 'member_type', type: 'select', options: ['Internal', 'External'], required: true, placeholder: 'Select type' },
+          { header: 'Select Faculty (Internal)', accessor: 'faculty_id', type: 'entitySelect', entityType: 'faculty', showIf: (item) => item.member_type === 'Internal', requiredIf: (item) => item.member_type === 'Internal' },
+          { header: 'Name (External)', accessor: 'name', showIf: (item) => item.member_type === 'External', requiredIf: (item) => item.member_type === 'External', placeholder: 'Enter name' },
+          { header: 'Details (External)', accessor: 'emp_code', showIf: (item) => item.member_type === 'External', placeholder: 'Enter details' }
         ],
-        transform: (members) =>
-          Array.isArray(members)
-            ? members.map((f) => f.faculty_name ? `${f.faculty_name} (${f.faculty_id})` : `${f.faculty_id}`).join(', ')
-            : "",
+        transform: (members) => Array.isArray(members) ? members.map(f => f.member_type === 'Internal' ? f.faculty_id : f.name).join(', ') : "",
       },
       {
-        header: 'Students',
+        header: 'Students Involved',
         accessor: 'students',
         type: 'objectList',
         subFields: [
-          { header: 'Student ID', accessor: 'student_id', type: 'entitySelect', entityType: 'student' },
+          { header: 'Student Name', accessor: 'name', required: true, placeholder: 'Enter student name' },
+          { header: 'Student Roll No', accessor: 'roll_no', required: true, placeholder: 'Enter roll no' }
         ],
-        transform: (students) =>
-          Array.isArray(students)
-            ? students.map((s) => s.student_name ? `${s.student_name} (${s.student_id})` : `${s.student_id}`).join(', ')
-            : "",
-      },
-      {
-        header: 'External Inventors',
-        accessor: 'external_inventors',
-        type: 'objectList',
-        subFields: [
-          { header: 'Name', accessor: 'name', required: true, placeholder: 'Enter external inventor name' },
-          { header: 'Email', accessor: 'email', placeholder: 'Enter email address' },
-          { header: 'Affiliation', accessor: 'affiliation', placeholder: 'Enter institution/affiliation' }
-        ],
-        transform: (externals) =>
-          Array.isArray(externals) ? externals.map(e => e.name).join(', ') : "",
-      },
+        transform: (students) => Array.isArray(students) ? students.map(s => s.name).join(', ') : "",
+      }
     ],
   },
   {
@@ -1409,78 +1173,42 @@ const rawResources = [
     updateFunctionName: 'updatePhdDefence',
     deleteFunctionName: 'deletePhdDefence',
     getByIdFunctionName: 'getPhdDefenceById',
-    submission: {
-      payloadType: 'formData',
-      fileUploadKey: 'doc',
-      signature: 'formDataWithHeaders',
-    },
+    submission: { payloadType: 'json' },
     keyAccessor: 'defence_id',
     columns: [
-      // { header: 'Defence ID', accessor: 'defence_id' },
-      { header: 'Student ID', accessor: 'student_id', required: true, type: 'entitySelect', entityType: 'student' },
-      { header: 'Enrollment No.', accessor: 'enrollment_no', required: true, placeholder: 'Enter enrollment number' },
-      { header: 'Candidate', accessor: 'student_name', required: true, placeholder: 'Enter candidate name' },
       { header: 'Department ID', accessor: 'department_id', required: true, type: 'entitySelect', entityType: 'department' },
+      { header: 'Student Name', accessor: 'student_name', required: true, placeholder: 'Enter student name' },
+      { header: 'Enrollment No', accessor: 'enrollment_no', required: true, placeholder: 'Enter enrollment no' },
       { header: 'Thesis Title', accessor: 'thesis_title', required: true, placeholder: 'Enter thesis title' },
-      {
-        header: 'Thesis Type',
-        accessor: 'thesis_type',
-        type: 'select',
-        options: ['Full-time', 'Part-time', 'Sponsored', 'Industry-linked', 'Other'],
-        required: true,
-        placeholder: 'Select thesis type'
-      },
-      { header: 'Supervisor ID', accessor: 'supervisor_id', required: true, type: 'entitySelect', entityType: 'faculty' },
-      { header: 'Supervisor', accessor: 'supervisor_name', required: true, placeholder: 'Enter supervisor name' },
-      { header: 'Date of Admission', accessor: 'date_of_admission', type: 'date' },
-      { header: 'Date of SRC', accessor: 'date_of_src', type: 'date' },
-      { header: 'Date of Defence', accessor: 'date_of_defence', type: 'date', required: true },
-      { header: 'Result Notification', accessor: 'date_of_result_notification', type: 'date' },
-      {
-        header: 'Outcome',
-        accessor: 'result_outcome',
-        type: 'select',
-        options: ['Accepted', 'Minor Revision', 'Major Revision', 'Rejected', 'Other'],
-        required: true,
-        placeholder: 'Select outcome'
-      },
+      { header: 'Thesis Type', accessor: 'thesis_type', type: 'select', options: ['PhD', 'MPhil', 'PG Dissertation'], required: true, placeholder: 'Select type' },
+      { header: 'Supervision Location', accessor: 'supervision_location', required: true, placeholder: 'Enter location' },
+      { header: 'Supervisor Name', accessor: 'supervisor_name', required: true, placeholder: 'Enter supervisor name' },
+      { header: 'Date of Registration', accessor: 'date_of_registration', type: 'date', required: true },
+      { header: 'Date of Defence', accessor: 'date_of_defence', type: 'date' },
+      { header: 'Date of Result Notification', accessor: 'date_of_result_notification', type: 'date' },
       ACADEMIC_YEAR_FIELD,
-      { header: 'Remarks', accessor: 'remarks', placeholder: 'Additional remarks' },
-      { header: 'PDF', accessor: 'link', type: 'hyperlink', fileKey: 'doc' , description: 'Upload final notification or degree certificate (Max 5MB PDF)' },
       {
         header: 'Co-Supervisors',
         accessor: 'co_supervisors',
         type: 'objectList',
         subFields: [
-          { header: 'Affiliation Type', accessor: 'affiliation_type', type: 'select', options: ['Internal', 'External'] },
-          { header: 'Internal Co-Supervisor', accessor: 'co_supervisor_id', type: 'entitySelect', entityType: 'faculty', placeholder: 'If Internal', showIf: (item) => item.affiliation_type !== 'External' },
-          { header: 'External Name', accessor: 'external_name', placeholder: 'If External', showIf: (item) => item.affiliation_type === 'External' },
-          { header: 'External Affiliation', accessor: 'external_affiliation', placeholder: 'If External', showIf: (item) => item.affiliation_type === 'External' },
+          { header: 'Member Type', accessor: 'member_type', type: 'select', options: ['Internal', 'External'], required: true, placeholder: 'Select type' },
+          { header: 'Select Faculty (Internal)', accessor: 'faculty_id', type: 'entitySelect', entityType: 'faculty', showIf: (item) => item.member_type === 'Internal', requiredIf: (item) => item.member_type === 'Internal' },
+          { header: 'Name (External)', accessor: 'name', showIf: (item) => item.member_type === 'External', requiredIf: (item) => item.member_type === 'External', placeholder: 'Enter name' },
+          { header: 'Details (External)', accessor: 'emp_code', showIf: (item) => item.member_type === 'External', placeholder: 'Enter details' }
         ],
-        transform: (members) => Array.isArray(members) ? members.map(m => m.affiliation_type === 'External' ? m.external_name : m.co_supervisor_name).join(', ') : "",
+        transform: (members) => Array.isArray(members) ? members.map(f => f.member_type === 'Internal' ? f.faculty_id : f.name).join(', ') : "",
       },
       {
         header: 'Committee Members',
         accessor: 'committee_members',
         type: 'objectList',
         subFields: [
-          { header: 'Member ID', accessor: 'member_id', placeholder: 'e.g., F003' },
-          { header: 'Role', accessor: 'role', type: 'select', options: ['Internal Examiner', 'External Examiner', 'Chair', 'Other'] }
+          { header: 'Name', accessor: 'name', required: true, placeholder: 'Enter name' },
+          { header: 'Role', accessor: 'role', required: true, placeholder: 'Enter role' }
         ],
-        transform: (members) => Array.isArray(members) ? members.map(m => m.member_name).join(', ') : "",
-      },
-      {
-        header: 'External Examiners',
-        accessor: 'external_examiners',
-        type: 'objectList',
-        subFields: [
-          { header: 'Name', accessor: 'name', required: true, placeholder: 'Enter external examiner name' },
-          { header: 'Email', accessor: 'email', placeholder: 'Enter email address' },
-          { header: 'Affiliation', accessor: 'affiliation', placeholder: 'Enter institution/affiliation' },
-          { header: 'Role', accessor: 'role', type: 'select', options: ['External Examiner', 'Subject Expert', 'Industry Expert', 'Other'] }
-        ],
-        transform: (externals) => Array.isArray(externals) ? externals.map(e => `${e.name} (${e.role || 'External'})`).join(', ') : "",
-      },
+        transform: (members) => Array.isArray(members) ? members.map(f => f.name).join(', ') : "",
+      }
     ],
   },
   {
@@ -1692,83 +1420,54 @@ const rawResources = [
     updateFunctionName: 'updateResearchFunding',
     deleteFunctionName: 'deleteResearchFunding',
     getByIdFunctionName: 'getResearchFundingById',
-    submission: {
-      payloadType: 'formData',
-      fileUploadKey: 'doc',
-      signature: 'formDataWithHeaders',
-    },
+    submission: { payloadType: 'json' },
     keyAccessor: 'funding_id',
     columns: [
-      // { header: 'Funding ID', accessor: 'funding_id' },
       { header: 'Department ID', accessor: 'department_id', required: true, type: 'entitySelect', entityType: 'department' },
-      { header: 'Research Title', accessor: 'title_research', required: true, placeholder: 'Enter research title' },
-      {
-        header: 'Project Type',
-        accessor: 'type_of_project',
-        type: 'select',
-        options: ['Research', 'Innovation', 'Startup', 'Other'],
-        required: true,
-        placeholder: 'Select project type'
-      },
-      { header: 'Funding Agency', accessor: 'funding_agency_name', required: true, placeholder: 'Enter funding agency' },
-      { header: 'Chair Holder', accessor: 'chair_holder', placeholder: 'Name of PI / Co-PI / Chair holder' },
-      {
-        header: 'Funding Type',
-        accessor: 'funding_type',
-        type: 'select',
-        options: ['Government', 'Non-Government', 'Industry'],
-        required: true,
-        placeholder: 'Select funding type'
-      },
-      { header: 'Sanction Number', accessor: 'sanction_number', placeholder: 'Enter sanction number' },
-      { header: 'Year of Sanction', accessor: 'year_of_sanction', type: 'number', required: true, placeholder: 'e.g., 2024' },
-      ACADEMIC_YEAR_FIELD,
+      { header: 'Title of Project', accessor: 'title_research', required: true, placeholder: 'Enter title' },
+      { header: 'Role', accessor: 'role', type: 'select', options: ['PI', 'Co-PI'], required: true, placeholder: 'Select role' },
+      { header: 'Type of Project', accessor: 'type_of_project', type: 'select', options: ['Sponsored Research', 'Internal Project', 'Other'], required: true, placeholder: 'Select type' },
+      { header: 'Funding Agency', accessor: 'funding_agency_name', required: true, placeholder: 'Enter agency name' },
+      { header: 'Funding Type', accessor: 'funding_type', type: 'select', options: ['Government', 'Non-Government'], required: true, placeholder: 'Select funding type' },
+      { header: 'Sanction Number', accessor: 'sanction_number', required: true, placeholder: 'Enter sanction number' },
+      { header: 'Total Amount Sanctioned', accessor: 'total_amount_sanctioned', type: 'number', required: true, placeholder: 'Enter total amount' },
+      { header: 'Amount Used This Year', accessor: 'total_amount_used_this_year', type: 'number', required: true, placeholder: 'Enter amount used' },
       { header: 'Start Date', accessor: 'start_date', type: 'date', required: true },
       { header: 'End Date', accessor: 'end_date', type: 'date', required: true },
-      { header: 'Amount', accessor: 'amount', type: 'number', required: true, placeholder: 'Amount in INR' },
+      ACADEMIC_YEAR_FIELD,
+      { header: 'Remarks', accessor: 'remarks', type: 'textarea', placeholder: 'Any remarks' },
       {
-        header: 'Status',
-        accessor: 'status',
-        type: 'select',
-        options: ['Ongoing', 'Completed', 'Submitted'],
-        required: true,
-        placeholder: 'Select status'
-      },
-      { header: 'Outcome', accessor: 'outcome', placeholder: 'Describe outcome' },
-      { header: 'Remarks', accessor: 'remarks', placeholder: 'Additional remarks' },
-      { header: 'PDF', accessor: 'link', type: 'hyperlink', fileKey: 'doc' , description: 'Upload grant sanction letter (Max 5MB PDF)' },
-      {
-        header: 'Faculty',
+        header: 'Faculty Members',
         accessor: 'faculty_involved',
         type: 'objectList',
         subFields: [
-          { header: 'Faculty ID', accessor: 'faculty_id', type: 'entitySelect', entityType: 'faculty' },
-          { header: 'Role', accessor: 'role', type: 'select', options: ['Principal Investigator', 'Co-Principal Investigator', 'Research Collaborator'] }
+          { header: 'Member Type', accessor: 'member_type', type: 'select', options: ['Internal', 'External'], required: true, placeholder: 'Select type' },
+          { header: 'Select Faculty (Internal)', accessor: 'faculty_id', type: 'entitySelect', entityType: 'faculty', showIf: (item) => item.member_type === 'Internal', requiredIf: (item) => item.member_type === 'Internal' },
+          { header: 'Name (External)', accessor: 'name', showIf: (item) => item.member_type === 'External', requiredIf: (item) => item.member_type === 'External', placeholder: 'Enter name' },
+          { header: 'Details (External)', accessor: 'emp_code', showIf: (item) => item.member_type === 'External', placeholder: 'Enter details' }
         ],
-        transform: (members) => Array.isArray(members) ? members.map(f => `${f.faculty_id} (${f.role})`).join(', ') : "",
+        transform: (members) => Array.isArray(members) ? members.map(f => f.member_type === 'Internal' ? f.faculty_id : f.name).join(', ') : "",
       },
       {
-        header: 'Students',
+        header: 'Students Involved',
         accessor: 'students_involved',
         type: 'objectList',
         subFields: [
-          { header: 'Student ID', accessor: 'student_id', type: 'entitySelect', entityType: 'student' },
-          { header: 'Role', accessor: 'role', type: 'select', options: ['Research Assistant', 'Intern', 'Contributor'] }
+          { header: 'Student Name', accessor: 'name', required: true, placeholder: 'Enter student name' },
+          { header: 'Student Roll No', accessor: 'roll_no', required: true, placeholder: 'Enter roll no' }
         ],
-        transform: (students) => Array.isArray(students) ? students.map(s => `${s.student_id} (${s.role})`).join(', ') : "",
+        transform: (students) => Array.isArray(students) ? students.map(s => s.name).join(', ') : "",
       },
       {
-        header: 'External Collaborators',
-        accessor: 'external_collaborators',
+        header: 'Manpower Details',
+        accessor: 'manpower_details',
         type: 'objectList',
         subFields: [
-          { header: 'Name', accessor: 'name', required: true, placeholder: 'Enter external collaborator name' },
-          { header: 'Email', accessor: 'email', placeholder: 'Enter email address' },
-          { header: 'Affiliation', accessor: 'affiliation', placeholder: 'Enter institution/affiliation' },
-          { header: 'Role', accessor: 'role', type: 'select', options: ['Principal Investigator', 'Co-PI', 'Research Collaborator', 'Other'] }
+          { header: 'Name', accessor: 'name', required: true },
+          { header: 'Role', accessor: 'role', required: true }
         ],
-        transform: (externals) => Array.isArray(externals) ? externals.map(e => `${e.name} (${e.role || 'External'})`).join(', ') : "",
-      },
+        transform: (details) => Array.isArray(details) ? details.map(d => d.name).join(', ') : "",
+      }
     ],
   },
   {
@@ -1785,75 +1484,42 @@ const rawResources = [
     updateFunctionName: 'updateAward',
     deleteFunctionName: 'deleteAward',
     getByIdFunctionName: 'getAwardById',
-    submission: {
-      payloadType: 'formData',
-      fileUploadKey: 'doc',
-      signature: 'formDataWithHeaders',
-    },
+    submission: { payloadType: 'json' },
     keyAccessor: 'award_id',
     columns: [
-      // { header: 'Award ID', accessor: 'award_id' },
-      { header: 'Faculty ID', accessor: 'faculty_id', type: 'entitySelect', entityType: 'faculty' },
       { header: 'Department ID', accessor: 'department_id', required: true, type: 'entitySelect', entityType: 'department' },
       { header: 'Name of Award', accessor: 'name_of_award', required: true, placeholder: 'Enter award name' },
-      {
-        header: 'Type of Award',
-        accessor: 'type_of_award',
-        type: 'select',
-        options: ['Research', 'Innovation', 'Teaching Excellence', 'Patent', 'Startup', 'Other'],
-        required: true,
-        placeholder: 'Select award type'
-      },
-      { header: 'Category', accessor: 'category_of_award', required: true, placeholder: 'Enter category' },
-      {
-        header: 'Level',
-        accessor: 'level',
-        type: 'select',
-        options: ['Institutional', 'State', 'National', 'International'],
-        required: true,
-        placeholder: 'Select level'
-      },
-      { header: 'Organisation', accessor: 'name_of_organisation', required: true, placeholder: 'Enter organisation name' },
+      { header: 'Type of Award', accessor: 'type_of_award', type: 'select', options: ['National', 'International', 'State', 'University'], required: true, placeholder: 'Select type' },
+      { header: 'Category of Award', accessor: 'category_of_award', type: 'select', options: ['Research', 'Teaching', 'Innovation', 'Other'], required: true, placeholder: 'Select category' },
+      { header: 'Name of Organisation', accessor: 'name_of_organisation', required: true, placeholder: 'Enter organisation name' },
       { header: 'Awarding Agency', accessor: 'awarding_agency', required: true, placeholder: 'Enter awarding agency' },
-      { header: 'Monetary Value', accessor: 'monetary_value', type: 'number', placeholder: 'Amount in INR' },
-      { header: 'Year', accessor: 'year', type: 'number', required: true, placeholder: 'e.g., 2024' },
+      { header: 'Agency Type', accessor: 'agency_type', type: 'select', options: ['Government', 'Non-Government'], required: true, placeholder: 'Select type' },
       { header: 'Date of Award', accessor: 'date_of_award', type: 'date', required: true },
+      { header: 'Monetary Value', accessor: 'monetary_value', type: 'number', placeholder: 'Enter monetary value (if any)' },
+      { header: 'Year', accessor: 'year', type: 'year', required: true },
       ACADEMIC_YEAR_FIELD,
-      { header: 'Outcome', accessor: 'outcome', placeholder: 'Describe outcome' },
-      { header: 'Remarks', accessor: 'remarks', placeholder: 'Additional remarks' },
-      { header: 'PDF', accessor: 'evidence_link', type: 'hyperlink', fileKey: 'doc' , description: 'Upload award certificate or notification (Max 5MB PDF)' },
       {
-        header: 'Faculty',
+        header: 'Faculty Recipients',
         accessor: 'faculty_recipients',
         type: 'objectList',
         subFields: [
-          { header: 'Faculty ID', accessor: 'faculty_id', type: 'entitySelect', entityType: 'faculty' },
-          { header: 'Role', accessor: 'role', type: 'select', options: ['Recipient', 'Co-recipient', 'Lead', 'Other'] }
+          { header: 'Member Type', accessor: 'member_type', type: 'select', options: ['Internal', 'External'], required: true, placeholder: 'Select type' },
+          { header: 'Select Faculty (Internal)', accessor: 'faculty_id', type: 'entitySelect', entityType: 'faculty', showIf: (item) => item.member_type === 'Internal', requiredIf: (item) => item.member_type === 'Internal' },
+          { header: 'Name (External)', accessor: 'name', showIf: (item) => item.member_type === 'External', requiredIf: (item) => item.member_type === 'External', placeholder: 'Enter name' },
+          { header: 'Details (External)', accessor: 'emp_code', showIf: (item) => item.member_type === 'External', placeholder: 'Enter details' }
         ],
-        transform: (members) => Array.isArray(members) ? members.map(f => `${f.faculty_id} (${f.role})`).join(', ') : "",
+        transform: (members) => Array.isArray(members) ? members.map(f => f.member_type === 'Internal' ? f.faculty_id : f.name).join(', ') : "",
       },
       {
-        header: 'Students',
+        header: 'Student Recipients',
         accessor: 'student_recipients',
         type: 'objectList',
         subFields: [
-          { header: 'Student ID', accessor: 'student_id', type: 'entitySelect', entityType: 'student' },
-          { header: 'Role', accessor: 'role', type: 'select', options: ['Contributor', 'Participant', 'Other'] }
+          { header: 'Student Name', accessor: 'name', required: true, placeholder: 'Enter student name' },
+          { header: 'Student Roll No', accessor: 'roll_no', required: true, placeholder: 'Enter roll no' }
         ],
-        transform: (students) => Array.isArray(students) ? students.map(s => `${s.student_id} (${s.role})`).join(', ') : "",
-      },
-      {
-        header: 'External Recipients',
-        accessor: 'external_recipients',
-        type: 'objectList',
-        subFields: [
-          { header: 'Name', accessor: 'name', required: true, placeholder: 'Enter external recipient name' },
-          { header: 'Email', accessor: 'email', placeholder: 'Enter email address' },
-          { header: 'Affiliation', accessor: 'affiliation', placeholder: 'Enter institution/affiliation' },
-          { header: 'Role', accessor: 'role', type: 'select', options: ['Recipient', 'Co-recipient', 'Lead', 'Other'] }
-        ],
-        transform: (externals) => Array.isArray(externals) ? externals.map(e => `${e.name} (${e.role || 'External'})`).join(', ') : "",
-      },
+        transform: (students) => Array.isArray(students) ? students.map(s => s.name).join(', ') : "",
+      }
     ],
   },
   {
@@ -1870,81 +1536,43 @@ const rawResources = [
     updateFunctionName: 'updateRevenueFromConsultancy',
     deleteFunctionName: 'deleteRevenueFromConsultancy',
     getByIdFunctionName: 'getRevenueFromConsultancyById',
-    submission: {
-      payloadType: 'formData',
-      fileUploadKey: 'doc',
-      signature: 'formDataWithHeaders',
-    },
+    submission: { payloadType: 'json' },
     keyAccessor: 'consultancy_id',
     columns: [
-      // { header: 'Consultancy ID', accessor: 'consultancy_id' },
       { header: 'Department ID', accessor: 'department_id', required: true, type: 'entitySelect', entityType: 'department' },
-      { header: 'Project', accessor: 'name_of_project', required: true, placeholder: 'Enter project name' },
-      { header: 'Agency', accessor: 'agency_name', required: true, placeholder: 'Enter agency name' },
-      {
-        header: 'Agency Type',
-        accessor: 'type_of_agency',
-        type: 'select',
-        options: ['Government', 'Private', 'Industry', 'Other'],
-        required: true,
-        placeholder: 'Select agency type'
-      },
-      { header: 'Grant Amount', accessor: 'grant_amount', type: 'number', required: true, placeholder: 'Grant amount in INR' },
-      { header: 'Revenue', accessor: 'revenue_generated', type: 'number', required: true, placeholder: 'Revenue in INR' },
-      { header: 'Start Date', accessor: 'duration_start_date', type: 'date', required: true },
+      { header: 'Project Title', accessor: 'name_of_project', required: true, placeholder: 'Enter project name' },
+      { header: 'Agency Name', accessor: 'agency_name', required: true, placeholder: 'Enter agency name' },
+      { header: 'Type of Agency', accessor: 'type_of_agency', type: 'select', options: ['Government', 'Non-Government'], required: true, placeholder: 'Select type' },
+      { header: 'Consultancy Type', accessor: 'consultancy_type', type: 'select', options: ['Technical', 'Management', 'Other'], required: true, placeholder: 'Select type' },
+      { header: 'Grant Amount', accessor: 'grant_amount', type: 'number', required: true, placeholder: 'Enter grant amount' },
+      { header: 'Revenue Generated', accessor: 'revenue_generated', type: 'number', required: true, placeholder: 'Enter revenue' },
+      { header: 'Start Date', accessor: 'start_date', type: 'date', required: true },
       { header: 'End Date', accessor: 'end_date', type: 'date', required: true },
-      { header: 'Year', accessor: 'year_of_consultancy', type: 'number', required: true, placeholder: 'e.g., 2024' },
+      { header: 'Year of Consultancy', accessor: 'year_of_consultancy', type: 'year', required: true },
       ACADEMIC_YEAR_FIELD,
+      { header: 'Remarks', accessor: 'remarks', type: 'textarea', placeholder: 'Any remarks' },
       {
-        header: 'Status',
-        accessor: 'status',
-        type: 'select',
-        options: ['Ongoing', 'Completed', 'Submitted'],
-        required: true,
-        placeholder: 'Select status'
-      },
-      {
-        header: 'Consultancy Type',
-        accessor: 'consultancy_type',
-        type: 'select',
-        options: ['Departmental', 'Individual', 'Collaborative'],
-        placeholder: 'Select type'
-      },
-      { header: 'Outcome', accessor: 'outcome', placeholder: 'Describe outcome' },
-      { header: 'Remarks', accessor: 'remarks', placeholder: 'Additional remarks' },
-      { header: 'PDF', accessor: 'link', type: 'hyperlink', fileKey: 'doc' , description: 'Upload consultancy agreement or receipt (Max 5MB PDF)' },
-      {
-        header: 'Faculty',
+        header: 'Faculty Members',
         accessor: 'faculty_involved',
         type: 'objectList',
         subFields: [
-          { header: 'Faculty ID', accessor: 'faculty_id', type: 'entitySelect', entityType: 'faculty' },
-          { header: 'Role', accessor: 'role', type: 'select', options: ['Principal Consultant', 'Co-Consultant', 'Technical Expert'] }
+          { header: 'Member Type', accessor: 'member_type', type: 'select', options: ['Internal', 'External'], required: true, placeholder: 'Select type' },
+          { header: 'Select Faculty (Internal)', accessor: 'faculty_id', type: 'entitySelect', entityType: 'faculty', showIf: (item) => item.member_type === 'Internal', requiredIf: (item) => item.member_type === 'Internal' },
+          { header: 'Name (External)', accessor: 'name', showIf: (item) => item.member_type === 'External', requiredIf: (item) => item.member_type === 'External', placeholder: 'Enter name' },
+          { header: 'Details (External)', accessor: 'emp_code', showIf: (item) => item.member_type === 'External', placeholder: 'Enter details' }
         ],
-        transform: (members) => Array.isArray(members) ? members.map(f => `${f.faculty_id} (${f.role})`).join(', ') : "",
+        transform: (members) => Array.isArray(members) ? members.map(f => f.member_type === 'Internal' ? f.faculty_id : f.name).join(', ') : "",
       },
       {
-        header: 'Students',
+        header: 'Students Involved',
         accessor: 'students_involved',
         type: 'objectList',
         subFields: [
-          { header: 'Student ID', accessor: 'student_id', type: 'entitySelect', entityType: 'student' },
-          { header: 'Role', accessor: 'role', type: 'select', options: ['Research Assistant', 'Intern', 'Contributor'] }
+          { header: 'Student Name', accessor: 'name', required: true, placeholder: 'Enter student name' },
+          { header: 'Student Roll No', accessor: 'roll_no', required: true, placeholder: 'Enter roll no' }
         ],
-        transform: (students) => Array.isArray(students) ? students.map(s => `${s.student_id} (${s.role})`).join(', ') : "",
-      },
-      {
-        header: 'External Consultants',
-        accessor: 'external_consultants',
-        type: 'objectList',
-        subFields: [
-          { header: 'Name', accessor: 'name', required: true, placeholder: 'Enter external consultant name' },
-          { header: 'Email', accessor: 'email', placeholder: 'Enter email address' },
-          { header: 'Affiliation', accessor: 'affiliation', placeholder: 'Enter institution/affiliation' },
-          { header: 'Role', accessor: 'role', type: 'select', options: ['Principal Consultant', 'Co-Consultant', 'Technical Expert', 'Other'] }
-        ],
-        transform: (externals) => Array.isArray(externals) ? externals.map(e => `${e.name} (${e.role || 'External'})`).join(', ') : "",
-      },
+        transform: (students) => Array.isArray(students) ? students.map(s => s.name).join(', ') : "",
+      }
     ],
   },
   {
