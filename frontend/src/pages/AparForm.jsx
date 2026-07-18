@@ -37,14 +37,14 @@ const toTitle = (value) => String(value || '')
     .replace(/\b\w/g, char => char.toUpperCase());
 
 const sectionLabels = {
-    personal: 'Part I - Personal Data',
-    profileQualifications: 'Part I - Academic Qualifications',
-    teaching: 'Part II - Self Appraisal & Teaching',
-    research: 'Part III - Research & Development',
-    corporate: 'Part IV - Corporate Life',
-    assessment: 'Part V - Numerical Assessment',
-    remarks: 'Part VI - Remarks',
-    timeline: 'Timeline'
+    personal: 'PART I - PERSONAL DATA',
+    profileQualifications: 'PART I - ACADEMIC QUALIFICATIONS',
+    teaching: 'PART II - SELF APPRAISAL & TEACHING',
+    research: 'PART III - RESEARCH & DEVELOPMENT',
+    corporate: 'PART IV - CORPORATE LIFE',
+    assessment: 'PART V - NUMERICAL ASSESSMENT',
+    remarks: 'PART VI - REMARKS',
+    timeline: 'TIMELINE'
 };
 
 const requiredCourseFields = [

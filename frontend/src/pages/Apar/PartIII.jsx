@@ -59,7 +59,7 @@ export default function PartIII({ formData, academicYear, addItem, removeItem, u
 
             {/* 1 a) Research Projects */}
             <DynamicTableSection
-                title="1) a) Details of Research Projects / Funding"
+                title="1.1. DETAILS OF RESEARCH PROJECTS / FUNDING"
                 data={formData.research.projects}
                 uniqueKey="title_research"
                 {...createHandlers('projects')}
@@ -147,7 +147,7 @@ export default function PartIII({ formData, academicYear, addItem, removeItem, u
 
             {/* 1 b) Journals */}
             <DynamicTableSection
-                title="1) b) Research Papers in Journals"
+                title="1.2. RESEARCH PAPERS IN JOURNALS"
                 data={formData.research.journals}
                 uniqueKey="title"
                 {...createHandlers('journals')}
@@ -182,7 +182,7 @@ export default function PartIII({ formData, academicYear, addItem, removeItem, u
 
             {/* 1 c) Books */}
             < DynamicTableSection
-                title="1) c) Books / Chapters in Edited Volumes"
+                title="1.3. BOOKS / CHAPTERS IN EDITED VOLUMES"
                 data={formData.research.books}
                 uniqueKey="title_of_book"
                 {...createHandlers('books')}
@@ -230,7 +230,7 @@ export default function PartIII({ formData, academicYear, addItem, removeItem, u
 
             {/* 2) Conferences */}
             < DynamicTableSection
-                title="2) Participation in Conferences / Seminars (Paper Presentation)"
+                title="2. PARTICIPATION IN CONFERENCES / SEMINARS (PAPER PRESENTATION)"
                 data={formData.research.conferences || []}
                 uniqueKey="title"
                 {...createHandlers('conferences')}
@@ -301,7 +301,7 @@ export default function PartIII({ formData, academicYear, addItem, removeItem, u
 
                     {formData.research?.is_eligible_supervisor !== 'No' && (
                         <DynamicTableSection
-                            title="Details of PhD Supervision / Defence"
+                            title="3. DETAILS OF PHD SUPERVISION / DEFENCE"
                 data={formData.research.phd_supervision || []}
                 uniqueKey="thesis_title"
                 {...createHandlers('phd_supervision')}
@@ -358,7 +358,7 @@ export default function PartIII({ formData, academicYear, addItem, removeItem, u
 
             {/* Awards */}
             < DynamicTableSection
-                title="Awards & Recognitions"
+                title="4. AWARDS & RECOGNITIONS"
                 data={formData.research.awards || []}
                 uniqueKey="name_of_award"
                 {...createHandlers('awards')}
@@ -382,7 +382,7 @@ export default function PartIII({ formData, academicYear, addItem, removeItem, u
 
             {/* E-Content */}
             < DynamicTableSection
-                title="E-Content Developed"
+                title="5. E-CONTENT DEVELOPED"
                 data={formData.research.e_content || []}
                 uniqueKey="name_of_module"
                 {...createHandlers('e_content')}
@@ -424,7 +424,7 @@ export default function PartIII({ formData, academicYear, addItem, removeItem, u
 
             {/* Collaborations */}
             < DynamicTableSection
-                title="Collaborations"
+                title="6.1. COLLABORATIONS"
                 data={formData.research.collaborations || []}
                 uniqueKey="title_of_activity"
                 {...createHandlers('collaborations')}
@@ -489,7 +489,7 @@ export default function PartIII({ formData, academicYear, addItem, removeItem, u
 
             {/* MoUs */}
             < DynamicTableSection
-                title="MoUs"
+                title="6.2. MOUS"
                 data={formData.research.mous || []}
                 uniqueKey="title"
                 {...createHandlers('mous')}
@@ -542,7 +542,7 @@ export default function PartIII({ formData, academicYear, addItem, removeItem, u
 
             {/* Faculty Visits */}
             < DynamicTableSection
-                title="Faculty Visits / Expert Lectures"
+                title="7. FACULTY VISITS / EXPERT LECTURES"
                 data={formData.research.faculty_visits || []}
                 uniqueKey="title"
                 {...createHandlers('faculty_visits')}
@@ -570,7 +570,7 @@ export default function PartIII({ formData, academicYear, addItem, removeItem, u
 
             {/* FDPs / Events */}
             < DynamicTableSection
-                title="FDPs / Workshops / Seminars"
+                title="8. FDPS / WORKSHOPS / SEMINARS"
                 data={formData.research.fdps || []}
                 uniqueKey="program_title"
                 {...createHandlers('fdps')}
@@ -633,10 +633,10 @@ export default function PartIII({ formData, academicYear, addItem, removeItem, u
             {/* 3.. Textareas */}
             < div className="space-y-6 pt-6 border-t border-gray-100" >
                 <div>
-                    <label className="block text-md font-semibold text-gray-800 mb-2">3) Summer institutes, refresher or orientation courses</label>
+                    <label className="block text-md font-semibold text-gray-800 mb-2">9. SUMMER INSTITUTES, REFRESHER OR ORIENTATION COURSES</label>
                     <div className="space-y-4">
                         <DynamicTableSection
-                            title="a) Attended"
+                            title="9.1. ATTENDED"
                             data={formData.research.summer_institutes_attended || []}
                             uniqueKey="description"
                             {...createHandlers('summer_institutes_attended')}
@@ -645,7 +645,7 @@ export default function PartIII({ formData, academicYear, addItem, removeItem, u
                             fields={[{ label: 'Description', key: 'description', fullWidth: true, required: true, placeholder: 'Enter details' }]}
                         />
                         <DynamicTableSection
-                            title="b) Organized / Conducted"
+                            title="9.2. ORGANIZED / CONDUCTED"
                             data={formData.research.summer_institutes_organized || []}
                             uniqueKey="description"
                             {...createHandlers('summer_institutes_organized')}
@@ -656,9 +656,9 @@ export default function PartIII({ formData, academicYear, addItem, removeItem, u
                     </div>
                 </div>
                 <div className="space-y-4">
-                    <label className="block text-md font-semibold text-gray-800 mb-2">4) Details of Guidance for:</label>
+                    <label className="block text-md font-semibold text-gray-800 mb-2">10. DETAILS OF GUIDANCE FOR:</label>
                     <DynamicTableSection
-                        title="i) U.G. and P.G. Project Guidance"
+                        title="10.1. U.G. AND P.G. PROJECT GUIDANCE"
                         data={formData.research.ug_pg_guidance || []}
                         uniqueKey="description"
                         {...createHandlers('ug_pg_guidance')}
@@ -668,7 +668,7 @@ export default function PartIII({ formData, academicYear, addItem, removeItem, u
                     />
 
                     <DynamicTableSection
-                        title="ii) Research guidance"
+                        title="10.2. RESEARCH GUIDANCE"
                         data={formData.research.research_guidance || []}
                         uniqueKey="description"
                         {...createHandlers('research_guidance')}
@@ -682,12 +682,12 @@ export default function PartIII({ formData, academicYear, addItem, removeItem, u
             {/* 5) Patents & Consultancy */}
             <div className="pt-6 border-t border-gray-100 space-y-8">
                 <div>
-                    <label className="block text-md font-semibold text-gray-800 mb-2">5) Details of industrial interaction/professional consultancy/patent obtained or applied for</label>
+                    <label className="block text-md font-semibold text-gray-800 mb-2">11. DETAILS OF INDUSTRIAL INTERACTION / PROFESSIONAL CONSULTANCY / PATENTS</label>
 
 
 
                     <DynamicTableSection
-                        title="ii) Patents (obtained or applied for)"
+                        title="11.1. PATENTS (OBTAINED OR APPLIED FOR)"
                         data={formData.research.patents || []}
                         uniqueKey="patent_title"
                         {...createHandlers('patents')}
@@ -732,7 +732,7 @@ export default function PartIII({ formData, academicYear, addItem, removeItem, u
                     <div className="mt-8"></div>
 
                     <DynamicTableSection
-                        title="iii) Professional Consultancy"
+                        title="11.2. PROFESSIONAL CONSULTANCY"
                         data={formData.research.consultancy || []}
                         uniqueKey="name_of_project"
                         {...createHandlers('consultancy')}
@@ -776,7 +776,7 @@ export default function PartIII({ formData, academicYear, addItem, removeItem, u
             {/* 6 & 7 Textareas */}
             <div className="space-y-6 pt-6 border-t border-gray-100">
                 <DynamicTableSection
-                    title="6) Membership or fellowship of professional/academic Bodies, Societies etc. give details"
+                    title="12. MEMBERSHIP OR FELLOWSHIP OF PROFESSIONAL/ACADEMIC BODIES, SOCIETIES ETC."
                     data={formData.research.memberships_text || []}
                     uniqueKey="description"
                     {...createHandlers('memberships_text')}
@@ -786,7 +786,7 @@ export default function PartIII({ formData, academicYear, addItem, removeItem, u
                 />
 
                 <DynamicTableSection
-                    title="7) Any other information regarding academic activities not covered"
+                    title="13. ANY OTHER INFORMATION REGARDING ACADEMIC ACTIVITIES NOT COVERED"
                     data={formData.research.other_activities || []}
                     uniqueKey="description"
                     {...createHandlers('other_activities')}

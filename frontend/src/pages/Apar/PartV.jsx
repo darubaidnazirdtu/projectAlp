@@ -130,27 +130,27 @@ export default function PartVAssessment({ formData, updateAssessment, activeRole
           <h4 className="text-md font-bold text-white bg-indigo-600 p-3 rounded-t-lg">GENERAL</h4>
           <div className="border-x border-b border-gray-200 rounded-b-lg p-6 space-y-6">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">1. Relations with the public (Accessibility/Responsiveness)</label>
+              <label className="block text-sm font-medium text-gray-700 mb-2">1. RELATIONS WITH THE PUBLIC (ACCESSIBILITY/RESPONSIVENESS)</label>
               <textarea {...requiredProps} rows="2" className="w-full border-gray-300 rounded-lg shadow-sm focus:ring-indigo-500 focus:border-indigo-500 p-3 transition-colors" value={formData.assessment.general.q1} onChange={(e) => updateAssessment('general', 'q1', e.target.value)}></textarea>
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">2. Training (Recommendations)</label>
+              <label className="block text-sm font-medium text-gray-700 mb-2">2. TRAINING (RECOMMENDATIONS)</label>
               <textarea {...requiredProps} rows="2" className="w-full border-gray-300 rounded-lg shadow-sm focus:ring-indigo-500 focus:border-indigo-500 p-3 transition-colors" value={formData.assessment.general.q2} onChange={(e) => updateAssessment('general', 'q2', e.target.value)}></textarea>
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">3. State of Health</label>
+              <label className="block text-sm font-medium text-gray-700 mb-2">3. STATE OF HEALTH</label>
               <textarea {...requiredProps} rows="2" className="w-full border-gray-300 rounded-lg shadow-sm focus:ring-indigo-500 focus:border-indigo-500 p-3 transition-colors" value={formData.assessment.general.q3} onChange={(e) => updateAssessment('general', 'q3', e.target.value)}></textarea>
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">4. Integrity</label>
+              <label className="block text-sm font-medium text-gray-700 mb-2">4. INTEGRITY</label>
               <textarea {...requiredProps} rows="2" className="w-full border-gray-300 rounded-lg shadow-sm focus:ring-indigo-500 focus:border-indigo-500 p-3 transition-colors" value={formData.assessment.general.q4} onChange={(e) => updateAssessment('general', 'q4', e.target.value)}></textarea>
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">5. Pen Picture by Reporting Officer (100 words)</label>
+              <label className="block text-sm font-medium text-gray-700 mb-2">5. PEN PICTURE BY REPORTING OFFICER (100 WORDS)</label>
               <textarea {...requiredProps} rows="4" className="w-full border-gray-300 rounded-lg shadow-sm focus:ring-indigo-500 focus:border-indigo-500 p-3 transition-colors" value={formData.assessment.general.q5} onChange={(e) => updateAssessment('general', 'q5', e.target.value)}></textarea>
             </div>
             <div className="bg-gray-100 p-4 rounded border border-gray-300">
-              <label className="block text-sm font-medium text-gray-700 mb-2">6. Overall numerical grading (Weighted A+B+C)</label>
+              <label className="block text-sm font-medium text-gray-700 mb-2">6. OVERALL NUMERICAL GRADING (WEIGHTED A+B+C)</label>
               <input {...requiredProps} type="number" min="1" max="10" readOnly className="w-32 border-gray-300 rounded-lg shadow-sm focus:ring-indigo-500 focus:border-indigo-500 p-2.5 font-bold text-lg transition-colors bg-gray-50" value={formData.assessment.general.q6} />
             </div>
           </div>

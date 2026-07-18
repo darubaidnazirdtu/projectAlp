@@ -18,17 +18,17 @@ export default function PartVI_Remarks({ formData, updateRemarks, formStatus }) 
             <fieldset disabled={isDisabled}>
                 <div className="space-y-6">
                     <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">1. Length of service under the Reviewing Officer</label>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">1. LENGTH OF SERVICE UNDER THE REVIEWING OFFICER</label>
                         <input {...requiredProps} type="text" className="w-full border-gray-300 rounded-lg shadow-sm focus:ring-indigo-500 focus:border-indigo-500 p-3 transition-colors" value={formData.remarks.length_of_service} onChange={(e) => updateRemarks('length_of_service', e.target.value)} />
                     </div>
 
                     <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">2. Is the Reviewing Officer satisfied that the Reporting Officer has made his/ her report with due care and attention?</label>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">2. IS THE REVIEWING OFFICER SATISFIED THAT THE REPORTING OFFICER HAS MADE HIS/HER REPORT WITH DUE CARE AND ATTENTION?</label>
                         <textarea {...requiredProps} rows="3" className="w-full border-gray-300 rounded-lg shadow-sm focus:ring-indigo-500 focus:border-indigo-500 p-3 transition-colors" value={formData.remarks.satisfied_with_reporting} onChange={(e) => updateRemarks('satisfied_with_reporting', e.target.value)}></textarea>
                     </div>
 
                     <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">3. Do you agree with the assessment of the officer given by the Reporting Officer?</label>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">3. DO YOU AGREE WITH THE ASSESSMENT OF THE OFFICER GIVEN BY THE REPORTING OFFICER?</label>
                         <select {...requiredProps} className="border-gray-300 rounded-lg shadow-sm focus:ring-indigo-500 focus:border-indigo-500 p-2.5 mb-2 transition-colors" value={formData.remarks.agree_with_assessment} onChange={(e) => updateRemarks('agree_with_assessment', e.target.value)}>
                             <option>Yes</option>
                             <option>No</option>
@@ -39,12 +39,12 @@ export default function PartVI_Remarks({ formData, updateRemarks, formStatus }) 
                     </div>
 
                     <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">4. General Remarks with specific comments</label>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">4. GENERAL REMARKS WITH SPECIFIC COMMENTS</label>
                         <textarea {...requiredProps} rows="4" className="w-full border-gray-300 rounded-lg shadow-sm focus:ring-indigo-500 focus:border-indigo-500 p-3 transition-colors" value={formData.remarks.general_remarks} onChange={(e) => updateRemarks('general_remarks', e.target.value)}></textarea>
                     </div>
 
                     <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">5. Has the officer any specific characteristics/abilities for special assignment/promotion?</label>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">5. HAS THE OFFICER ANY SPECIFIC CHARACTERISTICS/ABILITIES FOR SPECIAL ASSIGNMENT/PROMOTION?</label>
                         <textarea {...requiredProps} rows="4" className="w-full border-gray-300 rounded-lg shadow-sm focus:ring-indigo-500 focus:border-indigo-500 p-3 transition-colors" value={formData.remarks.specific_characteristics} onChange={(e) => updateRemarks('specific_characteristics', e.target.value)}></textarea>
                     </div>
 

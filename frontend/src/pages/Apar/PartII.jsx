@@ -966,7 +966,7 @@ export default function PartII({ formData, academicYear, addItem, removeItem, up
                 {/* Description of Duties */}
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <DynamicTableSection
-                        title="Description of Duties (Department Level)"
+                        title="DESCRIPTION OF DUTIES (DEPARTMENT LEVEL)"
                         data={teachingData?.description_of_duties_department || []}
                         uniqueKey="description"
                         {...createHandlers('teaching', 'description_of_duties_department')}
@@ -978,7 +978,7 @@ export default function PartII({ formData, academicYear, addItem, removeItem, up
                         ]}
                     />
                     <DynamicTableSection
-                        title="Description of Duties (Administration)"
+                        title="DESCRIPTION OF DUTIES (ADMINISTRATION)"
                         data={teachingData?.description_of_duties_admin || []}
                         uniqueKey="description"
                         {...createHandlers('teaching', 'description_of_duties_admin')}
@@ -1029,7 +1029,7 @@ export default function PartII({ formData, academicYear, addItem, removeItem, up
 
                 {/* 1.1 Courses taught at various levels */}
                 <div>
-                    <h4 className="text-md font-semibold text-gray-800 mb-2">1.1 Courses taught at various levels</h4>
+                    <h4 className="text-md font-semibold text-gray-800 mb-2">1. COURSES TAUGHT AT VARIOUS LEVELS</h4>
                     <div className="space-y-4">
                         {editingCourseIndex === null ? (
                             <div className="bg-white border border-gray-200 rounded-lg overflow-hidden">
@@ -1179,28 +1179,28 @@ export default function PartII({ formData, academicYear, addItem, removeItem, up
 
                 {/* 1.2 Total of hours/periods provided in time table vs actually taken */}
                 <div>
-                    <h4 className="text-md font-semibold text-gray-800 mb-2">1.2 Total Number of hours/ periods provided in the time table <span className="text-sm font-normal text-gray-500">(Only numbers allowed)</span></h4>
+                    <h4 className="text-md font-semibold text-gray-800 mb-2">1.2. TOTAL NUMBER OF HOURS/ PERIODS PROVIDED IN THE TIME TABLE <span className="text-sm font-normal text-gray-500">(Only numbers allowed)</span></h4>
                     <div className="bg-gray-50 border border-gray-200 rounded-lg p-6 mb-4">
-                        <div className="font-semibold mb-2">a) Provided in the academic year</div>
+                        <div className="font-semibold mb-2">1.2.1. PROVIDED IN THE ACADEMIC YEAR</div>
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-1">For odd semester<span className="text-red-500">*</span></label>
+                                <label className="block text-sm font-medium text-gray-700 mb-1">FOR ODD SEMESTER<span className="text-red-500">*</span></label>
                                 <input id="time-table-provided-odd" type="number" min="0" required disabled={readOnly} value={timeTable?.provided?.odd_semester || ''} onChange={(e) => { updateField('teaching', 'time_table', { ...timeTable, provided: { ...timeTable.provided, odd_semester: e.target.value } }); }} className="w-full bg-gray-50 border border-gray-200 text-gray-900 rounded-lg shadow-sm focus:ring-2 focus:ring-indigo-500/30 focus:border-indigo-500 hover:border-indigo-300 transition-all duration-200 px-4 py-2.5 disabled:bg-gray-100 disabled:text-gray-500" />
                             </div>
                             <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-1">For even semester<span className="text-red-500">*</span></label>
+                                <label className="block text-sm font-medium text-gray-700 mb-1">FOR EVEN SEMESTER<span className="text-red-500">*</span></label>
                                 <input id="time-table-provided-even" type="number" min="0" required disabled={readOnly} value={timeTable?.provided?.even_semester || ''} onChange={(e) => { updateField('teaching', 'time_table', { ...timeTable, provided: { ...timeTable.provided, even_semester: e.target.value } }); }} className="w-full bg-gray-50 border border-gray-200 text-gray-900 rounded-lg shadow-sm focus:ring-2 focus:ring-indigo-500/30 focus:border-indigo-500 hover:border-indigo-300 transition-all duration-200 px-4 py-2.5 disabled:bg-gray-100 disabled:text-gray-500" />
                             </div>
                         </div>
 
-                        <div className="mt-4 font-semibold mb-2">b) Actually taken during the academic year</div>
+                        <div className="mt-4 font-semibold mb-2">1.2.2. ACTUALLY TAKEN DURING THE ACADEMIC YEAR</div>
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-1">For odd semester<span className="text-red-500">*</span></label>
+                                <label className="block text-sm font-medium text-gray-700 mb-1">FOR ODD SEMESTER<span className="text-red-500">*</span></label>
                                 <input id="time-table-actual-odd" type="number" min="0" max={timeTable?.provided?.odd_semester || ''} required disabled={readOnly} value={timeTable?.actual?.odd_semester || ''} onChange={(e) => { updateField('teaching', 'time_table', { ...timeTable, actual: { ...timeTable.actual, odd_semester: e.target.value } }); }} onBlur={() => validateTimeTableHours('odd_semester')} className="w-full bg-gray-50 border border-gray-200 text-gray-900 rounded-lg shadow-sm focus:ring-2 focus:ring-indigo-500/30 focus:border-indigo-500 hover:border-indigo-300 transition-all duration-200 px-4 py-2.5 disabled:bg-gray-100 disabled:text-gray-500" />
                             </div>
                             <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-1">For even semester<span className="text-red-500">*</span></label>
+                                <label className="block text-sm font-medium text-gray-700 mb-1">FOR EVEN SEMESTER<span className="text-red-500">*</span></label>
                                 <input id="time-table-actual-even" type="number" min="0" max={timeTable?.provided?.even_semester || ''} required disabled={readOnly} value={timeTable?.actual?.even_semester || ''} onChange={(e) => { updateField('teaching', 'time_table', { ...timeTable, actual: { ...timeTable.actual, even_semester: e.target.value } }); }} onBlur={() => validateTimeTableHours('even_semester')} className="w-full bg-gray-50 border border-gray-200 text-gray-900 rounded-lg shadow-sm focus:ring-2 focus:ring-indigo-500/30 focus:border-indigo-500 hover:border-indigo-300 transition-all duration-200 px-4 py-2.5 disabled:bg-gray-100 disabled:text-gray-500" />
                             </div>
                         </div>
@@ -1209,9 +1209,9 @@ export default function PartII({ formData, academicYear, addItem, removeItem, up
 
                 {/* 1.3 Work load per week */}
                 <div>
-                    <h4 className="text-md font-semibold text-gray-800 mb-2">1.3 Work load per week <span className="text-sm font-normal text-gray-500">(Only numbers allowed)</span></h4>
+                    <h4 className="text-md font-semibold text-gray-800 mb-2">1.3. WORK LOAD PER WEEK <span className="text-sm font-normal text-gray-500">(Only numbers allowed)</span></h4>
                     <div className="bg-gray-50 border border-gray-200 rounded-lg p-6 mb-4">
-                        <div className="font-semibold mb-2 text-indigo-800">For odd semester</div>
+                        <div className="font-semibold mb-2 text-indigo-800">FOR ODD SEMESTER</div>
                         <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
                             <div>
                                 <label className="block text-sm text-gray-700 mb-1">Lectures<span className="text-red-500">*</span></label>
@@ -1231,7 +1231,7 @@ export default function PartII({ formData, academicYear, addItem, removeItem, up
                             </div>
                         </div>
 
-                        <div className="font-semibold mb-2 text-indigo-800">For even semester</div>
+                        <div className="font-semibold mb-2 text-indigo-800">FOR EVEN SEMESTER</div>
                         <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
                             <div>
                                 <label className="block text-sm text-gray-700 mb-1">Lectures<span className="text-red-500">*</span></label>
@@ -1255,7 +1255,7 @@ export default function PartII({ formData, academicYear, addItem, removeItem, up
 
                 {/* 2) Visit of faculty to other institution */}
                 <DynamicTableSection
-                    title="2) Visit of faculty to other institution for taking Experts’ Lectures/other academic work"
+                    title="2. VISIT OF FACULTY TO OTHER INSTITUTIONS FOR TAKING EXPERTS' LECTURES/OTHER ACADEMIC WORK"
                     data={teachingData?.faculty_visits_other_institutions || []}
                     uniqueKey="title_of_activity"
                     {...createHandlers('teaching', 'faculty_visits_other_institutions')}
@@ -1274,7 +1274,7 @@ export default function PartII({ formData, academicYear, addItem, removeItem, up
 
                 {/* 3) Details of teaching methods employed */}
                 <DynamicTableSection
-                    title="3) Details of teaching methods employed by you (Lectures, Tutorials, Seminars, Practicals etc.)"
+                    title="3. DETAILS OF TEACHING METHODS EMPLOYED BY YOU"
                     data={teachingData?.teaching_methods || []}
                     uniqueKey="description"
                     {...createHandlers('teaching', 'teaching_methods')}
@@ -1285,7 +1285,7 @@ export default function PartII({ formData, academicYear, addItem, removeItem, up
 
                 {/* ICT Tools */}
                 <DynamicTableSection
-                    title="3.1) ICT Tools and Resources Used"
+                    title="3.1. ICT TOOLS AND RESOURCES USED"
                     data={teachingData?.ict_tools || []}
                     uniqueKey="description"
                     {...createHandlers('teaching', 'ict_tools')}
@@ -1299,7 +1299,7 @@ export default function PartII({ formData, academicYear, addItem, removeItem, up
 
                 {/* Student Centric Methods */}
                 <DynamicTableSection
-                    title="3.2) Student Centric Methods (Experiential/Participative/Problem Solving)"
+                    title="3.2. STUDENT CENTRIC METHODS (EXPERIENTIAL/PARTICIPATIVE/PROBLEM SOLVING)"
                     data={teachingData?.student_centric_methods || []}
                     uniqueKey="description"
                     {...createHandlers('teaching', 'student_centric_methods')}
@@ -1310,7 +1310,7 @@ export default function PartII({ formData, academicYear, addItem, removeItem, up
 
                 {/* 4.1 Details of Tutorials/tests held */}
                 <DynamicTableSection
-                    title="4.1 Details of Tutorials/ tests held during the academic year (Only numbers allowed)"
+                    title="4.1. DETAILS OF TUTORIALS/TESTS HELD DURING THE ACADEMIC YEAR"
                     data={Array.isArray(teachingData?.tutorials_tests) ? teachingData.tutorials_tests : []}
                     uniqueKey=""
                     {...createHandlers('teaching', 'tutorials_tests')}
@@ -1328,7 +1328,7 @@ export default function PartII({ formData, academicYear, addItem, removeItem, up
 
                 {/* 4.2 academic planning */}
                 <DynamicTableSection
-                    title="4.2 Details of academic planning/ presentation of lectures during the session"
+                    title="4.2. DETAILS OF ACADEMIC PLANNING/PRESENTATION OF LECTURES DURING THE SESSION"
                     data={teachingData?.academic_planning || []}
                     uniqueKey="description"
                     {...createHandlers('teaching', 'academic_planning')}

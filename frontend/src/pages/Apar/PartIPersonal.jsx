@@ -141,12 +141,12 @@ export default function PartIPersonal({ personal, onChange, readOnly, department
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">1) Enter your name <span className="text-red-500">*</span></label>
+          <label className="block text-sm font-medium text-gray-700 mb-1">1. ENTER YOUR NAME <span className="text-red-500">*</span></label>
           <input required aria-required="true" type="text" name="name" value={personal.name} onChange={onChange} disabled={true} className="w-full border-gray-300 rounded-lg shadow-sm focus:ring-indigo-500 focus:border-indigo-500 px-4 py-2.5 disabled:bg-gray-50 disabled:text-gray-500 transition-colors" />
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">2) Enter the name of the department <span className="text-red-500">*</span></label>
+          <label className="block text-sm font-medium text-gray-700 mb-1">2. ENTER THE NAME OF THE DEPARTMENT <span className="text-red-500">*</span></label>
           <select
             required
             aria-required="true"
@@ -167,7 +167,7 @@ export default function PartIPersonal({ personal, onChange, readOnly, department
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">3) Designation <span className="text-red-500">*</span></label>
+          <label className="block text-sm font-medium text-gray-700 mb-1">3. DESIGNATION <span className="text-red-500">*</span></label>
           <input
             required
             aria-required="true"
@@ -181,7 +181,7 @@ export default function PartIPersonal({ personal, onChange, readOnly, department
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">4) Date of birth <span className="text-red-500">*</span></label>
+          <label className="block text-sm font-medium text-gray-700 mb-1">4. DATE OF BIRTH <span className="text-red-500">*</span></label>
           <input
             required
             aria-required="true"
@@ -195,7 +195,7 @@ export default function PartIPersonal({ personal, onChange, readOnly, department
         </div>
 
         <div className="md:col-span-2">
-          <label className="block text-sm font-medium text-gray-700 mb-1">5) Academic Qualifications <span className="text-red-500">*</span></label>
+          <label className="block text-sm font-medium text-gray-700 mb-1">5. ACADEMIC QUALIFICATIONS <span className="text-red-500">*</span></label>
           <p className="text-xs text-gray-500 mb-2">Fetched from your faculty profile. Update qualifications in Profile section.</p>
           {qualifications.length > 0 ? (
             <div className="border border-gray-200 rounded-lg overflow-hidden">
@@ -230,7 +230,7 @@ export default function PartIPersonal({ personal, onChange, readOnly, department
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">6) Category <span className="text-red-500">*</span></label>
+          <label className="block text-sm font-medium text-gray-700 mb-1">6. CATEGORY <span className="text-red-500">*</span></label>
           <input
             required
             aria-required="true"
@@ -244,7 +244,7 @@ export default function PartIPersonal({ personal, onChange, readOnly, department
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">7) Date of continuous employment <span className="text-red-500">*</span></label>
+          <label className="block text-sm font-medium text-gray-700 mb-1">7. DATE OF CONTINUOUS EMPLOYMENT <span className="text-red-500">*</span></label>
           <input
             required
             aria-required="true"
@@ -258,7 +258,7 @@ export default function PartIPersonal({ personal, onChange, readOnly, department
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">8) Present Grade <span className="text-red-500">*</span></label>
+          <label className="block text-sm font-medium text-gray-700 mb-1">8. PRESENT GRADE <span className="text-red-500">*</span></label>
           <input
             required
             aria-required="true"
@@ -273,7 +273,7 @@ export default function PartIPersonal({ personal, onChange, readOnly, department
 
         <div className="md:col-span-2">
           <label className="block text-sm font-medium text-gray-700 mb-1">
-            9) Have you taken any leave or remained absent during the appraisal period? <span className="text-red-500">*</span>
+            9. HAVE YOU TAKEN ANY LEAVE OR REMAINED ABSENT DURING THE APPRAISAL PERIOD? <span className="text-red-500">*</span>
           </label>
           <select
             required
@@ -291,7 +291,7 @@ export default function PartIPersonal({ personal, onChange, readOnly, department
 
           {personal.absence_taken === 'Yes' && (
             <div className="mt-4 space-y-3">
-              <label className="block text-sm font-medium text-gray-700">Period of absence from duty <span className="text-red-500">*</span></label>
+              <label className="block text-sm font-medium text-gray-700">10. PERIOD OF ABSENCE FROM DUTY <span className="text-red-500">*</span></label>
 
               {absenceRows.length > 0 && (
                 <div className="border border-gray-200 rounded-lg overflow-hidden mb-4">
