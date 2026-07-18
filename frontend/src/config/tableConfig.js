@@ -623,7 +623,7 @@ const rawResources = [
         header: 'Type',
         accessor: 'type_of_scheme',
         type: 'select',
-        options: ['Research Project', 'Consultancy', 'FDP', 'Innovation', 'Training', 'Other'],
+        options: ['Research Project', 'FDP', 'Innovation', 'Training', 'Other'],
         required: true,
         placeholder: 'Select scheme type'
       },
@@ -1706,7 +1706,7 @@ const rawResources = [
         header: 'Project Type',
         accessor: 'type_of_project',
         type: 'select',
-        options: ['Research', 'Consultancy', 'Innovation', 'Startup', 'Other'],
+        options: ['Research', 'Innovation', 'Startup', 'Other'],
         required: true,
         placeholder: 'Select project type'
       },

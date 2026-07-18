@@ -249,6 +249,7 @@ const AparFormSchema = new mongoose.Schema({
             category_of_award: String,
             name_of_organisation: String,
             awarding_agency: String,
+            agency_type: String,
             date_of_award: Date,
             monetary_value: String, // IQAC: Number
             year: String, // IQAC: Number
@@ -274,6 +275,8 @@ const AparFormSchema = new mongoose.Schema({
             learning_outcome: String,
             link: String,
             course_id: String,
+            course_name: String,
+            course_code: String,
             academic_year: String,
             department_id: String,
             faculty_id: String, // Main faculty

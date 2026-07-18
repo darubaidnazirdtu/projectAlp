@@ -363,11 +363,12 @@ export default function PartIII({ formData, academicYear, addItem, removeItem, u
                 uniqueKey="name_of_award"
                 {...createHandlers('awards')}
                 readOnly={readOnly}
-                initialItem={{ name_of_award: '', awarding_agency: '', category_of_award: '', date_of_award: '', evidence_link: '' }}
+                initialItem={{ name_of_award: '', awarding_agency: '', agency_type: '', category_of_award: '', date_of_award: '', evidence_link: '' }}
                 fields={[
 
                     { label: 'Award Name', key: 'name_of_award', required: true, placeholder: 'Enter award name' },
                     { label: 'Agency', key: 'awarding_agency', required: true, placeholder: 'Enter agency' },
+                    { label: 'Agency Type', key: 'agency_type', type: 'select', options: ['DTU', 'Other'], required: true, placeholder: 'Select agency type' },
                     { label: 'Organization', key: 'name_of_organisation', placeholder: 'Enter organization' },
                     { label: 'Category', key: 'category_of_award', placeholder: 'Enter category' },
                     { label: 'Type', key: 'type_of_award', type: 'select', options: ['International', 'National', 'State', 'University'], required: true, placeholder: 'Select type' },
@@ -389,7 +390,8 @@ export default function PartIII({ formData, academicYear, addItem, removeItem, u
                 initialItem={{
                     department_id: '',
                     faculty_id: currentFacultyId,
-                    course_id: '',
+                    course_name: '',
+                    course_code: '',
                     name_of_module: '',
                     type_of_content: '',
                     platform: '',
@@ -399,16 +401,13 @@ export default function PartIII({ formData, academicYear, addItem, removeItem, u
                     semester: '',
                     date_of_launching: '',
                     duration_hours: '',
-                    learning_outcome: '',
                     remarks: '',
                     link: ''
                 }}
                 fields={[
-
-
                     { label: 'Faculty ID', key: 'faculty_id', type: 'entitySelect', entityType: 'faculty', required: true, defaultValue: currentFacultyId, disabled: true },
-                    // Use draft-derived course IDs if available; fallback to global course list via entityType
-                    { label: 'Course Name', key: 'course_id', type: 'entitySelect', entityType: 'course', required: true, optionsOverride: courseOptionsFromDraft },
+                    { label: 'Course Name', key: 'course_name', required: true, placeholder: 'Enter course name' },
+                    { label: 'Course Code', key: 'course_code', required: true, placeholder: 'Enter course code' },
                     { label: 'Module Name', key: 'name_of_module', required: true, placeholder: 'Enter module name' },
                     { label: 'Type', key: 'type_of_content', type: 'select', options: ['Video', 'Module', 'Quiz', 'PPT', 'Simulation', 'eBook', 'Other'], required: true, placeholder: 'Select type' },
                     { label: 'Platform', key: 'platform', required: true, placeholder: 'Enter platform' },
@@ -418,15 +417,14 @@ export default function PartIII({ formData, academicYear, addItem, removeItem, u
                     { label: 'Semester', key: 'semester', required: true, placeholder: 'e.g., Odd' },
                     { label: 'Date', key: 'date_of_launching', type: 'date', required: true },
                     { label: 'Duration (Hours)', key: 'duration_hours', type: 'number', min: 0, placeholder: 'Hours' },
-                    { label: 'Outcome', key: 'learning_outcome', required: true, placeholder: 'Enter outcome' },
                     { label: 'Remarks', key: 'remarks', placeholder: 'Remarks' },
-                    { label: 'PDF', key: 'link', type: 'file' }
+                    { label: 'Upload pdf proof', key: 'link', type: 'file' }
                 ]}
             />
 
             {/* Collaborations */}
             < DynamicTableSection
-                title="Collaborations / MoUs"
+                title="Collaborations"
                 data={formData.research.collaborations || []}
                 uniqueKey="title_of_activity"
                 {...createHandlers('collaborations')}
@@ -454,7 +452,7 @@ export default function PartIII({ formData, academicYear, addItem, removeItem, u
 
 
                     { label: 'Activity Title', key: 'title_of_activity', required: true, placeholder: 'Enter title' },
-                    { label: 'Type', key: 'type_of_activity', type: 'select', options: ['Workshop', 'Seminar', 'Industrial Visit', 'Research Collaboration', 'MoU', 'Joint Program', 'Other'], required: true, placeholder: 'Select type' },
+                    { label: 'Type', key: 'type_of_activity', type: 'select', options: ['Workshop', 'Seminar', 'Industrial Visit', 'Research Collaboration', 'Joint Program', 'Other'], required: true, placeholder: 'Select type' },
                     { label: 'Agency', key: 'name_of_collaborative_agency', required: true, placeholder: 'Enter agency' },
                     { label: 'Level', key: 'level', type: 'select', options: ['Institutional', 'National', 'International'], required: true, placeholder: 'Select level' },
                     { label: 'Nature', key: 'nature_of_collaboration', placeholder: 'Describe nature' },
@@ -468,7 +466,7 @@ export default function PartIII({ formData, academicYear, addItem, removeItem, u
                     { label: 'End Date', key: 'end_date', type: 'date', required: true },
                     { label: 'Outcome', key: 'outcome', placeholder: 'Outcome' },
                     { label: 'Remarks', key: 'remarks', placeholder: 'Remarks' },
-                    { label: 'PDF', key: 'link', type: 'file' },
+                    { label: 'Document Upload', key: 'link', type: 'file', required: true },
                     {
                         label: 'Faculty Involved', key: 'faculty_involved', type: 'objectList', subFields: [
                             { label: 'Faculty ID', key: 'faculty_id', type: 'entitySelect', entityType: 'faculty', required: true },
@@ -483,6 +481,59 @@ export default function PartIII({ formData, academicYear, addItem, removeItem, u
                     },
                     {
                         label: 'External Collaborators', key: 'external_collaborators', type: 'objectList', subFields: [
+                            { label: 'Name', key: 'name', required: true }, { label: 'Role', key: 'role', required: true }, { label: 'Affiliation', key: 'affiliation' }
+                        ]
+                    }
+                ]}
+            />
+
+            {/* MoUs */}
+            < DynamicTableSection
+                title="MoUs"
+                data={formData.research.mous || []}
+                uniqueKey="title"
+                {...createHandlers('mous')}
+                readOnly={readOnly}
+                initialItem={{
+                    department_id: '',
+                    organisation_name: '',
+                    title: '',
+                    type_of_mou: '',
+                    year_of_signing: '',
+                    purpose: '',
+                    activities_under_mou: '',
+                    start_date: '',
+                    end_date: '',
+                    level: '',
+                    link: '',
+                    academic_year: resolvedAcademicYear
+                }}
+                fields={[
+                    { label: 'Organization Name', key: 'organisation_name', required: true, placeholder: 'Enter organization' },
+                    { label: 'Title', key: 'title', required: true, placeholder: 'Enter title' },
+                    { label: 'Type of MoU', key: 'type_of_mou', type: 'select', options: ['Academic', 'Research', 'Industrial', 'Other'], required: true, placeholder: 'Select type' },
+                    { label: 'Year of Signing', key: 'year_of_signing', type: 'monthYear', ...academicCycleMonthYearBounds, required: true, placeholder: 'MM-YYYY' },
+                    { label: 'Purpose', key: 'purpose', placeholder: 'Enter purpose' },
+                    { label: 'Activities under MoU', key: 'activities_under_mou', placeholder: 'Enter activities' },
+                    { label: 'Level', key: 'level', type: 'select', options: ['Institutional', 'National', 'International'], required: true, placeholder: 'Select level' },
+                    academicYearField,
+                    { label: 'Start Date', key: 'start_date', type: 'date', required: true },
+                    { label: 'End Date', key: 'end_date', type: 'date', required: true },
+                    { label: 'Document Upload', key: 'link', type: 'file', required: true },
+                    {
+                        label: 'Faculty Involved', key: 'faculty_associations', type: 'objectList', subFields: [
+                            { label: 'Faculty ID', key: 'faculty_id', type: 'entitySelect', entityType: 'faculty', required: true },
+                            { label: 'Role', key: 'role', required: true }
+                        ]
+                    },
+                    {
+                        label: 'Students Involved', key: 'student_associations', type: 'objectList', subFields: [
+                            { label: 'Student Name', key: 'name', required: true, placeholder: 'Enter student name' }, { label: 'Student Roll No', key: 'roll_no', required: true, placeholder: 'Enter roll no' },
+                            { label: 'Role', key: 'role', required: true }
+                        ]
+                    },
+                    {
+                        label: 'External Collaborators', key: 'external_contributors', type: 'objectList', subFields: [
                             { label: 'Name', key: 'name', required: true }, { label: 'Role', key: 'role', required: true }, { label: 'Affiliation', key: 'affiliation' }
                         ]
                     }
@@ -633,21 +684,7 @@ export default function PartIII({ formData, academicYear, addItem, removeItem, u
                 <div>
                     <label className="block text-md font-semibold text-gray-800 mb-2">5) Details of industrial interaction/professional consultancy/patent obtained or applied for</label>
 
-                    <div className="mb-6">
-                        <DynamicTableSection
-                            title="i) General Description"
-                            data={formData.research.industry_interaction || []}
-                            uniqueKey="description"
-                            {...createHandlers('industry_interaction')}
-                            readOnly={readOnly}
-                            initialItem={{
-                                description: ''
-                            }}
-                            fields={[
-                                { label: 'Description', key: 'description', fullWidth: true, required: true, placeholder: 'Enter general description' }
-                            ]}
-                        />
-                    </div>
+
 
                     <DynamicTableSection
                         title="ii) Patents (obtained or applied for)"
@@ -671,7 +708,7 @@ export default function PartIII({ formData, academicYear, addItem, removeItem, u
                         }}
                         fields={[
 
-                            { label: 'Department ID', key: 'department_id', type: 'entitySelect', entityType: 'department', required: true },
+                            { label: 'Department / Centre ID', key: 'department_id', type: 'entitySelect', entityType: 'department', required: true },
                             { label: 'Title', key: 'patent_title', required: true, placeholder: 'Enter patent title' },
                             { label: 'Authors', key: 'author_names', required: true, placeholder: 'Enter authors' },
                             { label: 'App No.', key: 'application_number', placeholder: 'App No' },

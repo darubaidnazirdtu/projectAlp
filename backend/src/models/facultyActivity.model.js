@@ -108,6 +108,7 @@ const FacultyActivitySchema = new mongoose.Schema({
     category_of_award: String,
     name_of_organisation: String,
     awarding_agency: String,
+    agency_type: String,
     date_of_award: Date,
     monetary_value: Number,
     year: String,
@@ -126,6 +127,7 @@ const FacultyActivitySchema = new mongoose.Schema({
     // -------------------------------------------------------------------------
     econtent_id: String, // Alternate key
     course_id: String,
+    course_code: String,
     name_of_module: String,
     type_of_content: String, // Video/Module/Quiz/PPT/Simulation/eBook/Other
     platform: String,

@@ -14,6 +14,8 @@ const set = async (data, loggedInUser = null) => {
       faculty_id,
       department_id,
       course_id,
+      course_name,
+      course_code,
       name_of_module,
       type_of_content,
       platform,
@@ -31,7 +33,7 @@ const set = async (data, loggedInUser = null) => {
     // Check for duplicates
     const existingContent = await FacultyActivity.findOne({
       name_of_module: name_of_module,
-      course_id: course_id,
+      course_name: course_name,
       department_id: department_id,
       type: 'econtent'
     });
@@ -50,6 +52,8 @@ const set = async (data, loggedInUser = null) => {
       department_id,
       type: 'econtent',
       course_id,
+      course_name,
+      course_code,
       name_of_module,
       title: name_of_module,
       type_of_content,
@@ -102,6 +106,8 @@ const transformEcontent = (activity) => ({
   faculty_id: activity.faculty_id,
   department_id: activity.department_id,
   course_id: activity.course_id,
+  course_name: activity.course_name,
+  course_code: activity.course_code,
   name_of_module: activity.name_of_module || activity.title,
   type_of_content: activity.type_of_content,
   platform: activity.platform,
@@ -169,7 +175,9 @@ const update = async (econtent_id, data, loggedInUser = null) => {
       updateFields.name_of_module = data.name_of_module;
       updateFields.title = data.name_of_module;
     }
-    if (data.course_id) updateFields.course_id = data.course_id;
+    if (data.course_id !== undefined) updateFields.course_id = data.course_id;
+    if (data.course_name !== undefined) updateFields.course_name = data.course_name;
+    if (data.course_code !== undefined) updateFields.course_code = data.course_code;
     if (data.type_of_content) updateFields.type_of_content = data.type_of_content;
     if (data.platform) updateFields.platform = data.platform;
     if (data.platform_type) updateFields.platform_type = data.platform_type;
