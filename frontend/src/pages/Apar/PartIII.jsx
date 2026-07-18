@@ -723,21 +723,35 @@ export default function PartIII({ formData, academicYear, addItem, removeItem, u
                         fields={[
 
                             { label: 'Department / Centre ID', key: 'department_id', type: 'entitySelect', entityType: 'department', required: true },
+                            { label: 'Centres', key: 'centres', required: true, placeholder: 'Enter Centre(s)' },
                             { label: 'Title', key: 'patent_title', required: true, placeholder: 'Enter patent title' },
                             { label: 'Authors', key: 'author_names', required: true, placeholder: 'Enter authors' },
-                            { label: 'App No.', key: 'application_number', placeholder: 'App No' },
+                            { label: 'App No.', key: 'application_number', required: true, placeholder: 'App No' },
                             { label: 'Patent No.', key: 'patent_number', placeholder: 'Patent No' },
                             { label: 'Status', key: 'status', type: 'select', options: ['Filed', 'Published', 'Granted'], required: true, placeholder: 'Select status' },
-                            { label: 'Country', key: 'country', placeholder: 'Country' },
-                            { label: 'Awarding Agency', key: 'patent_awarding_agency', placeholder: 'Agency' },
-                            { label: 'Filing Date', key: 'date_of_filing', type: 'date' },
+                            { label: 'Country', key: 'country', required: true, placeholder: 'Country' },
+                            { label: 'Awarding Agency', key: 'patent_awarding_agency', required: true, placeholder: 'Agency' },
+                            { label: 'Filing Date', key: 'date_of_filing', type: 'date', required: true },
                             { label: 'Award Date', key: 'date_of_award', type: 'date' },
-                            { label: 'PDF', key: 'link_to_patent', type: 'file' },
-                            { label: 'Faculty Members', key: 'faculty_members', type: 'objectList', subFields: [{ label: 'Faculty ID', key: 'faculty_id', type: 'entitySelect', entityType: 'faculty' }] },
-                            { label: 'Students', key: 'students', type: 'objectList', subFields: [{ label: 'Student Name', key: 'name', required: true, placeholder: 'Enter student name' }, { label: 'Student Roll No', key: 'roll_no', required: true, placeholder: 'Enter roll no' }] },
+                            { label: 'Upload PDF Proof', key: 'link_to_patent', type: 'file', required: true },
+                            {
+                                label: 'Faculty Members', key: 'faculty_members', type: 'objectList', subFields: [
+                                    { label: 'Author Type', key: 'author_type', type: 'select', options: ['Internal Author', 'External Author'], required: true, placeholder: 'Select type' },
+                                    { label: 'Faculty Name', key: 'name', required: true, placeholder: 'Enter name' },
+                                    { label: 'Employee Code', key: 'emp_code', showIf: (item) => item.author_type === 'Internal Author', requiredIf: (item) => item.author_type === 'Internal Author', placeholder: 'Enter employee code' }
+                                ]
+                            },
+                            {
+                                label: 'Students', key: 'students', type: 'objectList', subFields: [
+                                    { label: 'Student Name', key: 'name', required: true, placeholder: 'Enter student name' },
+                                    { label: 'Student Roll No', key: 'roll_no', required: true, placeholder: 'Enter roll no' }
+                                ]
+                            },
                             {
                                 label: 'External Inventors', key: 'external_inventors', type: 'objectList', subFields: [
-                                    { label: 'Name', key: 'name', required: true }, { label: 'Role', key: 'role', required: true }, { label: 'Affiliation', key: 'affiliation' }
+                                    { label: 'Name', key: 'name', required: true },
+                                    { label: 'Role', key: 'role', required: true },
+                                    { label: 'Affiliation', key: 'affiliation' }
                                 ]
                             }
                         ]}

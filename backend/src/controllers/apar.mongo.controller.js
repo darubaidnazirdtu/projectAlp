@@ -1588,13 +1588,14 @@ const saveToMonthly = asyncHandler(async (req, res) => {
             patent_number: item.patent_number,
             status: item.status,
             country: item.country,
+            centres: item.centres,
             date_of_filing: parseDate(item.date_of_filing),
             date_of_award: parseDate(item.date_of_award),
             patent_awarding_agency: item.patent_awarding_agency,
             link_to_patent: extractLink(item.link_to_patent),
             academic_year: item.academic_year || ay,
             faculty_members: ensureFaculty(item.faculty_members, faculty_id),
-            students: Array.isArray(item.students) ? item.students.map(s => ({ student_id: s.student_id || s })) : [],
+            students: Array.isArray(item.students) ? item.students.map(s => ({ student_id: s.student_id || s.roll_no || s, name: s.name, roll_no: s.roll_no })) : [],
             external_inventors: Array.isArray(item.external_inventors) ? item.external_inventors : [],
             metadata: { created_by: faculty_id, change_log: [{ action: 'updated', user_id: faculty_id, changes: 'Synced from APAR monthly save' }] }
         });

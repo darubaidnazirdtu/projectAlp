@@ -236,6 +236,7 @@ const AparFormSchema = new mongoose.Schema({
             patent_number: String,
             status: String,
             country: String,
+            centres: String,
             date_of_filing: Date,
             date_of_award: Date,
             patent_awarding_agency: String,

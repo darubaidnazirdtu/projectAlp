@@ -22,6 +22,7 @@ const PatentSchema = new mongoose.Schema({
     patent_number: String,
     status: { type: String, required: true }, // Filed/Published/Granted
     country: String,
+    centres: { type: String, required: true },
     date_of_filing: { type: Date, required: true },
     date_of_award: Date,
     patent_awarding_agency: String,
@@ -29,14 +30,9 @@ const PatentSchema = new mongoose.Schema({
     academic_year: String,
 
     // Many-to-many relationships
-    faculty_members: [{ faculty_id: String }],
-    students: [{ student_id: String }],
-    external_inventors: [{
-        name: String,
-        email: String,
-        role: String,
-        affiliation: String
-    }],
+    faculty_members: [],
+    students: [],
+    external_inventors: [],
 
     metadata: {
         created_at: { type: Date, default: Date.now },

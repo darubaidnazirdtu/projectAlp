@@ -19,6 +19,7 @@ const set = async (data, loggedInUser = null) => {
       patent_number,
       status,
       country,
+      centres,
       date_of_filing,
       date_of_award,
       patent_awarding_agency,
@@ -101,6 +102,7 @@ const set = async (data, loggedInUser = null) => {
       patent_number,
       status,
       country,
+      centres,
       date_of_filing,
       date_of_award,
       patent_awarding_agency,
@@ -201,6 +203,7 @@ const update = async (patent_id, data, loggedInUser = null) => {
     if (data.patent_number) updateFields.patent_number = data.patent_number;
     if (data.status) updateFields.status = data.status;
     if (data.country) updateFields.country = data.country;
+    if (data.centres) updateFields.centres = data.centres;
     if (data.date_of_filing) updateFields.date_of_filing = data.date_of_filing;
     if (data.date_of_award) updateFields.date_of_award = data.date_of_award;
     if (data.patent_awarding_agency) updateFields.patent_awarding_agency = data.patent_awarding_agency;
@@ -219,12 +222,20 @@ const update = async (patent_id, data, loggedInUser = null) => {
         try { fMembers = JSON.parse(fMembers); } catch (e) { fMembers = []; }
       }
       if (Array.isArray(fMembers)) {
-        const mapped = fMembers.map(f => ({ faculty_id: f.faculty_id || f }));
-        // Deduplicate by faculty_id
+        const mapped = fMembers.map(f => {
+          if (typeof f === 'string') return { faculty_id: f };
+          return {
+            faculty_id: f.faculty_id || f.emp_code || f.id || f,
+            author_type: f.author_type,
+            name: f.name,
+            emp_code: f.emp_code
+          };
+        });
         const seen = new Set();
         updateFields.faculty_members = mapped.filter(f => {
-          if (!f.faculty_id || seen.has(f.faculty_id)) return false;
-          seen.add(f.faculty_id);
+          const id = f.faculty_id || f.emp_code || f.name;
+          if (!id || seen.has(id)) return false;
+          seen.add(id);
           return true;
         });
       }
@@ -235,12 +246,19 @@ const update = async (patent_id, data, loggedInUser = null) => {
         try { sMembers = JSON.parse(sMembers); } catch (e) { sMembers = []; }
       }
       if (Array.isArray(sMembers)) {
-        const mapped = sMembers.map(s => ({ student_id: s.student_id || s }));
-        // Deduplicate by student_id
+        const mapped = sMembers.map(s => {
+          if (typeof s === 'string') return { student_id: s };
+          return {
+            student_id: s.student_id || s.roll_no || s.id || s,
+            name: s.name,
+            roll_no: s.roll_no
+          };
+        });
         const seen = new Set();
         updateFields.students = mapped.filter(s => {
-          if (!s.student_id || seen.has(s.student_id)) return false;
-          seen.add(s.student_id);
+          const id = s.student_id || s.roll_no || s.name;
+          if (!id || seen.has(id)) return false;
+          seen.add(id);
           return true;
         });
       }
