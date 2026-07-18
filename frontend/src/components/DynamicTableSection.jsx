@@ -684,14 +684,21 @@ export default function DynamicTableSection({
                                                 formatMonthYearValue(item[f.key])
                                             ) : f.type === 'objectList' ? (
                                                 <div className="flex flex-wrap gap-1 max-w-[200px]">
-                                                    {(item[f.key] || []).slice(0, 2).map((sub, sIdx) => (
-                                                        <span key={sIdx} className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-indigo-50 text-indigo-700 border border-indigo-100 truncate max-w-[80px]" title={sub.faculty_name || sub.name_of_post || sub.name || sub.faculty_id || sub.student_id}>
-                                                            {sub.faculty_name || sub.name_of_post || sub.name || sub.faculty_id || sub.student_id || sub.email || 'Item'}
-                                                        </span>
-                                                    ))}
+                                                    {(item[f.key] || []).slice(0, 2).map((sub, sIdx) => {
+                                                        const rawVal = sub.faculty_name || sub.name_of_post || sub.name || sub.faculty_id || sub.student_id || sub.email || 'Item';
+                                                        const displayStr = typeof rawVal === 'object' && rawVal !== null ? (rawVal.name || rawVal.faculty_name || JSON.stringify(rawVal)) : String(rawVal);
+                                                        return (
+                                                            <span key={sIdx} className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-indigo-50 text-indigo-700 border border-indigo-100 truncate max-w-[80px]" title={displayStr}>
+                                                                {displayStr}
+                                                            </span>
+                                                        );
+                                                    })}
                                                     {(item[f.key] || []).length > 2 && (
                                                         <span className="inline-flex items-center px-1.5 py-0.5 rounded text-xs font-medium bg-gray-100 text-gray-600 border border-gray-200 cursor-help"
-                                                            title={(item[f.key] || []).slice(2).map(sub => sub.faculty_name || sub.name_of_post || sub.name || sub.faculty_id || sub.student_id || sub.email).join(', ')}>
+                                                            title={(item[f.key] || []).slice(2).map(sub => {
+                                                                const rawVal = sub.faculty_name || sub.name_of_post || sub.name || sub.faculty_id || sub.student_id || sub.email || 'Item';
+                                                                return typeof rawVal === 'object' && rawVal !== null ? (rawVal.name || rawVal.faculty_name || JSON.stringify(rawVal)) : String(rawVal);
+                                                            }).join(', ')}>
                                                             +{(item[f.key] || []).length - 2}
                                                         </span>
                                                     )}
@@ -799,7 +806,10 @@ export default function DynamicTableSection({
                                             {(tempItem[f.key] || []).map((subItem, subIdx) => (
                                                 <div key={subIdx} className="flex justify-between items-center bg-gray-50 p-2 rounded text-sm border border-gray-100">
                                                     <div className="truncate flex-1" title={subItem.faculty_id || subItem.user_id || subItem.student_id || ''}>
-                                                        {Object.keys(subItem).map(k => subItem[k]).join(', ')}
+                                                        {Object.keys(subItem).map(k => {
+                                                            const val = subItem[k];
+                                                            return typeof val === 'object' && val !== null ? JSON.stringify(val) : val;
+                                                        }).join(', ')}
                                                     </div>
                                                     <button
                                                         type="button"
