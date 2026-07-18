@@ -454,6 +454,27 @@ export default function DynamicTableSection({
             return;
         }
 
+        // When editing, clean up old files from storage if they were replaced
+        if (editingIndex !== null) {
+            const originalItem = data[editingIndex] || {};
+            const storedPathRegex = /^(document|part3|optionaldocuments|additional documents|profilepicture|profile)\//;
+            for (const f of fields) {
+                if (f.type === 'file') {
+                    const oldVal = originalItem[f.key];
+                    const newVal = itemToSave[f.key];
+                    // Old value is a stored path and it differs from the new value
+                    if (typeof oldVal === 'string' && storedPathRegex.test(oldVal) && oldVal !== newVal) {
+                        try {
+                            const api = new Api();
+                            await api.delete(`/apar/mongo/documents?path=${encodeURIComponent(oldVal)}`);
+                        } catch (cleanupErr) {
+                            console.warn('Old file cleanup failed (non-blocking):', cleanupErr);
+                        }
+                    }
+                }
+            }
+        }
+
         try {
             let success;
             if (editingIndex !== null) {

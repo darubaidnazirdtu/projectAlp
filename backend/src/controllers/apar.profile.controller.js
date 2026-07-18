@@ -104,7 +104,7 @@ export const upsertSelfProfile = asyncHandler(async (req, res) => {
       if (qual.certificate_url && typeof qual.certificate_url === 'object' && qual.certificate_url.tempId) {
         const tempId = qual.certificate_url.tempId;
         temporaryIds.push(tempId);
-        const temp = getTemporaryDocument(tempId, req.user.id);
+        const temp = getTemporaryDocument(tempId, facultyId);
         if (temp) {
           const facultyName = update.basic_info?.full_name || 'faculty';
           const objectPath = createProfileEducationDocumentPath(facultyName);
@@ -113,7 +113,7 @@ export const upsertSelfProfile = asyncHandler(async (req, res) => {
             objectPath,
             contentType: 'application/pdf'
           });
-          recordCompletedTemporaryDocument(tempId, req.user.id, objectPath);
+          recordCompletedTemporaryDocument(tempId, facultyId, objectPath);
           await removeTemporaryDocument(tempId);
           qual.certificate_url = objectPath;
         } else {

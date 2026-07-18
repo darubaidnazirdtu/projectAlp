@@ -748,7 +748,7 @@ export default function AparForm() {
 
     const collectAparDocumentPaths = (value, paths = new Set()) => {
         if (typeof value === 'string') {
-            if (/^document\//.test(value)) paths.add(value);
+            if (/^(document|part3|optionaldocuments|additional documents|profilepicture|profile)\//.test(value)) paths.add(value);
             return paths;
         }
         if (Array.isArray(value)) value.forEach(item => collectAparDocumentPaths(item, paths));
@@ -759,8 +759,7 @@ export default function AparForm() {
     const confirmDelete = async () => {
         if (deleteModal.section && deleteModal.field && deleteModal.index !== null) {
             const deleted = await removeItem(deleteModal.section, deleteModal.field, deleteModal.index);
-            if (deleted) toast.success("Item and its PDF, if any, were deleted");
-            else toast.error("The entry was not deleted because the APAR draft could not be saved");
+            if (deleted) toast.success("Entry deleted successfully");
         }
         setDeleteModal({ open: false, section: null, field: null, index: null });
     };
@@ -1804,32 +1803,42 @@ export default function AparForm() {
     };
 
     const removeItem = async (section, field, index) => {
-        const itemToRemove = formData?.[section]?.[field]?.[index];
-        const documentPaths = [...collectAparDocumentPaths(itemToRemove)];
-
         try {
-            // Delete the row's files first. The endpoint also clears the stored
-            // APAR references, so deleting a row cannot leave orphan PDFs.
-            await Promise.all(documentPaths.map(path => AparFormGradedService.deleteDocument(path)));
-        } catch (error) {
-            console.error('Row PDF deletion failed:', error);
-            toast.error('Could not delete the row PDF. The row was kept unchanged.');
+            const itemToRemove = formData?.[section]?.[field]?.[index];
+            const documentPaths = [...collectAparDocumentPaths(itemToRemove)];
+
+            // Best-effort delete of the row's files. If this fails we still
+            // remove the row so the user is not stuck.
+            if (documentPaths.length > 0) {
+                try {
+                    await Promise.all(documentPaths.map(path => AparFormGradedService.deleteDocument(path)));
+                } catch (error) {
+                    console.warn('Row PDF deletion failed (continuing with row removal):', error);
+                }
+            }
+
+            const next = {
+                ...formData,
+                [section]: {
+                    ...formData[section],
+                    [field]: (formData[section]?.[field] || []).filter((_, i) => i !== index)
+                }
+            };
+
+            // Always remove the row from local state so the UI is responsive.
+            // Then persist the change.
+            setFormData(next);
+            const saved = await handleSaveDraft(true, next);
+            if (!saved) {
+                console.error('[APAR DELETE] handleSaveDraft returned false for', { section, field, index });
+                toast.error('Row removed but auto-save failed. Please save manually.');
+            }
+            return true;
+        } catch (err) {
+            console.error('[APAR DELETE] Unexpected error in removeItem:', err);
+            toast.error('Failed to delete the entry. Check console for details.');
             return false;
         }
-
-        const next = {
-            ...formData,
-            [section]: {
-                ...formData[section],
-                [field]: (formData[section][field] || []).filter((_, i) => i !== index)
-            }
-        };
-
-        // Persist first: saveForm compares old and new document paths and removes
-        // the file from object storage only after the row deletion succeeds.
-        const saved = await handleSaveDraft(true, next);
-        if (saved) setFormData(next);
-        return saved;
     };
 
     const updateArrayField = async (section, field, index, key, value) => {

@@ -5,6 +5,7 @@ import { ApiResponse } from '../utils/api-response.js';
 import { deleteObject, getObject, isAparObjectPath } from '../services/minio.service.js';
 import { discardTemporaryDocument, getTemporaryDocument, recordPendingTemporaryDocument } from '../services/apar-temp-document.service.js';
 import { AparForm } from '../models/aparForm.model.js';
+import { FacultyProfile } from '../models/facultyProfile.model.js';
 import { resolveToReadableId } from '../utils/apar-helpers.js';
 
 const clearDocumentReference = (value, documentPath) => {
@@ -100,24 +101,42 @@ export const deleteSavedDocument = asyncHandler(async (req, res) => {
     if (!isAparObjectPath(documentPath)) throw new ApiError(400, 'Invalid document path');
 
     const facultyId = await resolveToReadableId(req.user?.userId || req.user?.faculty_id || req.user?.id);
+    
+    // First, check AparForm
     const forms = await AparForm.find({ faculty_id: facultyId });
     const form = forms.find(candidate => {
         const plainCandidate = candidate.toObject?.() || candidate;
         return containsDocumentPath(plainCandidate.research, documentPath) || 
                containsDocumentPath(plainCandidate.teaching, documentPath);
     });
-    if (!form) throw new ApiError(404, 'PDF was not found in your APAR form');
 
-    const plainForm = form.toObject?.() || form;
-    if (containsDocumentPath(plainForm.research, documentPath)) {
-        form.research = clearDocumentReference(plainForm.research, documentPath);
+    if (form) {
+        const plainForm = form.toObject?.() || form;
+        if (containsDocumentPath(plainForm.research, documentPath)) {
+            form.research = clearDocumentReference(plainForm.research, documentPath);
+        }
+        if (containsDocumentPath(plainForm.teaching, documentPath)) {
+            form.teaching = clearDocumentReference(plainForm.teaching, documentPath);
+        }
+        await form.save();
+    } else {
+        // If not found in AparForm, check FacultyProfile
+        const profile = await FacultyProfile.findOne({ faculty_id: facultyId });
+        if (profile) {
+            const plainProfile = profile.toObject?.() || profile;
+            if (containsDocumentPath(plainProfile, documentPath)) {
+                // We use clearDocumentReference on the whole profile and manually assign modified paths
+                // Because Mongoose subdocuments behave differently, it's safer to just lean, clear, and update
+                const cleanProfile = clearDocumentReference(plainProfile, documentPath);
+                await FacultyProfile.replaceOne({ faculty_id: facultyId }, cleanProfile);
+                await deleteObject(documentPath);
+                return res.status(204).end();
+            }
+        }
+        throw new ApiError(404, 'PDF was not found in your APAR form or Profile');
     }
-    if (containsDocumentPath(plainForm.teaching, documentPath)) {
-        form.teaching = clearDocumentReference(plainForm.teaching, documentPath);
-    }
-    await form.save();
+
     await deleteObject(documentPath);
-
     return res.status(204).end();
 });
 

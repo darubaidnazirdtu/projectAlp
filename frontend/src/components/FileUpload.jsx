@@ -37,7 +37,7 @@ const FileUpload = ({ value, onChange, disabled, required = false, temporaryPdf 
         try {
             // A persisted PDF is removed before its replacement is uploaded. The
             // API clears the APAR reference and deletes the object as one action.
-            if ((temporaryPdf || directMinio) && typeof value === 'string' && /^(document|additional documents|profile|optionaldocuments)\//.test(value)) {
+            if ((temporaryPdf || directMinio) && typeof value === 'string' && /^(document|additional documents|profile|optionaldocuments|part3)\//.test(value)) {
                 await deleteSavedPdf(value);
                 onChange('');
             }
@@ -109,7 +109,7 @@ const FileUpload = ({ value, onChange, disabled, required = false, temporaryPdf 
                     console.warn('Temporary PDF cleanup failed:', error);
                 }
             }
-        } else if ((temporaryPdf || directMinio) && typeof value === 'string' && /^(document|additional documents|profile|optionaldocuments)\//.test(value)) {
+        } else if ((temporaryPdf || directMinio) && typeof value === 'string' && /^(document|additional documents|profile|optionaldocuments|part3)\//.test(value)) {
             try {
                 await deleteSavedPdf(value);
             } catch (error) {
@@ -125,7 +125,7 @@ const FileUpload = ({ value, onChange, disabled, required = false, temporaryPdf 
     const isFileObject = value instanceof File;
     const isTemporary = Boolean(!isFileObject && value && typeof value === 'object' && value.tempId);
     const displayName = isFileObject ? value.name : (isTemporary ? value.originalName || 'Selected PDF' : null);
-    const viewUrl = typeof value === 'string' && /^(document|profile|profilepicture|additional documents|optionaldocuments)\//.test(value)
+    const viewUrl = typeof value === 'string' && /^(document|profile|profilepicture|additional documents|optionaldocuments|part3)\//.test(value)
         ? `${api.client.defaults.baseURL}/apar/mongo/document?path=${encodeURIComponent(value)}`
         : value;
 
