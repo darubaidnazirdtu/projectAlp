@@ -331,8 +331,8 @@ export default function PartIII({ formData, academicYear, addItem, removeItem, u
                 fields={[
 
 
-                    { label: 'Supervisor ID', key: 'supervisor_id', type: 'entitySelect', entityType: 'faculty', required: true, defaultValue: currentFacultyId, disabled: true },
-                    { label: 'Supervisor Name', key: 'supervisor_name', required: true, placeholder: 'Enter supervisor name' },
+                    { label: 'Supervisor ID', key: 'supervisor_id', type: 'entitySelect', entityType: 'faculty', required: true, defaultValue: currentFacultyId, disabled: true, hidden: true, hideInTable: true },
+                    { label: 'Supervisor Name', key: 'supervisor_name', required: true, disabled: true, defaultValue: user?.name || '', placeholder: 'Enter supervisor name' },
                     { label: 'Student Name', key: 'student_name', required: true, placeholder: 'Enter student name' },
                     { label: 'Student Roll/Enrollment No', key: 'enrollment_no', required: true, placeholder: 'Enter enrollment no' },
                     { label: 'Student Thesis Title', key: 'thesis_title', required: true, placeholder: 'Enter thesis title' },
