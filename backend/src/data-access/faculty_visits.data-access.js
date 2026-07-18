@@ -113,6 +113,9 @@ const transformVisit = (activity) => ({
   outcome: activity.outcome,
   remarks: activity.remarks,
   link: activity.link,
+  faculty_participants: activity.faculty_participants || [],
+  student_recipients: activity.student_recipients || [],
+  external_contributors: activity.external_contributors || [],
   metadata: activity.metadata || {}
 });
 
@@ -170,6 +173,51 @@ const update = async (visit_id, data, loggedInUser = null) => {
     if (data.outcome) updateFields.outcome = data.outcome;
     if (data.remarks) updateFields.remarks = data.remarks;
     if (data.link) updateFields.link = data.link;
+
+    if (data.faculty_participants) {
+      let fPart = data.faculty_participants;
+      if (typeof fPart === 'string') {
+        try { fPart = JSON.parse(fPart); } catch (e) { fPart = []; }
+      }
+      if (Array.isArray(fPart)) {
+        updateFields.faculty_participants = fPart.map(f => {
+          if (typeof f === 'string') return { faculty_id: f };
+          return {
+            faculty_id: f.faculty_id || f.id || f.emp_code,
+            author_type: f.author_type,
+            name: f.name,
+            emp_code: f.emp_code,
+            role: f.role
+          };
+        }).filter(f => f.faculty_id || f.name || f.emp_code);
+      }
+    }
+
+    if (data.student_recipients) {
+      let sPart = data.student_recipients;
+      if (typeof sPart === 'string') {
+        try { sPart = JSON.parse(sPart); } catch (e) { sPart = []; }
+      }
+      if (Array.isArray(sPart)) {
+        updateFields.student_recipients = sPart.map(s => {
+          if (typeof s === 'string') return { student_id: s };
+          return {
+            student_id: s.student_id || s.roll_no,
+            name: s.name,
+            roll_no: s.roll_no,
+            role: s.role
+          };
+        }).filter(s => s.student_id || s.name || s.roll_no);
+      }
+    }
+
+    if (data.external_contributors) {
+      let extCont = data.external_contributors;
+      if (typeof extCont === 'string') {
+        try { extCont = JSON.parse(extCont); } catch (e) { extCont = []; }
+      }
+      updateFields.external_contributors = extCont;
+    }
 
     const userId = loggedInUser?.userId || loggedInUser?.id || null;
     updateFields['metadata.updated_at'] = new Date();

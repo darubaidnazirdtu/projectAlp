@@ -70,11 +70,7 @@ const CollaborationSchema = new mongoose.Schema({
     type_of_mou: String, // Academic/Research/Industry/Consultancy/Training/Other
     year_of_signing: String,
     purpose: String,
-    activities_under_mou: [{
-        activity_title: String,
-        activity_date: Date,
-        activity_description: String
-    }],
+    activities_under_mou: mongoose.Schema.Types.Mixed,
 
     // -------------------------------------------------------------------------
     // Outreach-specific (type: 'outreach')

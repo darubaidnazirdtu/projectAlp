@@ -1698,11 +1698,11 @@ const saveToMonthly = asyncHandler(async (req, res) => {
             end_date: parseDate(item.end_date),
             link: extractLink(item.link),
             faculty_participants: Array.isArray(item.faculty_participants) && item.faculty_participants.length
-                ? item.faculty_participants.map(f => ({ faculty_id: f.faculty_id || f }))
-                : (Array.isArray(item.faculty_ids) ? item.faculty_ids.map(fid => ({ faculty_id: fid.faculty_id || fid })) : []),
+                ? item.faculty_participants.map(f => ({ faculty_id: f.faculty_id || f.emp_code || f, author_type: f.author_type, name: f.name, emp_code: f.emp_code }))
+                : (Array.isArray(item.faculty_ids) ? item.faculty_ids.map(fid => ({ faculty_id: fid.faculty_id || fid.emp_code || fid, author_type: fid.author_type, name: fid.name, emp_code: fid.emp_code })) : []),
             student_recipients: Array.isArray(item.student_recipients) && item.student_recipients.length
-                ? item.student_recipients
-                : (Array.isArray(item.student_ids) ? item.student_ids.map(sid => ({ student_id: sid.student_id || sid })) : []),
+                ? item.student_recipients.map(s => ({ student_id: s.student_id || s.roll_no || s, name: s.name, roll_no: s.roll_no, role: s.role }))
+                : (Array.isArray(item.student_ids) ? item.student_ids.map(sid => ({ student_id: sid.student_id || sid.roll_no || sid, name: sid.name, roll_no: sid.roll_no, role: sid.role })) : []),
             external_contributors: Array.isArray(item.external_contributors) ? item.external_contributors : [],
             metadata: { created_by: faculty_id, change_log: [{ action: 'updated', user_id: faculty_id, changes: 'Synced from APAR monthly save' }] }
         });
@@ -1731,7 +1731,10 @@ const saveToMonthly = asyncHandler(async (req, res) => {
             academic_year: item.academic_year || ay,
             program_title: item.program_title,
             type_of_program: item.type_of_program,
+            type_of_program_other: item.type_of_program_other,
             level: item.level,
+            participation_level: item.participation_level,
+            amount_for_funding: parseNumber(item.amount_for_funding),
             mode: item.mode,
             organising_body: item.organising_body,
             funding_agency: item.funding_agency,
@@ -1743,7 +1746,7 @@ const saveToMonthly = asyncHandler(async (req, res) => {
             remarks: item.remarks,
             certificate_link: extractLink(item.certificate_link),
             link: extractLink(item.link),
-            faculty_participants: Array.isArray(item.faculty_participants) ? item.faculty_participants.map(f => ({ faculty_id: f.faculty_id || f })) : [],
+            faculty_participants: Array.isArray(item.faculty_participants) ? item.faculty_participants.map(f => ({ faculty_id: f.faculty_id || f.emp_code || f, author_type: f.author_type, name: f.name, emp_code: f.emp_code })) : [],
             external_participants: Array.isArray(item.external_participants) ? item.external_participants : [],
             metadata: { created_by: faculty_id, change_log: [{ action: 'updated', user_id: faculty_id, changes: 'Synced from APAR monthly save' }] }
         });
@@ -1822,7 +1825,7 @@ const saveToMonthly = asyncHandler(async (req, res) => {
             type_of_mou: item.type_of_mou,
             year_of_signing: normalizeMonthYear(item.year_of_signing),
             purpose: item.purpose,
-            activities_under_mou: Array.isArray(item.activities_under_mou) ? item.activities_under_mou : [],
+            activities_under_mou: item.activities_under_mou,
             start_date: parseDate(item.start_date),
             end_date: parseDate(item.end_date),
             level: item.level,

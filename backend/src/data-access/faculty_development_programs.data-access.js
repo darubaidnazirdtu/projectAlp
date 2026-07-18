@@ -139,7 +139,10 @@ const transformFdp = (activity) => ({
   department_id: activity.department_id,
   program_title: activity.program_title || activity.title,
   type_of_program: activity.type_of_program,
+  type_of_program_other: activity.type_of_program_other,
   level: activity.level,
+  participation_level: activity.participation_level,
+  amount_for_funding: activity.amount_for_funding,
   mode: activity.mode,
   start_date: activity.start_date,
   end_date: activity.end_date,
@@ -202,7 +205,10 @@ const update = async (program_id, data, loggedInUser = null) => {
       updateFields.title = data.program_title;
     }
     if (data.type_of_program) updateFields.type_of_program = data.type_of_program;
+    if (data.type_of_program_other) updateFields.type_of_program_other = data.type_of_program_other;
     if (data.level) updateFields.level = data.level;
+    if (data.participation_level) updateFields.participation_level = data.participation_level;
+    if (data.amount_for_funding !== undefined) updateFields.amount_for_funding = data.amount_for_funding;
     if (data.mode) updateFields.mode = data.mode;
     if (data.start_date) updateFields.start_date = data.start_date;
     if (data.end_date) updateFields.end_date = data.end_date;
@@ -230,8 +236,16 @@ const update = async (program_id, data, loggedInUser = null) => {
         try { fParticipants = JSON.parse(fParticipants); } catch (e) { fParticipants = []; }
       }
       if (Array.isArray(fParticipants)) {
-        // Default role 'Participant' if not provided
-        updateFields.faculty_participants = fParticipants.map(f => ({ faculty_id: f.faculty_id || f, role: f.role || 'Participant' }));
+        updateFields.faculty_participants = fParticipants.map(f => {
+          if (typeof f === 'string') return { faculty_id: f };
+          return {
+            faculty_id: f.faculty_id || f.id || f.emp_code,
+            author_type: f.author_type,
+            name: f.name,
+            emp_code: f.emp_code,
+            role: f.role || 'Participant'
+          };
+        }).filter(f => f.faculty_id || f.name || f.emp_code);
       }
     }
 

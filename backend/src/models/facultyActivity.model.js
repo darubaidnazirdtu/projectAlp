@@ -44,20 +44,19 @@ const FacultyActivitySchema = new mongoose.Schema({
     program_id: String, // Alternate key
     program_title: String,
     type_of_program: String,
+    type_of_program_other: String,
     level: String, // Institutional/National/International
+    participation_level: String,
+    amount_for_funding: Number,
     mode: String, // Online/Offline/Hybrid
     duration_days: Number,
     organising_body: String,
     funding_agency: String,
     venue: String,
     certificate_link: String,
-    faculty_participants: [{ faculty_id: String, role: String }],
-    external_participants: [{
-        name: String,
-        email: String,
-        role: String,
-        affiliation: String
-    }],
+    faculty_participants: [],
+    external_participants: [],
+    external_contributors: [],
 
     // -------------------------------------------------------------------------
     // Visit-specific (type: 'visit')
@@ -112,14 +111,9 @@ const FacultyActivitySchema = new mongoose.Schema({
     date_of_award: Date,
     monetary_value: Number,
     year: String,
-    faculty_recipients: [{ faculty_id: String, role: String }],
-    student_recipients: [{ student_id: String, role: String }],
-    external_recipients: [{
-        name: String,
-        email: String,
-        role: String,
-        affiliation: String
-    }],
+    faculty_recipients: [],
+    student_recipients: [],
+    external_recipients: [],
 
     // -------------------------------------------------------------------------
     // E-content-specific (type: 'econtent')

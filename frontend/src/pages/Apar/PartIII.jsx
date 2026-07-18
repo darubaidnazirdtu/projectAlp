@@ -517,17 +517,18 @@ export default function PartIII({ formData, academicYear, addItem, removeItem, u
                     { label: 'Title', key: 'title', required: true, placeholder: 'Enter title' },
                     { label: 'Type of MoU', key: 'type_of_mou', type: 'select', options: ['Academic', 'Research', 'Industrial', 'Other'], required: true, placeholder: 'Select type' },
                     { label: 'Year of Signing', key: 'year_of_signing', type: 'monthYear', ...academicCycleMonthYearBounds, required: true, placeholder: 'MM-YYYY' },
-                    { label: 'Purpose', key: 'purpose', placeholder: 'Enter purpose' },
-                    { label: 'Activities under MoU', key: 'activities_under_mou', placeholder: 'Enter activities' },
+                    { label: 'Purpose', key: 'purpose', required: true, placeholder: 'Enter purpose' },
+                    { label: 'Activities under MoU', key: 'activities_under_mou', required: true, placeholder: 'Enter activities' },
                     { label: 'Level', key: 'level', type: 'select', options: ['Institutional', 'National', 'International'], required: true, placeholder: 'Select level' },
-                    academicYearField,
+                    { ...academicYearField, hidden: true, hideInTable: true },
                     { label: 'Start Date', key: 'start_date', type: 'date', required: true },
                     { label: 'End Date', key: 'end_date', type: 'date', required: true },
                     { label: 'Document Upload', key: 'link', type: 'file', required: true },
                     {
                         label: 'Faculty Involved', key: 'faculty_associations', type: 'objectList', subFields: [
-                            { label: 'Faculty ID', key: 'faculty_id', type: 'entitySelect', entityType: 'faculty', required: true },
-                            { label: 'Role', key: 'role', required: true }
+                            { label: 'Author Type', key: 'author_type', type: 'select', options: ['Internal Author', 'External Author'], required: true, placeholder: 'Select type' },
+                            { label: 'Faculty Name', key: 'name', required: true, placeholder: 'Enter name' },
+                            { label: 'Employee Code', key: 'emp_code', showIf: (item) => item.author_type === 'Internal Author', requiredIf: (item) => item.author_type === 'Internal Author', placeholder: 'Enter employee code' }
                         ]
                     },
                     {
@@ -556,17 +557,27 @@ export default function PartIII({ formData, academicYear, addItem, removeItem, u
 
                     { label: 'Organization', key: 'organisation_name', required: true, placeholder: 'Enter organization' },
                     { label: 'Title/Context', key: 'title', required: true, placeholder: 'Enter title' },
-                    { label: 'Location', key: 'location', placeholder: 'Location' },
+                    { label: 'Location', key: 'location', required: true, placeholder: 'Location' },
                     { label: 'Start Date', key: 'start_date', type: 'date', required: true },
                     { label: 'End Date', key: 'end_date', type: 'date', required: true },
                     { label: 'Institutional Affiliation', key: 'same_institute_affiliation', type: 'select', options: ['Yes', 'No'], placeholder: 'Select' },
-                    { label: 'Pub PDF', key: 'link_to_publication', type: 'file' },
-                    { label: 'Proof PDF', key: 'link', type: 'file' },
-                    { label: 'Faculty IDs', key: 'faculty_ids', type: 'objectList', subFields: [{ label: 'Faculty ID', key: 'faculty_id', type: 'entitySelect', entityType: 'faculty' }] },
-                    { label: 'Student IDs', key: 'student_ids', type: 'objectList', subFields: [{ label: 'Student Name', key: 'name', required: true, placeholder: 'Enter student name' }, { label: 'Student Roll No', key: 'roll_no', required: true, placeholder: 'Enter roll no' }] },
+                    { label: 'Document proof upload', key: 'link', type: 'file', required: true },
                     {
-                        label: 'External Contributors', key: 'external_contributors', type: 'objectList', subFields: [
-                            { label: 'Name', key: 'name',required: true }, { label: 'Role', key: 'role', required: true }, { label: 'Affiliation', key: 'affiliation' }
+                        label: 'Faculty Involved', key: 'faculty_ids', type: 'objectList', subFields: [
+                            { label: 'Author Type', key: 'author_type', type: 'select', options: ['Internal Author', 'External Author'], required: true, placeholder: 'Select type' },
+                            { label: 'Faculty Name', key: 'name', required: true, placeholder: 'Enter name' },
+                            { label: 'Employee Code', key: 'emp_code', showIf: (item) => item.author_type === 'Internal Author', requiredIf: (item) => item.author_type === 'Internal Author', placeholder: 'Enter employee code' }
+                        ]
+                    },
+                    {
+                        label: 'Students Involved', key: 'student_ids', type: 'objectList', subFields: [
+                            { label: 'Student Name', key: 'name', required: true, placeholder: 'Enter student name' }, { label: 'Student Roll No', key: 'roll_no', required: true, placeholder: 'Enter roll no' },
+                            { label: 'Role', key: 'role', required: true }
+                        ]
+                    },
+                    {
+                        label: 'External Collaborators', key: 'external_contributors', type: 'objectList', subFields: [
+                            { label: 'Name', key: 'name', required: true }, { label: 'Role', key: 'role', required: true }, { label: 'Affiliation', key: 'affiliation' }
                         ]
                     }
                 ]}
@@ -607,23 +618,23 @@ export default function PartIII({ formData, academicYear, addItem, removeItem, u
                     { label: 'Specify Other Type', key: 'type_of_program_other', showIf: (item) => item.type_of_program === 'Other', requiredIf: (item) => item.type_of_program === 'Other', placeholder: 'Enter type', hideInTable: true },
                     { label: 'Level', key: 'level', type: 'select', options: ['Institutional', 'National', 'International'], required: true, placeholder: 'Select level' },
                     { label: 'Participation Level', key: 'participation_level', type: 'select', options: ['Attended', 'Organized'], placeholder: 'Select Attended/Organized' },
-                    { label: 'Amount for Funding (INR)', key: 'amount_for_funding', type: 'number', min: 0, placeholder: 'Enter amount' },
+                    { label: 'Amount for Funding (INR)', key: 'amount_for_funding', type: 'number', min: 0, required: true, placeholder: 'Enter amount' },
                     { label: 'Mode', key: 'mode', type: 'select', options: ['Online', 'Offline', 'Hybrid'], required: true, placeholder: 'Select mode' },
                     { label: 'Organizer', key: 'organising_body', required: true, placeholder: 'Enter organizer' },
-                    { label: 'Venue', key: 'venue', placeholder: 'Venue' },
+                    { label: 'Venue', key: 'venue', required: true, placeholder: 'Venue' },
                     { label: 'Duration (Days)', key: 'duration_days', type: 'number', min: 0, required: true, placeholder: 'No. of days' },
-                    academicYearField,
+                    { ...academicYearField, hidden: true, hideInTable: true },
                     { label: 'Funding Agency', key: 'funding_agency', placeholder: 'Agency' },
                     { label: 'Start Date', key: 'start_date', type: 'date', required: true }, 
                     { label: 'End Date', key: 'end_date', type: 'date', required: true },
                     { label: 'Outcome', key: 'outcome', placeholder: 'Outcome' },
                     { label: 'Remarks', key: 'remarks', placeholder: 'Remarks' },
-                    { label: 'Certificate PDF', key: 'certificate_link', type: 'file' },
-                    { label: 'PDF', key: 'link', type: 'file' },
+                    { label: 'Document proof upload', key: 'certificate_link', type: 'file', required: true },
                     {
                         label: 'Faculty Participants', key: 'faculty_participants', type: 'objectList', subFields: [
-                            { label: 'Faculty ID', key: 'faculty_id', type: 'entitySelect', entityType: 'faculty', required: true },
-                            { label: 'Role', key: 'role', required: true }
+                            { label: 'Author Type', key: 'author_type', type: 'select', options: ['Internal Author', 'External Author'], required: true, placeholder: 'Select type' },
+                            { label: 'Faculty Name', key: 'name', required: true, placeholder: 'Enter name' },
+                            { label: 'Employee Code', key: 'emp_code', showIf: (item) => item.author_type === 'Internal Author', requiredIf: (item) => item.author_type === 'Internal Author', placeholder: 'Enter employee code' }
                         ]
                     },
                     {

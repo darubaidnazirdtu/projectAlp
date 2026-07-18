@@ -215,7 +215,16 @@ const update = async (mou_id, data, loggedInUser = null) => {
         try { fAssoc = JSON.parse(fAssoc); } catch (e) { fAssoc = []; }
       }
       if (Array.isArray(fAssoc)) {
-        updateFields.faculty_associations = fAssoc.map(f => ({ faculty_id: f.faculty_id || f }));
+        updateFields.faculty_associations = fAssoc.map(f => {
+          if (typeof f === 'string') return { faculty_id: f };
+          return {
+            faculty_id: f.faculty_id || f.id || f.emp_code,
+            author_type: f.author_type,
+            name: f.name,
+            emp_code: f.emp_code,
+            role: f.role
+          };
+        }).filter(f => f.faculty_id || f.name || f.emp_code);
       }
     }
     if (data.student_associations) {
@@ -224,7 +233,15 @@ const update = async (mou_id, data, loggedInUser = null) => {
         try { sAssoc = JSON.parse(sAssoc); } catch (e) { sAssoc = []; }
       }
       if (Array.isArray(sAssoc)) {
-        updateFields.student_associations = sAssoc.map(s => ({ student_id: s.student_id || s }));
+        updateFields.student_associations = sAssoc.map(s => {
+          if (typeof s === 'string') return { student_id: s };
+          return {
+            student_id: s.student_id || s.roll_no,
+            name: s.name,
+            roll_no: s.roll_no,
+            role: s.role
+          };
+        }).filter(s => s.student_id || s.name || s.roll_no);
       }
     }
 
