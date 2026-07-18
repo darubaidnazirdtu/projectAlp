@@ -25,20 +25,20 @@ const set = async (data, loggedInUser = null) => {
       same_institute_affiliation,
       link_to_publication,
       academic_year,
-      faculty_ids = [],
-      student_ids = [],
+      faculty_members = [],
+      students = [],
       external_contributors = []
     } = data;
 
     // Parse JSON strings if necessary
-    if (typeof faculty_ids === 'string') {
-      try { faculty_ids = JSON.parse(faculty_ids); } catch (e) {
-        faculty_ids = [];
+    if (typeof faculty_members === 'string') {
+      try { faculty_members = JSON.parse(faculty_members); } catch (e) {
+        faculty_members = [];
       }
     }
-    if (typeof student_ids === 'string') {
-      try { student_ids = JSON.parse(student_ids); } catch (e) {
-        student_ids = [];
+    if (typeof students === 'string') {
+      try { students = JSON.parse(students); } catch (e) {
+        students = [];
       }
     }
     if (typeof external_contributors === 'string') {
@@ -47,16 +47,28 @@ const set = async (data, loggedInUser = null) => {
       }
     }
 
-    // Normalize arrays and extract IDs if they are objects
-    if (!Array.isArray(faculty_ids)) faculty_ids = [faculty_ids];
-    faculty_ids = faculty_ids.map(f => typeof f === 'object' && f !== null ? f.faculty_id : f);
-    // Deduplicate faculty_ids
-    faculty_ids = [...new Set(faculty_ids.filter(Boolean))];
+    if (!Array.isArray(faculty_members)) faculty_members = [faculty_members];
+    // Map to the new schema format
+    faculty_members = faculty_members.map(f => {
+      if (typeof f === 'string') return { faculty_id: f };
+      return {
+        faculty_id: f.faculty_id || f.id || f.emp_code,
+        author_type: f.author_type,
+        name: f.name,
+        emp_code: f.emp_code,
+        role: f.role
+      };
+    }).filter(f => f.faculty_id || f.name || f.emp_code);
 
-    if (!Array.isArray(student_ids)) student_ids = [student_ids];
-    student_ids = student_ids.map(s => typeof s === 'object' && s !== null ? s.student_id : s);
-    // Deduplicate student_ids
-    student_ids = [...new Set(student_ids.filter(Boolean))];
+    if (!Array.isArray(students)) students = [students];
+    students = students.map(s => {
+      if (typeof s === 'string') return { student_id: s };
+      return {
+        student_id: s.student_id || s.roll_no,
+        name: s.name,
+        roll_no: s.roll_no
+      };
+    }).filter(s => s.student_id || s.name || s.roll_no);
 
     // Check for duplicates
     const existingBook = await Publication.findOne({
@@ -75,8 +87,8 @@ const set = async (data, loggedInUser = null) => {
 
     // Add logged-in faculty if role is Faculty Member
     if (loggedInUser?.role === 'Faculty Member' && loggedInUser?.userId) {
-      if (!faculty_ids.includes(loggedInUser.userId)) {
-        faculty_ids.push(loggedInUser.userId);
+      if (!faculty_members.some(f => String(f.faculty_id) === String(loggedInUser.userId) || String(f.emp_code) === String(loggedInUser.userId))) {
+        faculty_members.push({ faculty_id: loggedInUser.userId });
       }
     }
 
@@ -103,8 +115,8 @@ const set = async (data, loggedInUser = null) => {
       link_to_publication,
       link: link_to_publication,
       academic_year,
-      faculty_ids,
-      student_ids,
+      faculty_members,
+      students,
       external_contributors,
       metadata: {
         created_by: userId,
@@ -119,10 +131,11 @@ const set = async (data, loggedInUser = null) => {
     const saved = await newPublication.save();
 
     // Trigger auto-sync
-    if (saved.faculty_ids && saved.faculty_ids.length > 0) {
+    if (saved.faculty_members && saved.faculty_members.length > 0) {
       const ay = saved.year_of_publication ? `${saved.year_of_publication}-${saved.year_of_publication + 1}` : null;
       const entryData = { type: 'book', ...saved.toObject() };
-      triggerAparAutoSyncMultiple(saved.faculty_ids, ay, entryData).catch(err =>
+      const fIds = saved.faculty_members.map(f => f.faculty_id).filter(Boolean);
+      triggerAparAutoSyncMultiple(fIds, ay, entryData).catch(err =>
         console.error('Auto-sync trigger failed:', err)
       );
     }
@@ -152,9 +165,8 @@ const transformBook = (book) => ({
   same_institute_affiliation: book.same_institute_affiliation,
   academic_year: book.academic_year,
   link_to_publication: book.link_to_publication || book.link,
-  // Backend stores [String], frontend expects [{ faculty_id: String }] for objectList
-  faculty_ids: (book.faculty_ids || []).map(id => ({ faculty_id: id })),
-  student_ids: (book.student_ids || []).map(id => ({ student_id: id })),
+  faculty_members: book.faculty_members || [],
+  students: book.students || [],
   external_contributors: book.external_contributors || [],
   metadata: book.metadata || {}
 });
@@ -225,27 +237,40 @@ const update = async (publication_id, data, loggedInUser = null) => {
     if (data.academic_year) updateFields.academic_year = data.academic_year;
     if (data.link_to_publication) updateFields.link_to_publication = data.link_to_publication;
 
-    // Handle faculty_ids and student_ids updates (expecting objects or strings)
-    // Handle faculty_ids and student_ids updates (expecting objects or strings)
-    if (data.faculty_ids) {
-      let fIds = data.faculty_ids;
-      if (typeof fIds === 'string') {
-        try { fIds = JSON.parse(fIds); } catch (e) { fIds = []; }
+    // Handle faculty_members and students updates (expecting objects or strings)
+    if (data.faculty_members) {
+      let fMembers = data.faculty_members;
+      if (typeof fMembers === 'string') {
+        try { fMembers = JSON.parse(fMembers); } catch (e) { fMembers = []; }
       }
-      if (Array.isArray(fIds)) {
-        const mapped = fIds.map(f => typeof f === 'object' && f !== null ? f.faculty_id : f);
-        updateFields.faculty_ids = [...new Set(mapped.filter(Boolean))];
+      if (Array.isArray(fMembers)) {
+        updateFields.faculty_members = fMembers.map(f => {
+          if (typeof f === 'string') return { faculty_id: f };
+          return {
+            faculty_id: f.faculty_id || f.id || f.emp_code,
+            author_type: f.author_type,
+            name: f.name,
+            emp_code: f.emp_code,
+            role: f.role
+          };
+        }).filter(f => f.faculty_id || f.name || f.emp_code);
       }
     }
 
-    if (data.student_ids) {
-      let sIds = data.student_ids;
-      if (typeof sIds === 'string') {
-        try { sIds = JSON.parse(sIds); } catch (e) { sIds = []; }
+    if (data.students) {
+      let sMembers = data.students;
+      if (typeof sMembers === 'string') {
+        try { sMembers = JSON.parse(sMembers); } catch (e) { sMembers = []; }
       }
-      if (Array.isArray(sIds)) {
-        const mapped = sIds.map(s => typeof s === 'object' && s !== null ? s.student_id : s);
-        updateFields.student_ids = [...new Set(mapped.filter(Boolean))];
+      if (Array.isArray(sMembers)) {
+        updateFields.students = sMembers.map(s => {
+          if (typeof s === 'string') return { student_id: s };
+          return {
+            student_id: s.student_id || s.roll_no,
+            name: s.name,
+            roll_no: s.roll_no
+          };
+        }).filter(s => s.student_id || s.name || s.roll_no);
       }
     }
     if (data.external_contributors) {
@@ -275,9 +300,10 @@ const update = async (publication_id, data, loggedInUser = null) => {
     );
 
     // Trigger auto-sync
-    if (result && result.faculty_ids && result.faculty_ids.length > 0) {
+    if (result && result.faculty_members && result.faculty_members.length > 0) {
       const ay = result.year_of_publication ? `${result.year_of_publication}-${result.year_of_publication + 1}` : null;
-      triggerAparAutoSyncMultiple(result.faculty_ids, ay, {
+      const fIds = result.faculty_members.map(f => f.faculty_id).filter(Boolean);
+      triggerAparAutoSyncMultiple(fIds, ay, {
         type: 'book',
         action: 'updated',
         ...result.toObject()
@@ -308,7 +334,7 @@ const deleteBook = async (id) => {
       throw new Error(`Book record not found for ID: ${id}`);
     }
 
-    const facultyIds = book.faculty_ids || [];
+    const facultyIds = book.faculty_members ? book.faculty_members.map(f => f.faculty_id).filter(Boolean) : [];
     const ay = book.year_of_publication ? `${book.year_of_publication}-${book.year_of_publication + 1}` : null;
     const entryData = { type: 'book', action: 'deleted', ...book.toObject() };
 
@@ -328,28 +354,28 @@ const deleteBook = async (id) => {
 const addFacultyToBook = async (publication_id, faculty_id) => {
   await Publication.updateOne(
     { publication_id, type: 'book' },
-    { $addToSet: { faculty_ids: faculty_id } }
+    { $addToSet: { faculty_members: { faculty_id } } }
   );
 }
 
 const addStudentToBook = async (publication_id, student_id) => {
   await Publication.updateOne(
     { publication_id, type: 'book' },
-    { $addToSet: { student_ids: student_id } }
+    { $addToSet: { students: { student_id } } }
   );
 }
 
 const removeFacultyFromBook = async (publication_id, faculty_id) => {
   await Publication.updateOne(
     { publication_id, type: 'book' },
-    { $pull: { faculty_ids: faculty_id } }
+    { $pull: { faculty_members: { faculty_id } } }
   );
 }
 
 const removeStudentFromBook = async (publication_id, student_id) => {
   await Publication.updateOne(
     { publication_id, type: 'book' },
-    { $pull: { student_ids: student_id } }
+    { $pull: { students: { student_id } } }
   );
 }
 

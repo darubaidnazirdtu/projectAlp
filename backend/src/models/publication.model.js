@@ -84,9 +84,19 @@ const PublicationSchema = new mongoose.Schema({
     // -------------------------------------------------------------------------
     // Many-to-many relationships (faculty and students involved)
     // -------------------------------------------------------------------------
-    faculty_members: [{ faculty_id: String }],
+    faculty_members: [{
+        faculty_id: String,
+        author_type: String,
+        name: String,
+        emp_code: String,
+        role: String
+    }],
     faculty_ids: [String], // Alternative format for books
-    students: [{ student_id: String }],
+    students: [{
+        student_id: String,
+        name: String,
+        roll_no: String
+    }],
     student_ids: [String], // Alternative format for books
     external_authors: [{
         name: String,

@@ -201,26 +201,26 @@ export default function PartIII({ formData, academicYear, addItem, removeItem, u
                     publisher_type: '',
                     doi: '',
                     indexing: '',
-                    same_institute_affiliation: '',
                     link_to_publication: '',
                     link: ''
                 }}
                 fields={[
-
-
                     { label: 'Publication Type', key: 'publication_type', type: 'select', options: ['Book', 'Chapter'], required: true, placeholder: 'Select type' },
-                    { label: 'Title of Book', key: 'title_of_book', requiredIf: (item) => item.publication_type === 'Book', placeholder: 'Enter book title' },
-                    { label: 'Title of Chapter', key: 'title_of_chapter', requiredIf: (item) => item.publication_type === 'Chapter', placeholder: 'Enter chapter title' },
+                    { label: 'Title of Book', key: 'title_of_book', required: true, placeholder: 'Enter book title' },
+                    { label: 'Title of Chapter', key: 'title_of_chapter', required: true, placeholder: 'Enter chapter title' },
                     { label: 'Role', key: 'role', type: 'select', options: ['Author', 'Co-Author', 'Editor'], required: true, placeholder: 'Select role' },
                     { label: 'Month-Year', key: 'year', type: 'monthYear', ...academicCycleMonthYearBounds, required: true, placeholder: 'e.g., 02-2026' },
-                    { label: 'ISBN', key: 'isbn_number', placeholder: 'ISBN' },
+                    { label: 'ISBN', key: 'isbn_number', required: true, placeholder: 'ISBN' },
                     { label: 'Publisher', key: 'name_of_publisher', required: true, placeholder: 'Enter publisher' },
                     { label: 'Publisher Type', key: 'publisher_type', type: 'select', options: ['National', 'International'], required: true, placeholder: 'Select type' },
-                    { label: 'DOI', key: 'doi', placeholder: 'DOI' },
-                    { label: 'Indexing', key: 'indexing', placeholder: 'Indexing' },
-                    { label: 'Affiliation', key: 'same_institute_affiliation', type: 'boolean' },
-                    { label: 'PDF', key: 'link_to_publication', type: 'file' },
-                    { label: 'Faculty Members', key: 'faculty_members', type: 'objectList', subFields: [{ label: 'Faculty ID', key: 'faculty_id', type: 'entitySelect', entityType: 'faculty', defaultValue: user?.faculty_id }] },
+                    { label: 'DOI', key: 'doi', required: true, placeholder: 'DOI' },
+                    { label: 'Indexing', key: 'indexing', type: 'select', options: ['SCI', 'SCIE', 'Scopus', 'Web of Science', 'PubMed', 'UGC Care', 'Google Scholar', 'Other'], required: true, placeholder: 'Select Indexing' },
+                    { label: 'upload proof file', key: 'link_to_publication', type: 'file', required: true },
+                    { label: 'Co-Author', key: 'faculty_members', type: 'objectList', subFields: [
+                        { label: 'Author Type', key: 'author_type', type: 'select', options: ['Internal Author', 'External Author'], required: true, placeholder: 'Select type' },
+                        { label: 'Co-Author Name', key: 'name', required: true, placeholder: 'Enter name' },
+                        { label: 'Employee Code', key: 'emp_code', showIf: (item) => item.author_type === 'Internal Author', requiredIf: (item) => item.author_type === 'Internal Author', placeholder: 'Enter employee code' }
+                    ] },
                     { label: 'Students', key: 'students', type: 'objectList', subFields: [{ label: 'Student Name', key: 'name', required: true, placeholder: 'Enter student name' }, { label: 'Student Roll No', key: 'roll_no', required: true, placeholder: 'Enter roll no' }] },
                     {
                         label: 'External Contributors', key: 'external_contributors', type: 'objectList', subFields: [

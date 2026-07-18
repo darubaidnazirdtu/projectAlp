@@ -1336,12 +1336,18 @@ const saveToMonthly = asyncHandler(async (req, res) => {
         let list = [];
         if (Array.isArray(arr)) {
             list = arr.map(f => {
-                let id = f.faculty_id || f.faculty || f;
-                if (typeof id === 'object') id = id.faculty_id || id.id;
-                return { faculty_id: id, role: f.role || role };
+                let id = f.faculty_id || f.faculty || f.emp_code || f;
+                if (typeof id === 'object') id = id.faculty_id || id.id || id.emp_code;
+                return { 
+                    faculty_id: id, 
+                    role: f.role || role,
+                    author_type: f.author_type,
+                    name: f.name,
+                    emp_code: f.emp_code
+                };
             });
         }
-        if (!list.some(f => String(f.faculty_id) === String(fId))) {
+        if (!list.some(f => String(f.faculty_id) === String(fId) || String(f.emp_code) === String(fId))) {
             list.push({ faculty_id: fId, role });
         }
         return list;
@@ -1372,7 +1378,7 @@ const saveToMonthly = asyncHandler(async (req, res) => {
             link_to_paper: extractLink(item.link_to_paper),
             academic_year: item.academic_year || ay,
             faculty_members: ensureFaculty(item.faculty_members, faculty_id),
-            students: Array.isArray(item.students) ? item.students.map(s => ({ student_id: s.student_id || s })) : [],
+            students: Array.isArray(item.students) ? item.students.map(s => ({ student_id: s.student_id || s.roll_no || s, name: s.name, roll_no: s.roll_no })) : [],
             external_authors: Array.isArray(item.external_authors) ? item.external_authors : [],
             external_contributors: Array.isArray(item.external_contributors) ? item.external_contributors : [],
             metadata: { created_by: faculty_id, change_log: [{ action: 'updated', user_id: faculty_id, changes: 'Synced from APAR monthly save' }] }
@@ -1417,7 +1423,7 @@ const saveToMonthly = asyncHandler(async (req, res) => {
             link_to_paper: extractLink(item.link_to_paper),
             academic_year: item.academic_year || ay,
             faculty_members: ensureFaculty(item.faculty_members, faculty_id),
-            students: Array.isArray(item.students) ? item.students.map(s => ({ student_id: s.student_id || s })) : [],
+            students: Array.isArray(item.students) ? item.students.map(s => ({ student_id: s.student_id || s.roll_no || s, name: s.name, roll_no: s.roll_no })) : [],
             external_contributors: Array.isArray(item.external_contributors) ? item.external_contributors : [],
             metadata: { created_by: faculty_id, change_log: [{ action: 'updated', user_id: faculty_id, changes: 'Synced from APAR monthly save' }] }
         });
@@ -1460,7 +1466,7 @@ const saveToMonthly = asyncHandler(async (req, res) => {
             indexing: item.indexing,
             academic_year: item.academic_year || ay,
             faculty_members: ensureFaculty(item.faculty_members || item.faculty_ids, faculty_id),
-            students: Array.isArray(item.students) ? item.students.map(s => ({ student_id: s.student_id || s })) : (Array.isArray(item.student_ids) ? item.student_ids.map(sid => ({ student_id: sid })) : []),
+            students: Array.isArray(item.students) ? item.students.map(s => ({ student_id: s.student_id || s.roll_no || s, name: s.name, roll_no: s.roll_no })) : (Array.isArray(item.student_ids) ? item.student_ids.map(sid => ({ student_id: sid })) : []),
             external_contributors: Array.isArray(item.external_contributors) ? item.external_contributors : [],
             metadata: { created_by: faculty_id, change_log: [{ action: 'updated', user_id: faculty_id, changes: 'Synced from APAR monthly save' }] }
         });

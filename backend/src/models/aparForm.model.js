@@ -169,9 +169,12 @@ const AparFormSchema = new mongoose.Schema({
             link_to_publication: String,
             link: String,
             doi: String,
+            indexing: String,
             department_id: String,
             faculty_ids: [],
             student_ids: [],
+            faculty_members: [],
+            students: [],
             external_contributors: []
         }],
 
