@@ -142,6 +142,8 @@ const AparFormSchema = new mongoose.Schema({
             publisher: String,
             other_publisher: String,
             isbn: String,
+            issn: String,
+            volume: String,
             year_of_publication: String, // IQAC: Number
             doi: String,
             indexing: String,

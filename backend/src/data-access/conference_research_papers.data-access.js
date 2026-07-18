@@ -176,10 +176,16 @@ const transformPaper = (paper) => ({
   academic_year: paper.academic_year,
   link_to_paper: paper.link_to_paper || paper.link,
   faculty_members: (paper.faculty_members || []).map(f => ({
-    faculty_id: f.faculty_id
+    faculty_id: f.faculty_id,
+    author_type: f.author_type,
+    name: f.name,
+    emp_code: f.emp_code,
+    role: f.role
   })),
   students: (paper.students || []).map(s => ({
-    student_id: s.student_id
+    student_id: s.student_id,
+    name: s.name,
+    roll_no: s.roll_no
   })),
   external_authors: paper.external_authors || [],
   metadata: paper.metadata || {}
@@ -265,13 +271,16 @@ const update = async (paper_id, data, loggedInUser = null) => {
         try { fMembers = JSON.parse(fMembers); } catch (e) { fMembers = []; }
       }
       if (Array.isArray(fMembers)) {
-        const mapped = fMembers.map(f => ({ faculty_id: f.faculty_id || f }));
-        const seen = new Set();
-        updateFields.faculty_members = mapped.filter(f => {
-          if (!f.faculty_id || seen.has(f.faculty_id)) return false;
-          seen.add(f.faculty_id);
-          return true;
-        });
+        updateFields.faculty_members = fMembers.map(f => {
+          if (typeof f === 'string') return { faculty_id: f };
+          return {
+            faculty_id: f.faculty_id || f.id || f.emp_code,
+            author_type: f.author_type,
+            name: f.name,
+            emp_code: f.emp_code,
+            role: f.role
+          };
+        }).filter(f => f.faculty_id || f.name || f.emp_code);
       }
     }
     if (data.students) {
@@ -280,13 +289,14 @@ const update = async (paper_id, data, loggedInUser = null) => {
         try { sMembers = JSON.parse(sMembers); } catch (e) { sMembers = []; }
       }
       if (Array.isArray(sMembers)) {
-        const mapped = sMembers.map(s => ({ student_id: s.student_id || s }));
-        const seen = new Set();
-        updateFields.students = mapped.filter(s => {
-          if (!s.student_id || seen.has(s.student_id)) return false;
-          seen.add(s.student_id);
-          return true;
-        });
+        updateFields.students = sMembers.map(s => {
+          if (typeof s === 'string') return { student_id: s };
+          return {
+            student_id: s.student_id || s.roll_no,
+            name: s.name,
+            roll_no: s.roll_no
+          };
+        }).filter(s => s.student_id || s.name || s.roll_no);
       }
     }
 
