@@ -1773,6 +1773,8 @@ const saveToMonthly = asyncHandler(async (req, res) => {
             title_of_activity: item.title_of_activity,
             name_of_collaborative_agency: item.name_of_collaborative_agency,
             type_of_activity: item.type_of_activity,
+            other_type_of_activity: item.other_type_of_activity,
+            nature_of_activity: item.nature_of_collaboration || item.nature_of_activity,
             number_of_participants: parseNumber(item.number_of_participants),
             source_of_financial_support: item.source_of_financial_support,
             funding_amount: parseNumber(item.funding_amount),
@@ -1782,13 +1784,12 @@ const saveToMonthly = asyncHandler(async (req, res) => {
             start_date: parseDate(item.start_date),
             end_date: parseDate(item.end_date),
             academic_year: item.academic_year || ay,
-            outcome: item.outcome,
             remarks: item.remarks,
             link: extractLink(item.link),
             faculty_associations: ensureFaculty(item.faculty_associations || item.faculty_involved, faculty_id),
             student_associations: Array.isArray(item.students_involved)
-                ? item.students_involved.map(s => ({ student_id: s.student_id || s.student || s, role: s.role }))
-                : (Array.isArray(item.student_associations) ? item.student_associations : []),
+                ? item.students_involved.map(s => ({ student_id: s.student_id || s.roll_no || s, name: s.name, roll_no: s.roll_no }))
+                : (Array.isArray(item.student_associations) ? item.student_associations.map(s => ({ student_id: s.student_id || s.roll_no || s, name: s.name, roll_no: s.roll_no })) : []),
             external_contributors: Array.isArray(item.external_contributors)
                 ? item.external_contributors
                 : (Array.isArray(item.external_collaborators) ? item.external_collaborators : []),

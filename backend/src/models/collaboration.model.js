@@ -45,6 +45,7 @@ const CollaborationSchema = new mongoose.Schema({
     title_of_activity: String,
     name_of_collaborative_agency: String,
     type_of_activity: String, // Workshop/Seminar/Industrial Visit/Research Collaboration/MoU/Joint Program/Other
+    other_type_of_activity: String,
     number_of_participants: Number,
     source_of_financial_support: String,
     funding_amount: Number,
@@ -88,14 +89,9 @@ const CollaborationSchema = new mongoose.Schema({
     // -------------------------------------------------------------------------
     // Relationships (common for most types)
     // -------------------------------------------------------------------------
-    faculty_associations: [{ faculty_id: String, role: String }],
-    student_associations: [{ student_id: String, role: String }],
-    external_contributors: [{
-        name: String,
-        email: String,
-        role: String,
-        affiliation: String
-    }],
+    faculty_associations: [],
+    student_associations: [],
+    external_contributors: [],
 
     metadata: {
         created_at: { type: Date, default: Date.now },

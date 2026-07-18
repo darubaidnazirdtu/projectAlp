@@ -134,6 +134,7 @@ const transformActivity = (collab) => ({
   title_of_activity: collab.title_of_activity || collab.title,
   name_of_collaborative_agency: collab.name_of_collaborative_agency,
   type_of_activity: collab.type_of_activity,
+  other_type_of_activity: collab.other_type_of_activity,
   level: collab.level,
   start_date: collab.start_date,
   end_date: collab.end_date,
@@ -190,6 +191,7 @@ const update = async (activity_id, data, loggedInUser = null) => {
     }
     if (data.name_of_collaborative_agency) updateFields.name_of_collaborative_agency = data.name_of_collaborative_agency;
     if (data.type_of_activity) updateFields.type_of_activity = data.type_of_activity;
+    if (data.other_type_of_activity) updateFields.other_type_of_activity = data.other_type_of_activity;
     if (data.level) updateFields.level = data.level;
     if (data.start_date) updateFields.start_date = data.start_date;
     if (data.end_date) updateFields.end_date = data.end_date;
@@ -216,7 +218,16 @@ const update = async (activity_id, data, loggedInUser = null) => {
         try { fAssoc = JSON.parse(fAssoc); } catch (e) { fAssoc = []; }
       }
       if (Array.isArray(fAssoc)) {
-        updateFields.faculty_associations = fAssoc.map(f => ({ faculty_id: f.faculty_id || f }));
+        updateFields.faculty_associations = fAssoc.map(f => {
+          if (typeof f === 'string') return { faculty_id: f };
+          return {
+            faculty_id: f.faculty_id || f.id || f.emp_code,
+            author_type: f.author_type,
+            name: f.name,
+            emp_code: f.emp_code,
+            role: f.role
+          };
+        }).filter(f => f.faculty_id || f.name || f.emp_code);
       }
     }
     if (data.student_associations) {
@@ -225,7 +236,15 @@ const update = async (activity_id, data, loggedInUser = null) => {
         try { sAssoc = JSON.parse(sAssoc); } catch (e) { sAssoc = []; }
       }
       if (Array.isArray(sAssoc)) {
-        updateFields.student_associations = sAssoc.map(s => ({ student_id: s.student_id || s }));
+        updateFields.student_associations = sAssoc.map(s => {
+          if (typeof s === 'string') return { student_id: s };
+          return {
+            student_id: s.student_id || s.roll_no,
+            name: s.name,
+            roll_no: s.roll_no,
+            role: s.role
+          };
+        }).filter(s => s.student_id || s.name || s.roll_no);
       }
     }
 

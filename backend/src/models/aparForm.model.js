@@ -317,7 +317,9 @@ const AparFormSchema = new mongoose.Schema({
             title: String, // Generic
             name_of_collaborative_agency: String,
             type_of_activity: String,
+            other_type_of_activity: String,
             nature_of_activity: String,
+            nature_of_collaboration: String,
             number_of_participants: String, // IQAC: Number
             source_of_financial_support: String,
             funding_amount: String, // IQAC: Number
