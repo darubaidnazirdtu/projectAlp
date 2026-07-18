@@ -82,20 +82,10 @@ const ResearchProjectSchema = new mongoose.Schema({
     // -------------------------------------------------------------------------
     // Relationships
     // -------------------------------------------------------------------------
-    faculty_involved: [{ faculty_name: String, faculty_emp_code: String, faculty_designation: String, faculty_id: String, role: String }],
-    students_involved: [{ student_id: String, role: String }],
-    external_collaborators: [{
-        name: String,
-        email: String,
-        role: String,
-        affiliation: String
-    }],
-    external_consultants: [{
-        name: String,
-        email: String,
-        role: String,
-        affiliation: String
-    }],
+    faculty_involved: [],
+    students_involved: [],
+    external_collaborators: [],
+    external_consultants: [],
     external_trainers: [{
         name: String,
         email: String,

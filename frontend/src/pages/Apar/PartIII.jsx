@@ -770,30 +770,29 @@ export default function PartIII({ formData, academicYear, addItem, removeItem, u
                             { label: 'Project Name', key: 'name_of_project', required: true, placeholder: 'Enter project name' },
                             { label: 'Agency', key: 'agency_name', required: true, placeholder: 'Enter agency' },
                             { label: 'Type', key: 'type_of_agency', type: 'select', options: ['Government', 'Private'], required: true, placeholder: 'Select type' },
-                            { label: 'Grant', key: 'grant_amount', type: 'number', min: 0,required: true, placeholder: 'Amount' },
-                            { label: 'Revenue', key: 'revenue_generated', type: 'number', min: 0, placeholder: 'Revenue' },
+                            { label: 'Grant', key: 'grant_amount', type: 'number', min: 0, required: true, placeholder: 'Amount' },
+                            { label: 'Revenue', key: 'revenue_generated', type: 'number', min: 0, required: true, placeholder: 'Revenue' },
                             { label: 'Start Date', key: 'start_date', type: 'date', required: true },
-                            { label: 'PDF', key: 'link', type: 'file' },
+                            { label: 'upload proof', key: 'link', type: 'file', required: true },
                             {
                                 label: 'Faculty Involved', key: 'faculty_involved', type: 'objectList', subFields: [
-                                    { label: 'Faculty ID', key: 'faculty_id', type: 'entitySelect', entityType: 'faculty', required: true },
-                                    { label: 'Role', key: 'role', required: true }
+                                    { label: 'Author Type', key: 'author_type', type: 'select', options: ['Internal Author', 'External Author'], required: true, placeholder: 'Select type' },
+                                    { label: 'Faculty Name', key: 'name', required: true, placeholder: 'Enter name' },
+                                    { label: 'Employee Code', key: 'emp_code', showIf: (item) => item.author_type === 'Internal Author', requiredIf: (item) => item.author_type === 'Internal Author', placeholder: 'Enter employee code' }
                                 ]
                             },
                             {
                                 label: 'Students Involved', key: 'students_involved', type: 'objectList', subFields: [
-                                    { label: 'Student Name', key: 'name', required: true, placeholder: 'Enter student name' }, { label: 'Student Roll No', key: 'roll_no', required: true, placeholder: 'Enter roll no' },
+                                    { label: 'Student Name', key: 'name', required: true, placeholder: 'Enter student name' },
+                                    { label: 'Student Roll No', key: 'roll_no', required: true, placeholder: 'Enter roll no' },
                                     { label: 'Role', key: 'role', required: true }
                                 ]
                             },
                             {
                                 label: 'External Collaborators', key: 'external_collaborators', type: 'objectList', subFields: [
-                                    { label: 'Name', key: 'name', required: true }, { label: 'Role', key: 'role', required: true }, { label: 'Affiliation', key: 'affiliation' }
-                                ]
-                            },
-                            {
-                                label: 'External Consultants', key: 'external_consultants', type: 'objectList', subFields: [
-                                    { label: 'Name', key: 'name', required: true }, { label: 'Role', key: 'role', required: true }, { label: 'Affiliation', key: 'affiliation' }
+                                    { label: 'Name', key: 'name', required: true },
+                                    { label: 'Role', key: 'role', required: true },
+                                    { label: 'Affiliation', key: 'affiliation' }
                                 ]
                             }
                         ]}

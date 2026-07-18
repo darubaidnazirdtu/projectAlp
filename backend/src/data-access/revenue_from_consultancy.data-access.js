@@ -202,12 +202,12 @@ const update = async (consultancy_id, data, loggedInUser = null) => {
     if (data.outcome) updateFields.outcome = data.outcome;
     if (data.remarks) updateFields.remarks = data.remarks;
     if (data.link) updateFields.link = data.link;
-    if (data.external_consultants) {
-      let extConsultants = data.external_consultants;
-      if (typeof extConsultants === 'string') {
-        try { extConsultants = JSON.parse(extConsultants); } catch (e) { extConsultants = []; }
+    if (data.external_collaborators) {
+      let extCollabs = data.external_collaborators;
+      if (typeof extCollabs === 'string') {
+        try { extCollabs = JSON.parse(extCollabs); } catch (e) { extCollabs = []; }
       }
-      updateFields.external_consultants = extConsultants;
+      updateFields.external_collaborators = extCollabs;
     }
     if (data.faculty_involved) {
       let fInv = data.faculty_involved;
@@ -215,7 +215,16 @@ const update = async (consultancy_id, data, loggedInUser = null) => {
         try { fInv = JSON.parse(fInv); } catch (e) { fInv = []; }
       }
       if (Array.isArray(fInv)) {
-        updateFields.faculty_involved = fInv.map(f => ({ faculty_id: f.faculty_id || f, role: f.role || 'Consultant' }));
+        updateFields.faculty_involved = fInv.map(f => {
+          if (typeof f === 'string') return { faculty_id: f, role: 'Consultant' };
+          return {
+            faculty_id: f.faculty_id || f.emp_code || f.id || f,
+            author_type: f.author_type,
+            name: f.name,
+            emp_code: f.emp_code,
+            role: f.role || 'Consultant'
+          };
+        });
       }
     }
     if (data.students_involved) {
@@ -224,7 +233,15 @@ const update = async (consultancy_id, data, loggedInUser = null) => {
         try { sInv = JSON.parse(sInv); } catch (e) { sInv = []; }
       }
       if (Array.isArray(sInv)) {
-        updateFields.students_involved = sInv.map(s => ({ student_id: s.student_id || s, role: s.role || 'Assistant' }));
+        updateFields.students_involved = sInv.map(s => {
+          if (typeof s === 'string') return { student_id: s, role: 'Assistant' };
+          return {
+            student_id: s.student_id || s.roll_no || s.id || s,
+            name: s.name,
+            roll_no: s.roll_no,
+            role: s.role || 'Assistant'
+          };
+        });
       }
     }
 

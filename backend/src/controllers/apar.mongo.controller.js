@@ -1558,9 +1558,8 @@ const saveToMonthly = asyncHandler(async (req, res) => {
             link: extractLink(item.link),
             academic_year: item.academic_year || ay,
             faculty_involved: ensureFaculty(item.faculty_involved, faculty_id),
-            students_involved: Array.isArray(item.students_involved) ? item.students_involved.map(s => ({ student_id: s.student_id || s.student_id || s, role: s.role })) : [],
+            students_involved: Array.isArray(item.students_involved) ? item.students_involved.map(s => ({ student_id: s.student_id || s.roll_no || s, name: s.name, roll_no: s.roll_no, role: s.role })) : [],
             external_collaborators: Array.isArray(item.external_collaborators) ? item.external_collaborators : [],
-            external_consultants: Array.isArray(item.external_consultants) ? item.external_consultants : [],
             metadata: { created_by: faculty_id, change_log: [{ action: 'updated', user_id: faculty_id, changes: 'Synced from APAR monthly save' }] }
         });
         const filter = buildUpsertFilter('project_id', item.project_id, project_id, item.consultancy_id
