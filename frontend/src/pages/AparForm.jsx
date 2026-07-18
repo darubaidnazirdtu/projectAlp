@@ -292,58 +292,128 @@ const createExportTables = (data, sectionName = 'APAR Form') => {
     }
 
     const fieldRows = [];
-    const childTables = [];
-
-    Object.entries(data).forEach(([key, value]) => {
-        const label = toTitle(key);
-        const nestedName = sectionName === 'APAR Form' ? (sectionLabels[key] || label) : `${sectionName} - ${label}`;
-
-        if (Array.isArray(value)) {
-            childTables.push(...createExportTables(value, nestedName));
-            return;
-        }
-
-        if (isPlainObject(value)) {
-            const hasChildTables = Object.values(value).some(item => Array.isArray(item));
-            if (hasChildTables) {
-                childTables.push(...createExportTables(value, nestedName));
-                return;
-            }
-            Object.entries(flattenRecord(value, label)).forEach(([field, val]) => {
-                fieldRows.push({ Field: field, Value: val });
-            });
-            return;
-        }
-
-        fieldRows.push({ Field: label, Value: toDisplayValue(value) });
+    Object.entries(flattenRecord(data)).forEach(([field, val]) => {
+        fieldRows.push({ Field: field, Value: val });
     });
+    
+    return [{
+        title: sectionName,
+        columns: ['Field', 'Value'],
+        rows: fieldRows.length ? fieldRows : [{ Field: 'Message', Value: 'No entries' }]
+    }];
+};
+
+const createAparExportTables = (formData, isDocument = false) => {
+    if (!isPlainObject(formData)) return [];
 
     const tables = [];
-    if (fieldRows.length) {
-        tables.push({
-            title: sectionLabels[sectionName] || sectionName,
-            columns: ['Field', 'Value'],
-            rows: fieldRows
+
+    const pushTable = (title, dataArray, singleObjectLabel = null) => {
+        if (Array.isArray(dataArray) && dataArray.length > 0) {
+            const rows = dataArray.map((item, index) => ({ 'S. No.': index + 1, ...flattenRecord(item) }));
+            const cols = getColumns(rows);
+            
+            // For Word/PDF, if a table has too many columns, it becomes unreadable.
+            // Transpose it into vertical key-value lists per item.
+            if (isDocument && cols.length > 5) {
+                dataArray.forEach((item, index) => {
+                    const fieldRows = [];
+                    Object.entries(flattenRecord(item)).forEach(([field, val]) => {
+                        fieldRows.push({ Field: field, Value: val });
+                    });
+                    if (fieldRows.length > 0) {
+                        tables.push({ 
+                            title: `${title} - Item ${index + 1}`, 
+                            columns: ['Field', 'Value'], 
+                            rows: fieldRows 
+                        });
+                    }
+                });
+            } else {
+                tables.push({ title, columns: cols, rows });
+            }
+        } else if (isPlainObject(dataArray)) {
+            const fieldRows = [];
+            Object.entries(flattenRecord(dataArray)).forEach(([field, val]) => {
+                fieldRows.push({ Field: field, Value: val });
+            });
+            if (fieldRows.length > 0) {
+                tables.push({ title: singleObjectLabel || title, columns: ['Field', 'Value'], rows: fieldRows });
+            }
+        }
+    };
+
+    // Part I: Personal Data
+    if (formData.personal) {
+        pushTable('PART I - PERSONAL DATA', formData.personal);
+    }
+    if (formData.profileQualifications && formData.profileQualifications.length > 0) {
+        pushTable('PART I - ACADEMIC QUALIFICATIONS', formData.profileQualifications);
+    }
+
+    // Part II: Self Appraisal
+    if (formData.teaching) {
+        if (formData.teaching.courses_taught && formData.teaching.courses_taught.length > 0) {
+            pushTable('PART II - COURSES TAUGHT', formData.teaching.courses_taught);
+        }
+        if (formData.teaching.time_table) {
+            const tt = formData.teaching.time_table;
+            const ttRows = [
+                { Semester: 'Odd Semester', 'Provided (hrs)': tt.provided?.odd_semester || 'N/A', 'Actual (hrs)': tt.actual?.odd_semester || 'N/A', 'Reason for variance': tt.reason_for_variance?.odd_semester || 'N/A' },
+                { Semester: 'Even Semester', 'Provided (hrs)': tt.provided?.even_semester || 'N/A', 'Actual (hrs)': tt.actual?.even_semester || 'N/A', 'Reason for variance': tt.reason_for_variance?.even_semester || 'N/A' }
+            ];
+            tables.push({ title: 'PART II - TIME TABLE (HOURS/PERIODS PER WEEK)', columns: ['Semester', 'Provided (hrs)', 'Actual (hrs)', 'Reason for variance'], rows: ttRows });
+        }
+    }
+
+    // Part III: Research
+    if (formData.research) {
+        Object.entries(formData.research).forEach(([key, value]) => {
+            if (Array.isArray(value) && value.length > 0) {
+                pushTable(`PART III - ${(sectionLabels[key] || toTitle(key)).toUpperCase()}`, value);
+            }
         });
     }
 
-    return [...tables, ...childTables];
+    // Part IV: Corporate Life
+    if (formData.corporate) {
+        Object.entries(formData.corporate).forEach(([key, value]) => {
+            if (Array.isArray(value) && value.length > 0) {
+                pushTable(`PART IV - ${(sectionLabels[key] || toTitle(key)).toUpperCase()}`, value);
+            }
+        });
+    }
+
+    // Part V: Assessment
+    if (formData.assessment) {
+        const assessment = formData.assessment;
+        if (assessment.section_a) pushTable('PART V - ASSESSMENT: SECTION A', assessment.section_a);
+        if (assessment.section_b) pushTable('PART V - ASSESSMENT: SECTION B', assessment.section_b);
+        if (assessment.section_c) pushTable('PART V - ASSESSMENT: SECTION C', assessment.section_c);
+        if (assessment.general) pushTable('PART V - GENERAL ASSESSMENT', assessment.general);
+    }
+
+    // Part VI: Remarks
+    if (formData.remarks) {
+        pushTable('PART VI - REMARKS BY REVIEWING OFFICER', formData.remarks);
+    }
+
+    return tables;
 };
 
-const createAparExportTables = (formData) => {
-    if (!isPlainObject(formData)) return createExportTables(formData);
-    return Object.entries(formData).flatMap(([key, value]) => {
-        const sectionName = sectionLabels[key] || toTitle(key);
-        return createExportTables(value, sectionName);
-    });
-};
-
-const createWordCell = (text, bold = false) => new TableCell({
+const createWordCell = (text, bold = false, isHeader = false) => new TableCell({
     width: { size: 10, type: WidthType.AUTO },
-    margins: { top: 100, bottom: 100, left: 100, right: 100 },
+    margins: { top: 150, bottom: 150, left: 150, right: 150 },
+    shading: isHeader ? { fill: "4F46E5" } : undefined,
     children: String(text ?? '').split('\n').map(line => new Paragraph({
-        spacing: { after: 100 },
-        children: [new TextRun({ text: line || ' ', bold, size: 20 })]
+        spacing: { after: 120, before: 60 },
+        children: [new TextRun({ 
+            text: line || ' ', 
+            bold, 
+            size: isHeader ? 24 : 22, 
+            color: isHeader ? "FFFFFF" : "333333",
+            font: "Calibri"
+        })]
     }))
 });
 
@@ -351,25 +421,29 @@ const createWordTable = (columns, rows) => {
     const safeRows = rows.length ? rows : [{ Message: 'No entries' }];
     const safeColumns = columns.length ? columns : getColumns(safeRows);
     
-    // Instead of forcing strict percentages which crush text, we use AUTO 
-    // so Word can naturally expand the columns based on the text length.
     return new Table({
-        width: { size: 100, type: WidthType.AUTO },
+        width: { size: 100, type: WidthType.PERCENTAGE },
         borders: {
-            top: { style: BorderStyle.SINGLE, size: 1, color: "000000" },
-            bottom: { style: BorderStyle.SINGLE, size: 1, color: "000000" },
-            left: { style: BorderStyle.SINGLE, size: 1, color: "000000" },
-            right: { style: BorderStyle.SINGLE, size: 1, color: "000000" },
-            insideHorizontal: { style: BorderStyle.SINGLE, size: 1, color: "000000" },
-            insideVertical: { style: BorderStyle.SINGLE, size: 1, color: "000000" }
+            top: { style: BorderStyle.SINGLE, size: 4, color: "CCCCCC" },
+            bottom: { style: BorderStyle.SINGLE, size: 4, color: "CCCCCC" },
+            left: { style: BorderStyle.SINGLE, size: 4, color: "CCCCCC" },
+            right: { style: BorderStyle.SINGLE, size: 4, color: "CCCCCC" },
+            insideHorizontal: { style: BorderStyle.SINGLE, size: 4, color: "E5E7EB" },
+            insideVertical: { style: BorderStyle.SINGLE, size: 4, color: "E5E7EB" }
         },
         rows: [
             new TableRow({
                 tableHeader: true,
-                children: safeColumns.map(column => createWordCell(column, true))
+                children: safeColumns.map(column => createWordCell(column, true, true))
             }),
-            ...safeRows.map(row => new TableRow({
-                children: safeColumns.map(column => createWordCell(row[column], false))
+            ...safeRows.map((row, index) => new TableRow({
+                children: safeColumns.map(column => {
+                    const cell = createWordCell(row[column], false, false);
+                    if (index % 2 === 1) {
+                        cell.options.shading = { fill: "F9FAFB" };
+                    }
+                    return cell;
+                })
             }))
         ]
     });
@@ -1112,7 +1186,7 @@ export default function AparForm() {
             const ay = reduxAy || loginData.academic_year || location.state?.ay || getAcademicYearFromDates(formData.personal?.report_start_date, formData.personal?.report_end_date);
             const tables = [
                 createSummaryTable(formData, aparUser, ay),
-                ...createAparExportTables(formData)
+                ...createAparExportTables(formData, true)
             ];
 
             const doc = new jsPDF({ orientation: 'landscape', unit: 'pt', format: 'a4' });
@@ -1242,7 +1316,7 @@ export default function AparForm() {
             const ay = reduxAy || loginData.academic_year || location.state?.ay || getAcademicYearFromDates(formData.personal?.report_start_date, formData.personal?.report_end_date);
             const tables = [
                 createSummaryTable(formData, aparUser, ay),
-                ...createAparExportTables(formData)
+                ...createAparExportTables(formData, true)
             ];
             const children = [
                 new Paragraph({
