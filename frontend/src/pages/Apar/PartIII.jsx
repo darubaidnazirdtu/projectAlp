@@ -90,7 +90,7 @@ export default function PartIII({ formData, academicYear, addItem, removeItem, u
                     { label: 'Project Type', key: 'type_of_project', type: 'select', options: ['Sponsored Research', 'Innovation', 'Startup', 'Other'], required: true, placeholder: 'Select type' },
                     { label: 'Funding Agency', key: 'funding_agency_name', required: true, placeholder: 'Enter funding agency' },
                     { label: 'Funding Type', key: 'funding_type', type: 'select', options: ['Government', 'Non-Government', 'Industry'], required: true, placeholder: 'Select funding type' },
-                    { label: 'Sanction Number', key: 'sanction_number', placeholder: 'Enter sanction number' },
+                    { label: 'Sanction Number', key: 'sanction_number', required: true, placeholder: 'Enter sanction number' },
                     {
     label: 'Month-Year of Sanction',
     key: 'year_of_sanction',
@@ -100,7 +100,7 @@ export default function PartIII({ formData, academicYear, addItem, removeItem, u
     max: academicYearBounds.endMonth,
     placeholder: 'Select sanction month-year'
 },
-                    academicYearField,
+                    { ...academicYearField, hidden: true },
                     {
     label: 'Start Date',
     key: 'start_date',
@@ -126,7 +126,9 @@ export default function PartIII({ formData, academicYear, addItem, removeItem, u
                     { label: 'Proof of Sanction Letter', key: 'link', type: 'file', required: true },
                     {
                         label: 'Faculty Involved', key: 'faculty_involved', type: 'objectList', subFields: [
-                            { label: 'Faculty ID', key: 'faculty_id', type: 'entitySelect', entityType: 'faculty', required: true, defaultValue: user?.faculty_id },
+                            { label: 'Faculty Name', key: 'faculty_name', required: true, placeholder: 'Enter name' },
+                            { label: 'Faculty Employ Code', key: 'faculty_emp_code', required: true, placeholder: 'Enter employ code' },
+                            { label: 'Designation', key: 'faculty_designation', placeholder: 'Enter designation' },
                             { label: 'Role', key: 'role', type: 'select', options: ['Principal Investigator', 'Co-Principal Investigator', 'Research Collaborator'], required: true }
                         ]
                     },

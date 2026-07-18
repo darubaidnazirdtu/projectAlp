@@ -1315,10 +1315,9 @@ export default function PartII({ formData, academicYear, addItem, removeItem, up
                     uniqueKey=""
                     {...createHandlers('teaching', 'tutorials_tests')}
                     readOnly={readOnly}
-                    initialItem={{ course_name: '', course_code: '', semester: '', degree_type: '', number_of_tests: '', assignment_checked: '' }}
+                    initialItem={{ course_name: '', semester: '', degree_type: '', number_of_tests: '', assignment_checked: '' }}
                     fields={[
                         { label: 'Course Name', key: 'course_name', type: 'select', options: [...new Set(coursesTaught.map(c => c.name_of_course).filter(Boolean))], required: true },
-                        { label: 'Course Code', key: 'course_code', type: 'select', options: [...new Set(coursesTaught.map(c => c.course_code).filter(Boolean))], required: true },
                         { label: 'Semester', key: 'semester', type: 'select', options: ['Odd', 'Even'], required: true },
                         { label: 'Degree Type', key: 'degree_type', type: 'select', options: ['UG', 'PG'], required: true },
                         { label: 'Number of tests held', key: 'number_of_tests', type: 'number', required: true, placeholder: 'Enter number' },

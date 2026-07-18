@@ -97,7 +97,7 @@ const AparFormSchema = new mongoose.Schema({
         student_centric_methods: [{ description: String }],
         tutorials_tests: [{
             course_name: String,
-            course_code: String,
+
             semester: String,
             degree_type: String,
             number_of_tests: String,
@@ -197,6 +197,7 @@ const AparFormSchema = new mongoose.Schema({
             department_id: String,
             faculty_involved: [],
             students_involved: [],
+            manpower_details: [],
             external_collaborators: []
         }],
 

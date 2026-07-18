@@ -82,7 +82,7 @@ const ResearchProjectSchema = new mongoose.Schema({
     // -------------------------------------------------------------------------
     // Relationships
     // -------------------------------------------------------------------------
-    faculty_involved: [{ faculty_id: String, role: String }],
+    faculty_involved: [{ faculty_name: String, faculty_emp_code: String, faculty_designation: String, faculty_id: String, role: String }],
     students_involved: [{ student_id: String, role: String }],
     external_collaborators: [{
         name: String,
@@ -101,6 +101,10 @@ const ResearchProjectSchema = new mongoose.Schema({
         email: String,
         role: String,
         affiliation: String
+    }],
+    manpower_details: [{
+        name_of_post: String,
+        number_of_posts: Number
     }],
 
     metadata: {

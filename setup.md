@@ -24,7 +24,7 @@ Once the Docker containers are successfully up and running, you can access the a
 
 - **Frontend Application**: [http://localhost:3000](http://localhost:3000)
 - **Backend API**: [http://localhost:8000](http://localhost:8000)
-- **MinIO Console**: [http://localhost:9001](http://localhost:9001) (Username: `minioadmin` / Password: `minioadmin`)
+- **MinIO Console**: [http://localhost:9001](http://localhost:9001) (Username: `git a` / Password: `minioadmin`)
 - **Mongo Express (Database UI)**: [http://localhost:8081](http://localhost:8081) (Username: `admin` / Password: `password123`)
 
 ## MongoDB Access

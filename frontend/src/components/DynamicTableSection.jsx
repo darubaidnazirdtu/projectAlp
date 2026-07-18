@@ -623,7 +623,7 @@ export default function DynamicTableSection({
                                     S.No.
                                 </th>
                                 {fields.map(f => {
-                                    if (f.hideInTable) return null;
+                                    if (f.hideInTable || f.hidden) return null;
                                     return (
                                     <th key={f.key} scope="col" className="!text-left whitespace-nowrap">
                                         {f.label} {f.required && <span className="text-red-500">*</span>}
@@ -641,7 +641,7 @@ export default function DynamicTableSection({
                                         {idx + 1}
                                     </td>
                                     {fields.map(f => {
-                                        if (f.hideInTable) return null;
+                                        if (f.hideInTable || f.hidden) return null;
                                         return (
                                         <td key={f.key} className="px-4 py-4 text-sm text-gray-700 break-words whitespace-normal">
                                             {f.type === 'file' ? (
@@ -664,13 +664,13 @@ export default function DynamicTableSection({
                                             ) : f.type === 'objectList' ? (
                                                 <div className="flex flex-wrap gap-1 max-w-[200px]">
                                                     {(item[f.key] || []).slice(0, 2).map((sub, sIdx) => (
-                                                        <span key={sIdx} className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-indigo-50 text-indigo-700 border border-indigo-100 truncate max-w-[80px]" title={sub.name || sub.faculty_id || sub.student_id}>
-                                                            {sub.name || sub.faculty_id || sub.student_id || sub.email || 'Item'}
+                                                        <span key={sIdx} className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-indigo-50 text-indigo-700 border border-indigo-100 truncate max-w-[80px]" title={sub.faculty_name || sub.name_of_post || sub.name || sub.faculty_id || sub.student_id}>
+                                                            {sub.faculty_name || sub.name_of_post || sub.name || sub.faculty_id || sub.student_id || sub.email || 'Item'}
                                                         </span>
                                                     ))}
                                                     {(item[f.key] || []).length > 2 && (
                                                         <span className="inline-flex items-center px-1.5 py-0.5 rounded text-xs font-medium bg-gray-100 text-gray-600 border border-gray-200 cursor-help"
-                                                            title={(item[f.key] || []).slice(2).map(sub => sub.name || sub.faculty_id || sub.student_id || sub.email).join(', ')}>
+                                                            title={(item[f.key] || []).slice(2).map(sub => sub.faculty_name || sub.name_of_post || sub.name || sub.faculty_id || sub.student_id || sub.email).join(', ')}>
                                                             +{(item[f.key] || []).length - 2}
                                                         </span>
                                                     )}
@@ -715,7 +715,7 @@ export default function DynamicTableSection({
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         {fields.map(f => {
                             const isVisible = typeof f.showIf === 'function' ? f.showIf(tempItem) : true;
-                            if (!isVisible) return null;
+                            if (!isVisible || f.hidden) return null;
                             return (
                             <div key={f.key} className={f.fullWidth ? "md:col-span-2" : ""}>
                                 <label className="block text-sm font-medium text-gray-700 mb-1">
