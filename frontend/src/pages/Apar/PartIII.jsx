@@ -471,20 +471,20 @@ export default function PartIII({ formData, academicYear, addItem, removeItem, u
                     { label: 'Remarks', key: 'remarks', placeholder: 'Remarks' },
                     { label: 'Document proof upload', key: 'link', type: 'file', required: true },
                     {
-                        label: 'Faculty Involved', key: 'faculty_involved', type: 'objectList', subFields: [
+                        label: 'Faculty Involved', key: 'faculty_associations', type: 'objectList', subFields: [
                             { label: 'Author Type', key: 'author_type', type: 'select', options: ['Internal Author', 'External Author'], required: true, placeholder: 'Select type' },
                             { label: 'Faculty Name', key: 'name', required: true, placeholder: 'Enter name' },
                             { label: 'Employee Code', key: 'emp_code', showIf: (item) => item.author_type === 'Internal Author', requiredIf: (item) => item.author_type === 'Internal Author', placeholder: 'Enter employee code' }
                         ]
                     },
                     {
-                        label: 'Students Involved', key: 'students_involved', type: 'objectList', subFields: [
+                        label: 'Students Involved', key: 'student_associations', type: 'objectList', subFields: [
                             { label: 'Student Name', key: 'name', required: true, placeholder: 'Enter student name' }, { label: 'Student Roll No', key: 'roll_no', required: true, placeholder: 'Enter roll no' },
                             { label: 'Role', key: 'role', required: true }
                         ]
                     },
                     {
-                        label: 'External Collaborators', key: 'external_collaborators', type: 'objectList', subFields: [
+                        label: 'External Collaborators', key: 'external_contributors', type: 'objectList', subFields: [
                             { label: 'Name', key: 'name', required: true }, { label: 'Role', key: 'role', required: true }, { label: 'Affiliation', key: 'affiliation' }
                         ]
                     }
@@ -627,7 +627,6 @@ export default function PartIII({ formData, academicYear, addItem, removeItem, u
                     { label: 'Funding Agency', key: 'funding_agency', placeholder: 'Agency' },
                     { label: 'Start Date', key: 'start_date', type: 'date', required: true }, 
                     { label: 'End Date', key: 'end_date', type: 'date', required: true },
-                    { label: 'Outcome', key: 'outcome', placeholder: 'Outcome' },
                     { label: 'Remarks', key: 'remarks', placeholder: 'Remarks' },
                     { label: 'Document proof upload', key: 'certificate_link', type: 'file', required: true },
                     {
