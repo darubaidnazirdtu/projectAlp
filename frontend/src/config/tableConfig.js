@@ -116,7 +116,7 @@ const rawResources = [
       signature: 'formDataWithHeaders',
     },
     columns: [
-      // { header: 'Scheme ID', accessor: 'scheme_id' },
+      // { header: 'Scheme ID', accessor: 'scheme_id', required: true },
       { header: 'Department ID', accessor: 'department_id', required: true, type: 'entitySelect', entityType: 'department' },
       { header: 'Scheme Name', accessor: 'name_of_scheme', required: true, placeholder: 'Enter scheme name' },
       {
@@ -132,7 +132,7 @@ const rawResources = [
       { header: 'Start Date', accessor: 'start_date', type: 'date', required: true },
       { header: 'End Date', accessor: 'end_date', type: 'date', required: true },
       { header: 'Enrolled', accessor: 'no_of_students_enrolled', type: 'number', required: true, placeholder: 'Number of students' },
-      { header: 'Agencies', accessor: 'name_of_agencies_involved', placeholder: 'Enter agency names' },
+      { header: 'Agencies', accessor: 'name_of_agencies_involved', placeholder: 'Enter agency names', required: true },
       {
         header: 'Mode',
         accessor: 'mode',
@@ -149,7 +149,7 @@ const rawResources = [
         accessor: 'faculty_ids',
         type: 'objectList',
         subFields: [
-          { header: 'Faculty ID', accessor: 'faculty_id', type: 'entitySelect', entityType: 'faculty' },
+          { header: 'Faculty ID', accessor: 'faculty_id', type: 'entitySelect', entityType: 'faculty', required: true },
           {
             header: 'Role',
             accessor: 'role',
@@ -161,10 +161,11 @@ const rawResources = [
       },
       {
         header: 'Students',
-        accessor: 'student_ids',
+        accessor: 'students',
         type: 'objectList',
         subFields: [
-          { header: 'Student ID', accessor: 'student_id', type: 'entitySelect', entityType: 'student' },
+          { header: 'Student Name', accessor: 'name', required: true, placeholder: 'Enter student name' },
+          { header: 'Student Roll No', accessor: 'roll_no', required: true, placeholder: 'Enter roll no' },
           {
             header: 'Role',
             accessor: 'role',
@@ -172,19 +173,18 @@ const rawResources = [
             options: ['Participant', 'Intern', 'Beneficiary']
           }
         ],
-        transform: (students) => Array.isArray(students) ? students.map(s => `${s.student_id} (${s.role})`) : [],
+        transform: (students) => Array.isArray(students) ? students.map(s => s.name).join(', ') : "",
       },
       {
         header: 'External Contributors',
         accessor: 'external_contributors',
         type: 'objectList',
         subFields: [
-          { header: 'Name', accessor: 'name', required: true, placeholder: 'Enter external contributor name' },
-          { header: 'Email', accessor: 'email', placeholder: 'Enter email address' },
-          { header: 'Affiliation', accessor: 'affiliation', placeholder: 'Enter affiliation' },
-          { header: 'Role', accessor: 'role', type: 'select', options: ['Participant', 'Collaborator', 'Trainer', 'Other'] }
+          { header: 'Name', accessor: 'name', required: true },
+          { header: 'Role', accessor: 'role', type: 'select', options: ['Participant', 'Collaborator', 'Trainer', 'Other'], required: true },
+          { header: 'Affiliation', accessor: 'affiliation' }
         ],
-        transform: (externals) => Array.isArray(externals) ? externals.map(e => `${e.name} (${e.role || 'External'})`) : [],
+        transform: (externals) => Array.isArray(externals) ? externals.map(e => e.name).join(', ') : "",
       },
     ],
   },
@@ -264,7 +264,7 @@ const rawResources = [
       signature: 'formDataWithHeaders',
     },
     columns: [
-      // { header: 'Collaboration ID', accessor: 'collaboration_id' },
+      // { header: 'Collaboration ID', accessor: 'collaboration_id', required: true },
       { header: 'Department ID', accessor: 'department_id', required: true, type: 'entitySelect', entityType: 'department' },
       {
         header: 'Activity Type',
@@ -284,10 +284,10 @@ const rawResources = [
         placeholder: 'Select level'
       },
       { header: 'Start Date', accessor: 'start_date', type: 'date', required: true },
-      { header: 'End Date', accessor: 'end_date', type: 'date', placeholder: 'Select end date' },
-      { header: 'Participants', accessor: 'number_of_participants', type: 'number', placeholder: 'Number of participants' },
-      { header: 'Funding Agency', accessor: 'funding_agency', placeholder: 'Enter funding agency' },
-      { header: 'Funding Amount', accessor: 'funding_amount', type: 'number', placeholder: 'Amount in INR' },
+      { header: 'End Date', accessor: 'end_date', type: 'date', placeholder: 'Select end date', required: true },
+      { header: 'Participants', accessor: 'number_of_participants', type: 'number', placeholder: 'Number of participants', required: true },
+      { header: 'Funding Agency', accessor: 'funding_agency', placeholder: 'Enter funding agency', required: true },
+      { header: 'Funding Amount', accessor: 'funding_amount', type: 'number', placeholder: 'Amount in INR', required: true },
       ACADEMIC_YEAR_FIELD,
       { header: 'Year', accessor: 'year', type: 'number', required: true, placeholder: 'e.g., 2024' },
       { header: 'Nature of Collaboration', accessor: 'nature_of_collaboration', required: true, placeholder: 'Describe collaboration nature' },
@@ -299,7 +299,7 @@ const rawResources = [
         accessor: 'faculty_associations',
         type: 'objectList',
         subFields: [
-          { header: 'Faculty ID', accessor: 'faculty_id', type: 'entitySelect', entityType: 'faculty' },
+          { header: 'Faculty ID', accessor: 'faculty_id', type: 'entitySelect', entityType: 'faculty', required: true },
           { header: 'Role', accessor: 'role', type: 'select', options: ['Lead', 'Co-Researcher', 'Visiting Faculty'] }
         ],
         transform: (members) => Array.isArray(members) ? members.map(f => `${f.faculty_id} (${f.role})`) : [],
@@ -415,18 +415,18 @@ const rawResources = [
     },
     keyAccessor: 'course_id',
     columns: [
-      // { header: 'Course ID', accessor: 'course_id' },
+      // { header: 'Course ID', accessor: 'course_id', required: true },
       { header: 'Course Name', accessor: 'course_name', required: true, placeholder: 'Enter course name' },
       { header: 'Course Code', accessor: 'course_code', required: true, placeholder: 'e.g., CS101' },
-      { header: 'Programme ID', accessor: 'programme_id', placeholder: 'Enter programme ID' },
+      { header: 'Programme ID', accessor: 'programme_id', placeholder: 'Enter programme ID', required: true },
       { header: 'Department ID', accessor: 'department_id', required: true, type: 'entitySelect', entityType: 'department' },
       { header: 'Credits', accessor: 'credits', type: 'number', required: true, placeholder: 'e.g., 4' },
       { header: 'Semester', accessor: 'semester_offered', type: 'number', required: true, placeholder: 'e.g., 3' },
       { header: 'Type', accessor: 'type', required: true, placeholder: 'e.g., Core/Elective' },
       { header: 'Year of Introduction', accessor: 'year_of_introduction', type: 'number', required: true, placeholder: 'e.g., 2020' },
-      { header: 'Employability Focus', accessor: 'focus_on_employability', type: 'boolean' },
-      { header: 'Entrepreneurship Focus', accessor: 'focus_on_entrepreneurship', type: 'boolean' },
-      { header: 'Skill Dev Focus', accessor: 'focus_on_skill_development', type: 'boolean' },
+      { header: 'Employability Focus', accessor: 'focus_on_employability', type: 'boolean', required: true },
+      { header: 'Entrepreneurship Focus', accessor: 'focus_on_entrepreneurship', type: 'boolean', required: true },
+      { header: 'Skill Dev Focus', accessor: 'focus_on_skill_development', type: 'boolean', required: true },
     ],
   },
   {
@@ -453,15 +453,15 @@ const rawResources = [
       { header: 'Head', accessor: 'head_of_department', required: true, placeholder: 'Enter HOD name' },
       { header: 'Email', accessor: 'contact_email', required: true, placeholder: 'e.g., dept@example.com' },
       { header: 'Phone', accessor: 'contact_phone', required: true, placeholder: 'e.g., 9876543210' },
-      { header: 'Location', accessor: 'location', placeholder: 'Enter location' },
+      { header: 'Location', accessor: 'location', placeholder: 'Enter location', required: true },
       {
         header: 'Recognitions',
         accessor: 'recognitions',
         type: 'objectList',
         subFields: [
-          { header: 'Agency Name', accessor: 'name_of_agency', placeholder: 'Enter agency name' },
-          { header: 'Year', accessor: 'year_of_award', type: 'number', placeholder: 'e.g., 2024' },
-          { header: 'Type', accessor: 'type', placeholder: 'Enter type' },
+          { header: 'Agency Name', accessor: 'name_of_agency', placeholder: 'Enter agency name', required: true },
+          { header: 'Year', accessor: 'year_of_award', type: 'number', placeholder: 'e.g., 2024', required: true },
+          { header: 'Type', accessor: 'type', placeholder: 'Enter type', required: true },
           { header: 'Link', accessor: 'link', placeholder: 'Enter link' }
         ],
         transform: (items) => Array.isArray(items) ? items.map(i => i.name_of_agency) : [],
@@ -494,24 +494,23 @@ const rawResources = [
     },
     keyAccessor: 'book_id',
     columns: [
-      // { header: 'Book ID', accessor: 'book_id' },
+      // { header: 'Book ID', accessor: 'book_id', required: true },
       { header: 'Department ID', accessor: 'department_id', required: true, type: 'entitySelect', entityType: 'department' },
       { header: 'Title', accessor: 'title_of_book', required: true, placeholder: 'Enter book title' },
       { header: 'Author', accessor: 'author', required: true, placeholder: 'Enter author name' },
       { header: 'Publisher', accessor: 'publisher', required: true, placeholder: 'Enter publisher name' },
       { header: 'Year of Publication', accessor: 'year_of_publication', type: 'number', required: true, placeholder: 'e.g., 2024' },
       ACADEMIC_YEAR_FIELD,
-      { header: 'ISBN', accessor: 'isbn_number', placeholder: 'e.g., 978-3-16-148410-0' },
-      { header: 'Edition', accessor: 'edition', placeholder: 'e.g., 2nd Edition' },
+      { header: 'ISBN', accessor: 'isbn_number', placeholder: 'e.g., 978-3-16-148410-0', required: true },
+      { header: 'Edition', accessor: 'edition', placeholder: 'e.g., 2nd Edition', required: true },
       {
         header: 'Type of Book',
         accessor: 'type_of_book',
         type: 'select',
         options: ['Textbook', 'Reference', 'eBook', 'Journal', 'Other'],
-        placeholder: 'Select book type'
-      },
+        placeholder: 'Select book type', required: true },
       { header: 'Copies', accessor: 'no_of_copies', type: 'number', required: true, placeholder: 'Number of copies' },
-      { header: 'Students Using', accessor: 'no_of_students_using', type: 'number', placeholder: 'Number of students' },
+      { header: 'Students Using', accessor: 'no_of_students_using', type: 'number', placeholder: 'Number of students', required: true },
       { header: 'Remarks', accessor: 'remarks', placeholder: 'Additional remarks' },
       { header: 'PDF', accessor: 'link', type: 'hyperlink', fileKey: 'doc' , description: 'Upload relevant supporting document (Max 5MB PDF)' },
     ],
@@ -537,7 +536,7 @@ const rawResources = [
     },
     keyAccessor: 'scheme_id',
     columns: [
-      // { header: 'Scheme ID', accessor: 'scheme_id' },
+      // { header: 'Scheme ID', accessor: 'scheme_id', required: true },
       { header: 'Department ID', accessor: 'department_id', required: true, type: 'entitySelect', entityType: 'department' },
       { header: 'Scheme Name', accessor: 'name_of_scheme', required: true, placeholder: 'Enter scheme name' },
       {
@@ -549,13 +548,13 @@ const rawResources = [
         placeholder: 'Select scheme type'
       },
       { header: 'Organisation', accessor: 'name_of_organisation', required: true, placeholder: 'Enter organisation name' },
-      { header: 'Funding Agency', accessor: 'funding_agency', placeholder: 'Enter funding agency' },
-      { header: 'Sanction Number', accessor: 'sanction_number', placeholder: 'Enter sanction number' },
+      { header: 'Funding Agency', accessor: 'funding_agency', placeholder: 'Enter funding agency', required: true },
+      { header: 'Sanction Number', accessor: 'sanction_number', placeholder: 'Enter sanction number', required: true },
       { header: 'Principal Investigator', accessor: 'principal_investigator', required: true, placeholder: 'Enter PI name' },
-      { header: 'Co-Investigators', accessor: 'co_investigators', placeholder: 'Enter co-investigator names' },
+      { header: 'Co-Investigators', accessor: 'co_investigators', placeholder: 'Enter co-investigator names', required: true },
       { header: 'Sanction Year', accessor: 'year_of_sanction', type: 'number', required: true, placeholder: 'e.g., 2024' },
       ACADEMIC_YEAR_FIELD,
-      { header: 'Funds Amount', accessor: 'funds_amount', type: 'number', placeholder: 'Amount in INR' },
+      { header: 'Funds Amount', accessor: 'funds_amount', type: 'number', placeholder: 'Amount in INR', required: true },
       { header: 'Start Date', accessor: 'duration_start_date', type: 'date', required: true },
       { header: 'End Date', accessor: 'end_date', type: 'date', required: true },
       {
@@ -624,7 +623,7 @@ const rawResources = [
     },
     keyAccessor: 'activity_id',
     columns: [
-      // { header: 'Activity ID', accessor: 'activity_id' },
+      // { header: 'Activity ID', accessor: 'activity_id', required: true },
       { header: 'Department ID', accessor: 'department_id', required: true, type: 'entitySelect', entityType: 'department' },
       { header: 'Title', accessor: 'title_of_activity', required: true, placeholder: 'Enter activity title' },
       {
@@ -640,9 +639,9 @@ const rawResources = [
       { header: 'Location', accessor: 'location', required: true, placeholder: 'Enter location' },
       { header: 'Geo Tag Link', accessor: 'geo_tag_location_link', type: 'textarea', placeholder: 'Enter geo-tagged location link' },
       ACADEMIC_YEAR_FIELD,
-      { header: 'Participants', accessor: 'no_of_participants', type: 'number', placeholder: 'Number of participants' },
+      { header: 'Participants', accessor: 'no_of_participants', type: 'number', placeholder: 'Number of participants', required: true },
       { header: 'Target Beneficiaries', accessor: 'target_beneficiaries', required: true, placeholder: 'Describe target beneficiaries' },
-      { header: 'Sponsoring Agency', accessor: 'sponsoring_agency', placeholder: 'Enter sponsoring agency' },
+      { header: 'Sponsoring Agency', accessor: 'sponsoring_agency', placeholder: 'Enter sponsoring agency', required: true },
       { header: 'Outcome', accessor: 'outcome', placeholder: 'Describe outcome' },
       { header: 'Remarks', accessor: 'remarks', placeholder: 'Additional remarks' },
       { header: 'PDF', accessor: 'link', type: 'hyperlink', fileKey: 'doc' , description: 'Upload relevant supporting document (Max 5MB PDF)' },
@@ -651,7 +650,7 @@ const rawResources = [
         accessor: 'faculty_associations',
         type: 'objectList',
         subFields: [
-          { header: 'Faculty ID', accessor: 'faculty_id', type: 'entitySelect', entityType: 'faculty' },
+          { header: 'Faculty ID', accessor: 'faculty_id', type: 'entitySelect', entityType: 'faculty', required: true },
           { header: 'Role', accessor: 'role', type: 'select', options: ['Coordinator', 'Lead', 'Support'] }
         ],
         transform: (members) => Array.isArray(members) ? members.map(f => `${f.faculty_id} (${f.role})`) : [],
@@ -701,15 +700,15 @@ const rawResources = [
     columns: [
       { header: 'Faculty ID', accessor: 'faculty_id', required: true, placeholder: 'Enter new faculty ID' },
       { header: 'Name', accessor: 'basic_info.full_name', required: true, placeholder: 'Enter full name' },
-      { header: 'Gender', accessor: 'basic_info.gender', placeholder: 'Enter gender' },
-      { header: 'DOB', accessor: 'basic_info.date_of_birth', type: 'date' },
+      { header: 'Gender', accessor: 'basic_info.gender', placeholder: 'Enter gender', required: true },
+      { header: 'DOB', accessor: 'basic_info.date_of_birth', type: 'date', required: true },
       { header: 'Designation', accessor: 'professional_info.designation', required: true, placeholder: 'Enter designation' },
       { header: 'Email', accessor: 'contact_info.email_address', required: true, placeholder: 'e.g., name@example.com' },
-      { header: 'Phone', accessor: 'contact_info.mobile_number', placeholder: 'e.g., 9876543210' },
+      { header: 'Phone', accessor: 'contact_info.mobile_number', placeholder: 'e.g., 9876543210', required: true },
       { header: 'Department', accessor: 'professional_info.department', required: true, type: 'entitySelect', entityType: 'department' },
-      { header: 'Specialization', accessor: 'professional_info.specialization', placeholder: 'Enter specialization' },
-      { header: 'Date of Joining', accessor: 'professional_info.date_of_joining', type: 'date' },
-      { header: 'Employment Type', accessor: 'professional_info.employment_type', placeholder: 'e.g., Regular/Contract' },
+      { header: 'Specialization', accessor: 'professional_info.specialization', placeholder: 'Enter specialization', required: true },
+      { header: 'Date of Joining', accessor: 'professional_info.date_of_joining', type: 'date', required: true },
+      { header: 'Employment Type', accessor: 'professional_info.employment_type', placeholder: 'e.g., Regular/Contract', required: true },
     ],
   },
   {
@@ -828,7 +827,7 @@ const rawResources = [
     },
     keyAccessor: 'support_id',
     columns: [
-      // { header: 'Support ID', accessor: 'support_id' },
+      // { header: 'Support ID', accessor: 'support_id', required: true },
       { header: 'Department ID', accessor: 'department_id', required: true, type: 'entitySelect', entityType: 'department' },
       { header: 'Event Title', accessor: 'title_of_event', required: true, placeholder: 'Enter event title' },
       {
@@ -862,7 +861,7 @@ const rawResources = [
         accessor: 'faculty_participants',
         type: 'objectList',
         subFields: [
-          { header: 'Faculty ID', accessor: 'faculty_id', type: 'entitySelect', entityType: 'faculty' },
+          { header: 'Faculty ID', accessor: 'faculty_id', type: 'entitySelect', entityType: 'faculty', required: true },
           { header: 'Role', accessor: 'role', type: 'select', options: ['Recipient', 'Coordinator', 'Lead', 'Other'] }
         ],
         transform: (members) => Array.isArray(members) ? members.map(f => `${f.faculty_id} (${f.role})`).join(', ') : "",
@@ -952,22 +951,22 @@ const rawResources = [
     },
     keyAccessor: 'stock_id',
     columns: [
-      // { header: 'Stock ID', accessor: 'stock_id' },
+      // { header: 'Stock ID', accessor: 'stock_id', required: true },
       { header: 'Department ID', accessor: 'department_id', required: true, type: 'entitySelect', entityType: 'department' },
       { header: 'Lab Name', accessor: 'lab_name', required: true, placeholder: 'Enter lab name' },
       { header: 'Faculty ID', accessor: 'faculty_id', required: true, type: 'entitySelect', entityType: 'faculty' },
-      { header: 'No. of Desktops', accessor: 'no_of_desktops', type: 'number', placeholder: 'Number of desktops' },
-      { header: 'No. of Servers', accessor: 'no_of_servers', type: 'number', placeholder: 'Number of servers' },
-      { header: 'No. of Workstations', accessor: 'no_of_workstations', type: 'number', placeholder: 'Number of workstations' },
-      { header: 'No. of HPCs', accessor: 'no_of_hpcs', type: 'number', placeholder: 'Number of HPCs' },
-      { header: 'Storage (TB)', accessor: 'total_storage_tb', type: 'number', placeholder: 'Storage in TB' },
-      { header: 'Bandwidth (Mbps)', accessor: 'internet_bandwidth_mbps', type: 'number', placeholder: 'Bandwidth in Mbps' },
-      { header: 'Software List', accessor: 'software_list', placeholder: 'List software installed' },
-      { header: 'Total Cost', accessor: 'total_cost', type: 'number', placeholder: 'Total cost in INR' },
-      { header: 'Funding Source', accessor: 'funding_source', placeholder: 'Enter funding source' },
+      { header: 'No. of Desktops', accessor: 'no_of_desktops', type: 'number', placeholder: 'Number of desktops', required: true },
+      { header: 'No. of Servers', accessor: 'no_of_servers', type: 'number', placeholder: 'Number of servers', required: true },
+      { header: 'No. of Workstations', accessor: 'no_of_workstations', type: 'number', placeholder: 'Number of workstations', required: true },
+      { header: 'No. of HPCs', accessor: 'no_of_hpcs', type: 'number', placeholder: 'Number of HPCs', required: true },
+      { header: 'Storage (TB)', accessor: 'total_storage_tb', type: 'number', placeholder: 'Storage in TB', required: true },
+      { header: 'Bandwidth (Mbps)', accessor: 'internet_bandwidth_mbps', type: 'number', placeholder: 'Bandwidth in Mbps', required: true },
+      { header: 'Software List', accessor: 'software_list', placeholder: 'List software installed', required: true },
+      { header: 'Total Cost', accessor: 'total_cost', type: 'number', placeholder: 'Total cost in INR', required: true },
+      { header: 'Funding Source', accessor: 'funding_source', placeholder: 'Enter funding source', required: true },
       { header: 'Year of Installation', accessor: 'year_of_installation', type: 'number', required: true, placeholder: 'e.g., 2024' },
       ACADEMIC_YEAR_FIELD,
-      { header: 'Year of Purchase', accessor: 'year_of_purchase', type: 'number', placeholder: 'e.g., 2023' },
+      { header: 'Year of Purchase', accessor: 'year_of_purchase', type: 'number', placeholder: 'e.g., 2023', required: true },
       {
         header: 'Condition',
         accessor: 'condition_status',
@@ -1064,7 +1063,7 @@ const rawResources = [
     },
     keyAccessor: 'mentor_record_id',
     columns: [
-      // { header: 'Record ID', accessor: 'mentor_record_id' },
+      // { header: 'Record ID', accessor: 'mentor_record_id', required: true },
       { header: 'Faculty ID', accessor: 'faculty_id', required: true, type: 'entitySelect', entityType: 'faculty' },
       { header: 'Department ID', accessor: 'department_id', required: true, type: 'entitySelect', entityType: 'department' },
       {
@@ -1077,7 +1076,7 @@ const rawResources = [
       },
       ACADEMIC_YEAR_FIELD,
       { header: 'Semester', accessor: 'semester', required: true, placeholder: 'e.g., Odd/Even' },
-      { header: 'Mentor-Mentee Ratio', accessor: 'mentor_mentee_ratio', placeholder: 'e.g., 1:20' },
+      { header: 'Mentor-Mentee Ratio', accessor: 'mentor_mentee_ratio', placeholder: 'e.g., 1:20', required: true },
       { header: 'Participants', accessor: 'number_of_participants', type: 'number', required: true, placeholder: 'Number of participants' },
       {
         header: 'Target Group',
@@ -1096,12 +1095,12 @@ const rawResources = [
         placeholder: 'Select mode'
       },
       { header: 'Date', accessor: 'date_of_activity', type: 'date', required: true },
-      { header: 'Duration (Hrs)', accessor: 'duration_hours', type: 'number', placeholder: 'Duration in hours' },
+      { header: 'Duration (Hrs)', accessor: 'duration_hours', type: 'number', placeholder: 'Duration in hours', required: true },
       { header: 'Organizer', accessor: 'organizer_name', required: true, placeholder: 'Enter organizer name' },
       { header: 'Mentor Name', accessor: 'mentor_name', required: true, placeholder: 'Enter mentor name' },
-      { header: 'Student Details', accessor: 'student_details', placeholder: 'Enter student details' },
+      { header: 'Student Details', accessor: 'student_details', placeholder: 'Enter student details', required: true },
       { header: 'Outcome', accessor: 'outcome', required: true, placeholder: 'Describe outcome' },
-      { header: 'Feedback Summary', accessor: 'feedback_summary', placeholder: 'Summarize feedback' },
+      { header: 'Feedback Summary', accessor: 'feedback_summary', placeholder: 'Summarize feedback', required: true },
       { header: 'Remarks', accessor: 'remarks', placeholder: 'Additional remarks' },
       { header: 'PDF', accessor: 'evidence_link', type: 'hyperlink', fileKey: 'doc' , description: 'Upload details of counseling, agenda, or attendance (Max 5MB PDF)' },
     ],
@@ -1232,13 +1231,13 @@ const rawResources = [
     },
     keyAccessor: 'affiliation_id',
     columns: [
-      // { header: 'Affiliation ID', accessor: 'affiliation_id' },
+      // { header: 'Affiliation ID', accessor: 'affiliation_id', required: true },
       { header: 'Faculty ID', accessor: 'faculty_id', required: true, type: 'entitySelect', entityType: 'faculty' },
       { header: 'Department ID', accessor: 'department_id', required: true, type: 'entitySelect', entityType: 'department' },
       { header: 'Professional Body', accessor: 'professional_body_name', required: true, placeholder: 'Enter professional body name' },
-      { header: 'Membership ID', accessor: 'membership_id', placeholder: 'Enter membership ID' },
+      { header: 'Membership ID', accessor: 'membership_id', placeholder: 'Enter membership ID', required: true },
       { header: 'Type', accessor: 'type_of_membership', required: true, placeholder: 'Enter membership type' },
-      { header: 'Position', accessor: 'position_held', placeholder: 'Enter position held' },
+      { header: 'Position', accessor: 'position_held', placeholder: 'Enter position held', required: true },
       {
         header: 'Level',
         accessor: 'level',
@@ -1247,9 +1246,9 @@ const rawResources = [
         required: true,
         placeholder: 'Select level'
       },
-      { header: 'Area of Support', accessor: 'area_of_support', placeholder: 'Enter area of support' },
+      { header: 'Area of Support', accessor: 'area_of_support', placeholder: 'Enter area of support', required: true },
       { header: 'Start Date', accessor: 'start_date', type: 'date', required: true },
-      { header: 'End Date', accessor: 'end_date', type: 'date' },
+      { header: 'End Date', accessor: 'end_date', type: 'date', required: true },
       {
         header: 'Status',
         accessor: 'status',
@@ -1284,7 +1283,7 @@ const rawResources = [
     },
     keyAccessor: 'training_id',
     columns: [
-      // { header: 'Training ID', accessor: 'training_id' },
+      // { header: 'Training ID', accessor: 'training_id', required: true },
       { header: 'Department ID', accessor: 'department_id', required: true, type: 'entitySelect', entityType: 'department' },
       { header: 'Title of Event', accessor: 'title_of_event', required: true, placeholder: 'Enter event title' },
       {
@@ -1303,12 +1302,12 @@ const rawResources = [
         required: true,
         placeholder: 'Select mode'
       },
-      { header: 'Year', accessor: 'year_of_training', type: 'number', placeholder: 'e.g., 2024' },
+      { header: 'Year', accessor: 'year_of_training', type: 'number', placeholder: 'e.g., 2024', required: true },
       ACADEMIC_YEAR_FIELD,
       { header: 'Start Date', accessor: 'start_date', type: 'date', required: true },
       { header: 'End Date', accessor: 'end_date', type: 'date', required: true },
       { header: 'Participants', accessor: 'number_of_participants', type: 'number', required: true, placeholder: 'Number of participants' },
-      { header: 'Sponsoring Agencies', accessor: 'sponsoring_agencies', placeholder: 'Enter sponsoring agencies' },
+      { header: 'Sponsoring Agencies', accessor: 'sponsoring_agencies', placeholder: 'Enter sponsoring agencies', required: true },
       { header: 'Outcome', accessor: 'outcome', placeholder: 'Describe outcome' },
       { header: 'Remarks', accessor: 'remarks', placeholder: 'Additional remarks' },
       { header: 'PDF', accessor: 'link', type: 'hyperlink', fileKey: 'doc' , description: 'Upload training certificate or attendance (Max 5MB PDF)' },
@@ -1317,7 +1316,7 @@ const rawResources = [
         accessor: 'faculty_participants',
         type: 'objectList',
         subFields: [
-          { header: 'Faculty ID', accessor: 'faculty_id', type: 'entitySelect', entityType: 'faculty' },
+          { header: 'Faculty ID', accessor: 'faculty_id', type: 'entitySelect', entityType: 'faculty', required: true },
           { header: 'Role', accessor: 'role', type: 'select', options: ['Coordinator', 'Trainer', 'Participant', 'Support'] }
         ],
         transform: (members) => Array.isArray(members) ? members.map(f => `${f.faculty_id} (${f.role})`).join(', ') : "",
@@ -1365,12 +1364,12 @@ const rawResources = [
     },
     keyAccessor: 'programme_id',
     columns: [
-      // { header: 'Programme ID', accessor: 'programme_id' },
+      // { header: 'Programme ID', accessor: 'programme_id', required: true },
       { header: 'Programme Name', accessor: 'programme_name', required: true, placeholder: 'Enter programme name' },
       { header: 'Department ID', accessor: 'department_id', required: true, type: 'entitySelect', entityType: 'department' },
       { header: 'Level', accessor: 'level', required: true, placeholder: 'e.g., UG/PG/PhD' },
       { header: 'Duration (Years)', accessor: 'duration_years', type: 'number', required: true, placeholder: 'e.g., 4' },
-      { header: 'Intake Capacity', accessor: 'intake_capacity', type: 'number', placeholder: 'e.g., 60' },
+      { header: 'Intake Capacity', accessor: 'intake_capacity', type: 'number', placeholder: 'e.g., 60', required: true },
     ],
   },
   {
@@ -1394,13 +1393,13 @@ const rawResources = [
     },
     keyAccessor: 'programme_id',
     columns: [
-      // { header: 'Programme ID', accessor: 'programme_id' },
+      // { header: 'Programme ID', accessor: 'programme_id', required: true },
       { header: 'Department ID', accessor: 'department_id', required: true, type: 'entitySelect', entityType: 'department' },
       { header: 'Programme Name', accessor: 'programme_name', required: true, placeholder: 'Enter programme name' },
       { header: 'Programme Code', accessor: 'programme_code', required: true, placeholder: 'Enter programme code' },
       { header: 'Component Name', accessor: 'component_name', required: true, placeholder: 'Enter component name' },
-      { header: 'Component Course Code', accessor: 'course_code_of_component', placeholder: 'Enter course code' },
-      { header: 'Students Undertaking', accessor: 'number_of_students_undertaking', type: 'number', placeholder: 'Number of students' },
+      { header: 'Component Course Code', accessor: 'course_code_of_component', placeholder: 'Enter course code', required: true },
+      { header: 'Students Undertaking', accessor: 'number_of_students_undertaking', type: 'number', placeholder: 'Number of students', required: true },
       { header: 'Has Field Research', accessor: 'has_field_research_component', type: 'boolean', required: true },
       ACADEMIC_YEAR_FIELD,
       { header: 'PDF', accessor: 'link', type: 'hyperlink', fileKey: 'doc' , description: 'Upload relevant supporting document (Max 5MB PDF)' },
@@ -1596,14 +1595,14 @@ const rawResources = [
     },
     keyAccessor: 'training_id',
     columns: [
-      // { header: 'Training ID', accessor: 'training_id' },
+      // { header: 'Training ID', accessor: 'training_id', required: true },
       { header: 'Department ID', accessor: 'department_id', required: true, type: 'entitySelect', entityType: 'department' },
       { header: 'Program', accessor: 'name_of_program', required: true, placeholder: 'Enter program name' },
       { header: 'Agency', accessor: 'agency_name', required: true, placeholder: 'Enter agency name' },
-      { header: 'Agency Contact Details', accessor: 'agency_contact_details', placeholder: 'Enter agency contact person / email / phone' },
-      { header: 'Number of Faculties', accessor: 'number_of_faculties', type: 'number', placeholder: 'Number of faculty participants' },
-      { header: 'Number of Students', accessor: 'number_of_students', type: 'number', placeholder: 'Number of student participants' },
-      { header: 'Number of External Trainees', accessor: 'number_of_external_trainees', type: 'number', placeholder: 'Number of external trainees' },
+      { header: 'Agency Contact Details', accessor: 'agency_contact_details', placeholder: 'Enter agency contact person / email / phone', required: true },
+      { header: 'Number of Faculties', accessor: 'number_of_faculties', type: 'number', placeholder: 'Number of faculty participants', required: true },
+      { header: 'Number of Students', accessor: 'number_of_students', type: 'number', placeholder: 'Number of student participants', required: true },
+      { header: 'Number of External Trainees', accessor: 'number_of_external_trainees', type: 'number', placeholder: 'Number of external trainees', required: true },
       {
         header: 'Agency Type',
         accessor: 'type_of_agency',
@@ -1633,7 +1632,7 @@ const rawResources = [
         accessor: 'faculty_involved',
         type: 'objectList',
         subFields: [
-          { header: 'Faculty ID', accessor: 'faculty_id', type: 'entitySelect', entityType: 'faculty' },
+          { header: 'Faculty ID', accessor: 'faculty_id', type: 'entitySelect', entityType: 'faculty', required: true },
           { header: 'Role', accessor: 'role', type: 'select', options: ['Coordinator', 'Trainer', 'Support Faculty'] }
         ],
         transform: (members) => Array.isArray(members) ? members.map(f => `${f.faculty_id} (${f.role})`).join(', ') : "",
@@ -1683,7 +1682,7 @@ const rawResources = [
     },
     keyAccessor: 'training_record_id',
     columns: [
-      // { header: 'ID', accessor: 'training_record_id' },
+      // { header: 'ID', accessor: 'training_record_id', required: true },
       { header: 'Department ID', accessor: 'department_id', required: true, type: 'entitySelect', entityType: 'department' },
       { header: 'Name of Official', accessor: 'name_of_official', required: true, placeholder: 'Enter official name' },
       { header: 'Program Name', accessor: 'program_name', required: true, placeholder: 'Enter program name' },
@@ -1707,7 +1706,7 @@ const rawResources = [
       { header: 'End Date', accessor: 'end_date', type: 'date', required: true },
       ACADEMIC_YEAR_FIELD,
       { header: 'Organising Agency', accessor: 'organising_agency', required: true, placeholder: 'Enter organising agency' },
-      { header: 'Funding Details', accessor: 'funding_details', placeholder: 'Describe funding details' },
+      { header: 'Funding Details', accessor: 'funding_details', placeholder: 'Describe funding details', required: true },
       { header: 'Outcome', accessor: 'outcome', required: true, placeholder: 'Describe outcome' },
       { header: 'Remarks', accessor: 'remarks', placeholder: 'Additional remarks' },
       { header: 'PDF', accessor: 'link', type: 'hyperlink', fileKey: 'doc' , description: 'Upload training schedule or attendance (Max 5MB PDF)' },
@@ -1716,7 +1715,7 @@ const rawResources = [
         accessor: 'participants',
         type: 'objectList',
         subFields: [
-          { header: 'Faculty ID', accessor: 'faculty_id', type: 'entitySelect', entityType: 'faculty' },
+          { header: 'Faculty ID', accessor: 'faculty_id', type: 'entitySelect', entityType: 'faculty', required: true },
           { header: 'Role', accessor: 'role', type: 'select', options: ['Coordinator', 'Trainer', 'Participant', 'Support'] }
         ],
         transform: (members) => Array.isArray(members) ? members.map(f => `${f.faculty_id} (${f.role})`).join(', ') : "",
@@ -1756,7 +1755,7 @@ const rawResources = [
     },
     keyAccessor: 'method_id',
     columns: [
-      // { header: 'Method ID', accessor: 'method_id' },
+      // { header: 'Method ID', accessor: 'method_id', required: true },
       { header: 'Course ID', accessor: 'course_id', required: true, placeholder: 'Enter course ID' },
       { header: 'Programme ID', accessor: 'programme_id', required: true, placeholder: 'Enter programme ID' },
       { header: 'Department ID', accessor: 'department_id', required: true, type: 'entitySelect', entityType: 'department' },
@@ -1780,10 +1779,10 @@ const rawResources = [
         placeholder: 'Select method type'
       },
       { header: 'Course Name', accessor: 'course_name', required: true, placeholder: 'Enter course name' },
-      { header: 'Course Code', accessor: 'course_code', placeholder: 'Enter course code' },
+      { header: 'Course Code', accessor: 'course_code', placeholder: 'Enter course code', required: true },
       { header: 'Programme Name', accessor: 'programme_name', required: true, placeholder: 'Enter programme name' },
       { header: 'Details', accessor: 'details_of_methods', required: true, placeholder: 'Describe method details' },
-      { header: 'Assessment Method', accessor: 'assessment_method', placeholder: 'Describe assessment method' },
+      { header: 'Assessment Method', accessor: 'assessment_method', placeholder: 'Describe assessment method', required: true },
       { header: 'Outcome', accessor: 'outcome', placeholder: 'Describe outcome' },
       { header: 'Remarks', accessor: 'remarks', placeholder: 'Additional remarks' },
       { header: 'PDF', accessor: 'evidence_link', type: 'hyperlink', fileKey: 'doc' , description: 'Upload method evidence or syllabus mapping (Max 5MB PDF)' },
@@ -1810,7 +1809,7 @@ const rawResources = [
     },
     keyAccessor: 'support_id',
     columns: [
-      // { header: 'Support ID', accessor: 'support_id' },
+      // { header: 'Support ID', accessor: 'support_id', required: true },
       { header: 'Department ID', accessor: 'department_id', required: true, type: 'entitySelect', entityType: 'department' },
       { header: 'Event Date', accessor: 'date_of_event', type: 'date', required: true },
       { header: 'Event Name', accessor: 'name_of_event', required: true, placeholder: 'Enter event name' },
@@ -1822,7 +1821,7 @@ const rawResources = [
         required: true,
         placeholder: 'Select support type'
       },
-      { header: 'Funding Agency', accessor: 'funding_agency', placeholder: 'Enter funding agency' },
+      { header: 'Funding Agency', accessor: 'funding_agency', placeholder: 'Enter funding agency', required: true },
       ACADEMIC_YEAR_FIELD,
       { header: 'Amount', accessor: 'amount_of_support', type: 'number', required: true, placeholder: 'Amount in INR' },
       { header: 'Outcome', accessor: 'outcome', placeholder: 'Describe outcome' },
@@ -1833,22 +1832,21 @@ const rawResources = [
         accessor: 'students',
         type: 'objectList',
         subFields: [
-          { header: 'Student ID', accessor: 'student_id', type: 'entitySelect', entityType: 'student' },
-          { header: 'Student Name', accessor: 'student_name', placeholder: 'Enter student name' },
-          { header: 'Amount', accessor: 'amount', type: 'number', placeholder: 'Amount in INR' },
-          { header: 'PAN No.', accessor: 'pan_no', placeholder: 'Enter PAN number' }
+          { header: 'Student Name', accessor: 'name', required: true, placeholder: 'Enter student name' },
+          { header: 'Student Roll No', accessor: 'roll_no', required: true, placeholder: 'Enter roll no' },
+          { header: 'Amount', accessor: 'amount', type: 'number', placeholder: 'Amount in INR', required: true },
+          { header: 'PAN No.', accessor: 'pan_no', placeholder: 'Enter PAN number', required: true }
         ],
-        transform: (students) => Array.isArray(students) ? students.map(s => `${s.student_id}`).join(', ') : "",
+        transform: (students) => Array.isArray(students) ? students.map(s => s.name).join(', ') : "",
       },
       {
         header: 'External Recipients',
         accessor: 'external_recipients',
         type: 'objectList',
         subFields: [
-          { header: 'Name', accessor: 'name', required: true, placeholder: 'Enter external recipient name' },
-          { header: 'Email', accessor: 'email', placeholder: 'Enter email address' },
-          { header: 'Amount', accessor: 'amount', type: 'number', placeholder: 'Amount in INR' },
-          { header: 'PAN No.', accessor: 'pan_no', placeholder: 'Enter PAN number' }
+          { header: 'Name', accessor: 'name', required: true },
+          { header: 'Amount', accessor: 'amount', type: 'number', placeholder: 'Amount in INR', required: true },
+          { header: 'PAN No.', accessor: 'pan_no', placeholder: 'Enter PAN number', required: true }
         ],
         transform: (externals) => Array.isArray(externals) ? externals.map(e => e.name).join(', ') : "",
       },
@@ -1875,7 +1873,7 @@ const rawResources = [
     },
     keyAccessor: 'performance_id',
     columns: [
-      // { header: 'Performance ID', accessor: 'performance_id' },
+      // { header: 'Performance ID', accessor: 'performance_id', required: true },
       { header: 'Department ID', accessor: 'department_id', required: true, type: 'entitySelect', entityType: 'department' },
       ACADEMIC_YEAR_FIELD,
       { header: 'Year', accessor: 'year', type: 'number', required: true, placeholder: 'e.g., 2024' },
@@ -1907,23 +1905,23 @@ const rawResources = [
         accessor: 'students',
         type: 'objectList',
         subFields: [
-          { header: 'Student ID', accessor: 'student_id', type: 'entitySelect', entityType: 'student' },
-          { header: 'Aadhar No.', accessor: 'student_aadhar', placeholder: 'Enter Aadhar number' },
-          { header: 'Role', accessor: 'role', type: 'select', options: ['Participant', 'Winner', 'Team Lead', 'Other'] }
+          { header: 'Student Name', accessor: 'name', required: true, placeholder: 'Enter student name' },
+          { header: 'Student Roll No', accessor: 'roll_no', required: true, placeholder: 'Enter roll no' },
+          { header: 'Aadhar No.', accessor: 'student_aadhar', placeholder: 'Enter Aadhar number', required: true },
+          { header: 'Role', accessor: 'role', type: 'select', options: ['Participant', 'Winner', 'Team Lead', 'Other'], required: true }
         ],
-        transform: (students) => Array.isArray(students) ? students.map(s => `${s.student_id} (${s.role})`).join(', ') : "",
+        transform: (students) => Array.isArray(students) ? students.map(s => s.name).join(', ') : "",
       },
       {
         header: 'External Participants',
         accessor: 'external_participants',
         type: 'objectList',
         subFields: [
-          { header: 'Name', accessor: 'name', required: true, placeholder: 'Enter external participant name' },
-          { header: 'Email', accessor: 'email', placeholder: 'Enter email address' },
-          { header: 'Affiliation', accessor: 'affiliation', placeholder: 'Enter institution/organization' },
-          { header: 'Role', accessor: 'role', type: 'select', options: ['Participant', 'Winner', 'Team Lead', 'Other'] }
+          { header: 'Name', accessor: 'name', required: true },
+          { header: 'Role', accessor: 'role', type: 'select', options: ['Participant', 'Winner', 'Team Lead', 'Other'], required: true },
+          { header: 'Affiliation', accessor: 'affiliation' }
         ],
-        transform: (externals) => Array.isArray(externals) ? externals.map(e => `${e.name} (${e.role || 'External'})`).join(', ') : "",
+        transform: (externals) => Array.isArray(externals) ? externals.map(e => e.name).join(', ') : "",
       },
     ],
   },
@@ -1949,15 +1947,15 @@ const rawResources = [
       { header: 'Student ID', accessor: 'student_id', required: true, placeholder: 'Enter Student ID', pattern: '^[a-zA-Z0-9]+$', title: 'Only letters and numbers allowed' },
       { header: 'Enrollment No.', accessor: 'enrollment_no', required: true, placeholder: 'Enter enrollment number', pattern: '^[a-zA-Z0-9]+$', title: 'Only letters and numbers allowed' },
       { header: 'Name', accessor: 'name', required: true, placeholder: 'Enter full name' },
-      { header: 'Gender', accessor: 'gender', type: 'select', options: ['Male', 'Female', 'Other'], placeholder: 'Select gender' },
+      { header: 'Gender', accessor: 'gender', type: 'select', options: ['Male', 'Female', 'Other'], placeholder: 'Select gender', required: true },
       { header: 'Level', accessor: 'level', type: 'select', options: ['UG', 'PG', 'PHD', 'POST DOC', 'others'], placeholder: 'Select level', required: true },
-      { header: 'DOB', accessor: 'date_of_birth', type: 'date' },
+      { header: 'DOB', accessor: 'date_of_birth', type: 'date', required: true },
       { header: 'Email', accessor: 'email', required: true, placeholder: 'e.g., student@example.com' },
-      { header: 'Phone', accessor: 'phone', placeholder: 'e.g., 9876543210' },
+      { header: 'Phone', accessor: 'phone', placeholder: 'e.g., 9876543210', required: true },
       { header: 'Department ID', accessor: 'department_id', required: true, type: 'entitySelect', entityType: 'department' },
       { header: 'Programme', accessor: 'programme_id', required: true, placeholder: 'Enter programme ID' },
       { header: 'Year of Admission', accessor: 'year_of_admission', type: 'number', required: true, placeholder: 'e.g., 2021' },
-      { header: 'Current Semester', accessor: 'current_semester', type: 'number', placeholder: 'e.g., 3' },
+      { header: 'Current Semester', accessor: 'current_semester', type: 'number', placeholder: 'e.g., 3', required: true },
     ],
   },
   {
@@ -1981,7 +1979,7 @@ const rawResources = [
     },
     keyAccessor: 'exam_record_id',
     columns: [
-      // { header: 'Exam Record ID', accessor: 'exam_record_id' },
+      // { header: 'Exam Record ID', accessor: 'exam_record_id', required: true },
       { header: 'Student ID', accessor: 'student_id', required: true, type: 'entitySelect', entityType: 'student' },
       { header: 'Department ID', accessor: 'department_id', required: true, type: 'entitySelect', entityType: 'department' },
       { header: 'Student Name', accessor: 'student_name', required: true, placeholder: 'Enter student name' },
@@ -2005,8 +2003,8 @@ const rawResources = [
       { header: 'Year Qualified', accessor: 'year_of_qualifying', type: 'number', required: true, placeholder: 'e.g., 2024' },
       ACADEMIC_YEAR_FIELD,
       { header: 'Rank/Score', accessor: 'rank_or_score', required: true, placeholder: 'Enter rank or score' },
-      { header: 'Attempt No.', accessor: 'attempt_number', type: 'number', placeholder: 'e.g., 1' },
-      { header: 'Programme Applied For', accessor: 'programme_applied_for', placeholder: 'Enter programme name' },
+      { header: 'Attempt No.', accessor: 'attempt_number', type: 'number', placeholder: 'e.g., 1', required: true },
+      { header: 'Programme Applied For', accessor: 'programme_applied_for', placeholder: 'Enter programme name', required: true },
       {
         header: 'Result Status',
         accessor: 'result_status',
@@ -2040,7 +2038,7 @@ const rawResources = [
     },
     keyAccessor: 'record_id',
     columns: [
-      // { header: 'Record ID', accessor: 'record_id' },
+      // { header: 'Record ID', accessor: 'record_id', required: true },
       { header: 'Student ID', accessor: 'student_id', required: true, type: 'entitySelect', entityType: 'student' },
       { header: 'Department ID', accessor: 'department_id', required: true, type: 'entitySelect', entityType: 'department' },
       { header: 'Student Name', accessor: 'student_name', required: true, placeholder: 'Enter student name' },
@@ -2063,7 +2061,7 @@ const rawResources = [
         placeholder: 'Select programme type'
       },
       { header: 'Details of Programme', accessor: 'details_of_programme', required: true, placeholder: 'Describe programme details' },
-      { header: 'Mentor Name', accessor: 'mentor_name', placeholder: 'Enter mentor name' },
+      { header: 'Mentor Name', accessor: 'mentor_name', placeholder: 'Enter mentor name', required: true },
       ACADEMIC_YEAR_FIELD,
       { header: 'Year Joined', accessor: 'year_of_joining', type: 'number', required: true, placeholder: 'e.g., 2024' },
       {
@@ -2099,7 +2097,7 @@ const rawResources = [
     },
     keyAccessor: 'ict_id',
     columns: [
-      // { header: 'ICT ID', accessor: 'ict_id' },
+      // { header: 'ICT ID', accessor: 'ict_id', required: true },
       { header: 'Faculty ID', accessor: 'faculty_id', required: true, type: 'entitySelect', entityType: 'faculty' },
       { header: 'Department ID', accessor: 'department_id', required: true, type: 'entitySelect', entityType: 'department' },
       { header: 'Course Name', accessor: 'course_name', required: true, placeholder: 'Enter course name' },
@@ -2114,9 +2112,9 @@ const rawResources = [
         placeholder: 'Select ICT mode'
       },
       { header: 'ICT Tools Used', accessor: 'ict_tools_used', required: true, placeholder: 'List ICT tools used' },
-      { header: 'E-Resources & Techniques', accessor: 'e_resources_and_techniques_used', placeholder: 'Describe e-resources' },
+      { header: 'E-Resources & Techniques', accessor: 'e_resources_and_techniques_used', placeholder: 'Describe e-resources', required: true },
       { header: 'ICT Enabled Classrooms', accessor: 'no_of_ict_enabled_classrooms', type: 'number', required: true, placeholder: 'Number of classrooms' },
-      { header: 'ICT Classroom Room Nos', accessor: 'ict_classroom_rooms', placeholder: 'List room numbers or identifiers (comma separated)' },
+      { header: 'ICT Classroom Room Nos', accessor: 'ict_classroom_rooms', placeholder: 'List room numbers or identifiers (comma separated)', required: true },
       { header: 'Impact', accessor: 'impact', required: true, placeholder: 'Describe impact' },
       { header: 'Remarks', accessor: 'remarks', placeholder: 'Additional remarks' },
       { header: 'PDF', accessor: 'evidence_link', type: 'hyperlink', fileKey: 'doc' , description: 'Upload ICT tool usage proof or screenshot (Max 5MB PDF)' },

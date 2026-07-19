@@ -75,13 +75,8 @@ const StudentActivitySchema = new mongoose.Schema({
     organizing_body: String,
     year: String,
     outcome: String,
-    students: [{ student_id: String, student_aadhar: String, role: String }],
-    external_participants: [{
-        name: String,
-        email: String,
-        role: String,
-        affiliation: String
-    }],
+    students: [{ name: String, roll_no: String, student_aadhar: String, role: String, amount: Number, pan_no: String }],
+    external_participants: [{ name: String, role: String, affiliation: String }],
 
     // -------------------------------------------------------------------------
     // Financial support-specific (type: 'financial_support')
@@ -94,12 +89,7 @@ const StudentActivitySchema = new mongoose.Schema({
     amount_of_support: Number,
     date_of_event: Date,
     students_supported: [{ student_id: String, student_name: String, amount: Number, pan_no: String }],
-    external_recipients: [{
-        name: String,
-        email: String,
-        amount: Number,
-        pan_no: String
-    }],
+    external_recipients: [{ name: String, amount: Number, pan_no: String }],
 
     metadata: {
         created_at: { type: Date, default: Date.now },

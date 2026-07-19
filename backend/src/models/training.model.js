@@ -94,13 +94,8 @@ const TrainingSchema = new mongoose.Schema({
     no_of_students_enrolled: Number,
     name_of_agencies_involved: String,
     faculty_ids: [{ faculty_id: String, role: String }],
-    student_ids: [{ student_id: String, role: String }],
-    external_contributors: [{
-        name: String,
-        email: String,
-        role: String,
-        affiliation: String
-    }],
+    students: [{ name: String, roll_no: String, role: String }],
+    external_contributors: [{ name: String, role: String, affiliation: String }],
 
     metadata: {
         created_at: { type: Date, default: Date.now },
