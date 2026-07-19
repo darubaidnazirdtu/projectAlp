@@ -63,13 +63,14 @@ const NavLink = ({ to, icon, label, isCollapsed, matchPaths = [], addPath, setMo
       <Link
         to={to}
         onClick={handleLinkClick}
-        className={`mx-2 flex items-center rounded-xl text-gray-600 transition-all duration-200 ${isActive ? 'bg-indigo-600 font-semibold text-white shadow-md shadow-indigo-200' : 'hover:bg-indigo-50 hover:text-indigo-700'
+        className={`mx-2 flex items-center rounded-xl text-gray-600 transition-all duration-300 relative overflow-hidden group ${isActive ? 'bg-gradient-to-r from-indigo-600 to-violet-600 font-bold text-white shadow-lg shadow-indigo-300/50 hover:shadow-indigo-400/50 hover:scale-[1.02]' : 'hover:bg-indigo-50/80 hover:text-indigo-700 hover:shadow-sm hover:-translate-y-[1px]'
           } ${isCollapsed ? 'justify-center h-12' : `justify-center md:justify-start md:px-4 md:pr-10 ${isHovered ? 'min-h-[3rem] py-2' : 'h-12'}`
           }`}
       >
-        <div className={`flex min-w-0 ${isHovered ? 'items-start' : 'items-center'}`}>
+        {isActive && <div className="absolute left-0 top-0 bottom-0 w-1 bg-white/30 rounded-r-full" />}
+        <div className={`flex min-w-0 z-10 relative ${isHovered ? 'items-start' : 'items-center'}`}>
           {React.cloneElement(icon, {
-            className: `w-6 h-6 shrink-0 ${isHovered ? 'mt-0.5' : ''} ${isCollapsed ? '' : 'md:mr-4'}`,
+            className: `w-6 h-6 shrink-0 transition-transform duration-300 group-hover:scale-110 ${isHovered ? 'mt-0.5' : ''} ${isCollapsed ? '' : 'md:mr-4'}`,
           })}
           {!isCollapsed && (
             <span className={`hidden md:inline text-md leading-snug ${isHovered ? '' : 'truncate'}`}>{label}</span>

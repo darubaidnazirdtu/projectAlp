@@ -221,61 +221,71 @@ export default function LandingPage() {
   return (
     <div className="portal-page-bg min-h-screen relative overflow-hidden flex flex-col items-center">
       <div
-        className="absolute inset-0 z-0 opacity-30"
+        className="absolute inset-0 z-0 opacity-40"
         style={{
           backgroundImage: "url('/1703710559423.jpeg')",
           backgroundSize: 'cover',
           backgroundPosition: 'center',
         }}
       />
-      <div className="absolute inset-0 z-0 bg-white/75 backdrop-blur-[2px]" />
+      <div className="absolute inset-0 z-0 bg-white/60 backdrop-blur-[8px]" />
+      
+      {/* Animated Orbs */}
+      <div className="absolute top-20 -left-20 w-72 h-72 bg-purple-300 rounded-full mix-blend-multiply filter blur-3xl opacity-30 animate-float" />
+      <div className="absolute top-40 -right-20 w-72 h-72 bg-indigo-300 rounded-full mix-blend-multiply filter blur-3xl opacity-30 animate-float-delayed" />
+      <div className="absolute -bottom-32 left-1/2 w-96 h-96 bg-cyan-300 rounded-full mix-blend-multiply filter blur-3xl opacity-30 animate-float" />
 
       {/* Adjusted wrapper padding for mobile (px-4) and desktop (px-6) */}
       <div className="relative z-10 w-full max-w-7xl px-4 sm:px-6 py-8 sm:py-10 md:py-14">
-        <header className="mb-10 sm:mb-14 flex flex-col items-center text-center">
+        <header className="mb-10 sm:mb-14 flex flex-col items-center text-center animate-fade-in-up">
           
-          <img
-            src="/dtu_logo.jpeg"
-            alt="DTU Logo"
-            className="mx-auto mb-6 sm:mb-8 h-32 sm:h-40 md:h-56 lg:h-64 w-auto object-contain drop-shadow-sm"
-          />
+          <div className="relative mb-6 sm:mb-8">
+             <div className="absolute inset-0 bg-white/50 blur-2xl rounded-full scale-150 z-0"></div>
+             <img
+               src="/dtu_logo.jpeg"
+               alt="DTU Logo"
+               className="relative z-10 h-32 sm:h-40 md:h-56 lg:h-64 w-auto object-contain drop-shadow-md"
+             />
+          </div>
           
           {/* Highly responsive typography for the main title to strictly keep it on one line */}
-          <p className="mx-auto whitespace-nowrap text-base sm:text-xl md:text-3xl lg:text-4xl xl:text-5xl font-semibold uppercase tracking-wider sm:tracking-widest md:tracking-[0.2em] text-indigo-800">
+          <p className="mx-auto whitespace-nowrap text-base sm:text-xl md:text-3xl lg:text-4xl xl:text-5xl font-semibold uppercase tracking-wider sm:tracking-widest md:tracking-[0.2em] bg-gradient-to-r from-indigo-800 to-violet-700 bg-clip-text text-transparent">
             Delhi Technological University
           </p>
           
-          <h1 className="mt-2 sm:mt-3 text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-extrabold tracking-tight text-gray-900">
+          <h1 className="mt-2 sm:mt-3 text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-extrabold tracking-tight text-gray-900 drop-shadow-sm">
             Internal Quality Assurance Cell
           </h1>
           
-          <p className="mx-auto mt-4 max-w-2xl text-base sm:text-lg text-gray-600 px-2">
+          <p className="mx-auto mt-4 max-w-2xl text-base sm:text-lg text-gray-600 px-2 font-medium">
             One gateway for IQAC data management, APAR performance reviews, and AI-powered feedback analysis.
           </p>
           
-          <div className="mt-6 inline-flex items-center gap-2 rounded-full border border-gray-200 bg-white/90 px-4 py-2 text-xs sm:text-sm text-gray-600 shadow-sm">
-            <FiShield className="h-4 w-4 text-indigo-500" />
+          <div className="mt-6 inline-flex items-center gap-2 rounded-full border border-indigo-100/50 bg-white/80 backdrop-blur-md px-5 py-2.5 text-xs sm:text-sm text-indigo-900 font-semibold shadow-md ring-1 ring-indigo-50 transition-all hover:scale-105 hover:bg-white">
+            <FiShield className="h-4 w-4 text-indigo-500 animate-pulse-soft" />
             Secure, role-based access for academic staff
           </div>
         </header>
 
         {/* Responsive grid handles 1 column on mobile, 2 on tablet, 3 on desktop */}
         <section className="grid gap-6 sm:gap-8 md:grid-cols-2 lg:grid-cols-3">
-          {PORTALS.map((portal) => {
+          {PORTALS.map((portal, index) => {
             const Icon = portal.icon;
             const ctaLabel =
               portal.id === 'iqac' && isAuthenticated ? portal.ctaAuthenticated : portal.cta;
+            const delayClass = `animate-fade-in-up-delay-${index + 1}`;
 
             return (
               <button
                 key={portal.id}
                 type="button"
                 onClick={() => portal.onClick(navigate, isAuthenticated)}
-                className={`portal-card group text-left ring-2 ${portal.ring} transition-all duration-300 hover:-translate-y-1`}
+                className={`portal-card group text-left relative overflow-hidden rounded-2xl border border-white/60 bg-white/50 backdrop-blur-xl shadow-xl transition-all duration-300 hover:-translate-y-2 hover:shadow-2xl hover:bg-white/70 ${delayClass}`}
               >
-                <div className={`h-1.5 w-full bg-gradient-to-r ${portal.accent}`} />
+                <div className="absolute inset-0 bg-gradient-to-br from-white/40 to-white/10 opacity-0 transition-opacity duration-300 group-hover:opacity-100 z-0" />
+                <div className={`absolute top-0 left-0 right-0 h-1.5 bg-gradient-to-r ${portal.accent}`} />
                 {/* Responsive padding inside the cards */}
-                <div className="p-6 sm:p-8 bg-white/80 backdrop-blur-sm h-full">
+                <div className="relative z-10 p-6 sm:p-8 h-full flex flex-col">
                   <span
                     className={`inline-flex items-center rounded-full px-3 py-1 text-[10px] sm:text-xs font-bold uppercase tracking-wide ring-1 ${portal.badgeClass}`}
                   >

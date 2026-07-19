@@ -961,11 +961,26 @@ export default function TablePage({ config }) {
                   {filteredItems.length === 0 && (
                     <tr>
                       <td colSpan={visibleColumns.length || 1} className="data-table-empty">
-                        <div className="flex flex-col items-center justify-center">
-                          <FiFilter className="w-8 h-8 text-gray-300 mb-2" />
-                          <p>No {title} found{Object.keys(filters).length > 0 ? ' matching your filters' : ''}.</p>
+                        <div className="flex flex-col items-center justify-center py-8">
+                          <div className="relative mb-4">
+                            <div className="absolute inset-0 bg-indigo-100 rounded-full blur-xl opacity-60 animate-pulse-soft"></div>
+                            <div className="relative bg-gradient-to-br from-indigo-50 to-white border border-indigo-100/50 p-4 rounded-2xl shadow-sm">
+                              <FiFilter className="w-8 h-8 text-indigo-400" />
+                            </div>
+                          </div>
+                          <h3 className="text-lg font-semibold text-gray-800 mb-1">No {title} found</h3>
+                          <p className="text-sm text-gray-500 max-w-sm mx-auto">
+                            {Object.keys(filters).length > 0 
+                              ? "We couldn't find any records matching your current filter criteria." 
+                              : "There are currently no records available for this section."}
+                          </p>
                           {Object.keys(filters).length > 0 && (
-                            <button onClick={handleClearFilters} className="mt-2 text-indigo-600 hover:text-indigo-800 text-sm font-medium">Clear filters</button>
+                            <button 
+                              onClick={handleClearFilters} 
+                              className="mt-4 px-4 py-2 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 text-sm font-semibold rounded-lg transition-colors"
+                            >
+                              Clear filters
+                            </button>
                           )}
                         </div>
                       </td>

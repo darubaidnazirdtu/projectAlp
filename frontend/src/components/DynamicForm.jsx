@@ -30,7 +30,7 @@ const InputField = ({ label, name, type = 'text', placeholder, value, onChange, 
                 min={min}
                 max={max}
                 disabled={disabled}
-                className={className || "w-full h-12 px-4 bg-gray-100 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"}
+                className={className || "w-full h-12 px-4 bg-gray-50/50 border border-gray-200/60 rounded-xl focus:outline-none transition-all duration-300 hover:border-indigo-300 focus:bg-white focus:outline-none focus:ring-4 focus:ring-indigo-500/20 shadow-sm hover:shadow-md"}
             />
         </div>
     );
@@ -63,7 +63,7 @@ const ListField = ({ label, name, values, onChange, disabled }) => {
                         value={item}
                         onChange={(e) => handleItemChange(index, e.target.value)}
                         disabled={disabled}
-                        className="w-full h-12 px-4 bg-gray-100 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                        className="w-full h-12 px-4 bg-gray-50/50 border border-gray-200/60 rounded-xl focus:outline-none transition-all duration-300 hover:border-indigo-300 focus:bg-white focus:outline-none focus:ring-4 focus:ring-indigo-500/20 shadow-sm hover:shadow-md"
                     />
                     {!disabled && (
                         <button type="button" onClick={() => handleRemoveItem(index)} className="ml-2 text-red-500">Remove</button>
@@ -149,7 +149,7 @@ const ObjectListField = ({ label, name, values = [], subFields = [], onChange, d
 
             <div className="space-y-4">
                 {values.map((item, index) => (
-                    <div key={index} className="flex flex-wrap gap-4 p-4 bg-gray-50 border border-gray-200 rounded-lg items-start relative pr-10 shadow-sm">
+                    <div key={index} className="flex flex-wrap gap-4 p-4 bg-white/60 border border-indigo-100/60 rounded-xl shadow-sm backdrop-blur-sm items-start relative pr-10 shadow-sm">
                         {/* Remove Button */}
                         {!disabled && (
                             <button
@@ -177,7 +177,7 @@ const ObjectListField = ({ label, name, values = [], subFields = [], onChange, d
                                             onChange={(e) => handleItemChange(index, field.accessor, e.target.value)}
                                             required={field.required}
                                             disabled={disabled}
-                                            className="w-full h-11 px-3 bg-white border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm"
+                                            className="w-full h-11 px-3 bg-white border border-gray-300 rounded-md focus:outline-none transition-all duration-300 hover:border-indigo-300 focus:bg-white focus:outline-none focus:ring-4 focus:ring-indigo-500/20 shadow-sm hover:shadow-md text-sm"
                                         >
                                             <option value="" disabled>{field.placeholder || 'Select...'}</option>
                                             {field.options?.map(option => (
@@ -217,7 +217,7 @@ const ObjectListField = ({ label, name, values = [], subFields = [], onChange, d
                                 <div key={field.accessor} className="flex-1 min-w-[200px]">
                                     <label className="block text-sm font-semibold mb-1 text-gray-700">{field.header}</label>
                                     <input
-                                        className="w-full h-11 px-3 bg-white border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm"
+                                        className="w-full h-11 px-3 bg-white border border-gray-300 rounded-md focus:outline-none transition-all duration-300 hover:border-indigo-300 focus:bg-white focus:outline-none focus:ring-4 focus:ring-indigo-500/20 shadow-sm hover:shadow-md text-sm"
                                         name={`${name}_${index}_${field.accessor}`}
                                         type={field.type || 'text'}
                                         placeholder={field.placeholder || ''}
@@ -267,7 +267,7 @@ export default function DynamicForm({ resource, formData, onChange, files = {}, 
                             {col.header}
                             {col.required && <span className="text-red-500 ml-1">*</span>}
                         </label>
-                        <div className={`flex items-center h-12 px-4 bg-gray-100 rounded-lg ${isDisabled ? 'opacity-50 pointer-events-none' : ''}`}>
+                        <div className={`flex items-center h-12 px-4 bg-gray-50/50 border border-gray-200/60 rounded-xl ${isDisabled ? 'opacity-50 pointer-events-none' : ''}`}>
                             <input
                                 type="checkbox"
                                 name={col.accessor}
@@ -290,7 +290,7 @@ export default function DynamicForm({ resource, formData, onChange, files = {}, 
                             {col.header}
                             {col.required && <span className="text-red-500 ml-1">*</span>}
                         </label>
-                        <select {...commonProps} value={formData[col.accessor] || ''} className="w-full h-12 px-4 bg-gray-100 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 disabled:opacity-50 disabled:bg-gray-200">
+                        <select {...commonProps} value={formData[col.accessor] || ''} className="w-full h-12 px-4 bg-gray-50/50 border border-gray-200/60 rounded-xl focus:outline-none transition-all duration-300 hover:border-indigo-300 focus:bg-white focus:outline-none focus:ring-4 focus:ring-indigo-500/20 shadow-sm hover:shadow-md disabled:opacity-50 disabled:bg-gray-200">
                             <option value="" disabled>{col.placeholder || 'Select...'}</option>
                             {col.options?.map(option => (
                                 <option key={option.value || option} value={option.value || option}>
@@ -311,7 +311,7 @@ export default function DynamicForm({ resource, formData, onChange, files = {}, 
                             {...commonProps}
                             value={formData[col.accessor] || ''}
                             rows={col.rows || 3}
-                            className="w-full px-4 py-2 bg-gray-100 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 disabled:opacity-50 disabled:bg-gray-200"
+                            className="w-full px-4 py-2 bg-gray-50/50 border border-gray-200/60 rounded-xl focus:outline-none transition-all duration-300 hover:border-indigo-300 focus:bg-white focus:outline-none focus:ring-4 focus:ring-indigo-500/20 shadow-sm hover:shadow-md disabled:opacity-50 disabled:bg-gray-200"
                         />
                     </div>
                 );
@@ -363,7 +363,7 @@ export default function DynamicForm({ resource, formData, onChange, files = {}, 
                         value={formData[col.accessor] || ''}
                         required={col.required}
                         {...commonProps}
-                        className={`w-full h-12 px-4 bg-gray-100 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 ${isDisabled ? 'opacity-50 bg-gray-200 cursor-not-allowed' : ''}`}
+                        className={`w-full h-12 px-4 bg-gray-50/50 border border-gray-200/60 rounded-xl focus:outline-none transition-all duration-300 hover:border-indigo-300 focus:bg-white focus:outline-none focus:ring-4 focus:ring-indigo-500/20 shadow-sm hover:shadow-md ${isDisabled ? 'opacity-50 bg-gray-200 cursor-not-allowed' : ''}`}
                     />
                 );
             case 'list':

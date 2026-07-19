@@ -232,7 +232,7 @@ export default function Header({ setMobileMenuOpen }) {
         <input
           type="text"
           placeholder="Search..."
-          className="w-full h-10 sm:h-12 pl-10 sm:pl-12 pr-8 sm:pr-10 bg-gray-100 rounded-full focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm"
+          className="w-full h-10 sm:h-12 pl-10 sm:pl-12 pr-8 sm:pr-10 bg-gray-50/50 border border-gray-200/60 rounded-full focus:bg-white shadow-sm hover:shadow-md transition-all duration-300 focus:outline-none focus:ring-4 focus:ring-indigo-500/20 text-sm"
           ref={inputRef}
           value={query}
           onChange={handleChange}
@@ -315,10 +315,10 @@ export default function Header({ setMobileMenuOpen }) {
           <button
             type="button"
             onClick={() => setProfileDropdownOpen(!profileDropdownOpen)}
-            className="flex items-center space-x-2 sm:space-x-3 p-1 rounded-lg hover:bg-gray-100 transition-colors"
+            className="flex items-center space-x-2 sm:space-x-3 p-1.5 rounded-xl hover:bg-indigo-50/50 transition-all duration-300 border border-transparent hover:border-indigo-100 hover:shadow-sm"
           >
-            <div className="w-8 h-8 sm:w-12 sm:h-12 rounded-full bg-gradient-to-br from-indigo-500 to-violet-500 flex items-center justify-center shadow-md">
-              <FiUser className="w-4 h-4 sm:w-6 sm:h-6 text-white" />
+            <div className="w-8 h-8 sm:w-11 sm:h-11 rounded-full bg-gradient-to-br from-indigo-500 to-violet-500 flex items-center justify-center shadow-md ring-2 ring-white">
+              <FiUser className="w-4 h-4 sm:w-5 sm:h-5 text-white" />
             </div>
             <div className="hidden sm:block text-left">
               <div className="font-semibold text-sm text-gray-900 truncate max-w-[120px]">{displayName}</div>

@@ -62,12 +62,17 @@ textarea {
 
 .iqac-shell {
     background:
-        linear-gradient(180deg, #eef2ff 0%, #f8fafc 120px);
+        radial-gradient(circle at top left, rgba(99, 102, 241, 0.1), transparent 40%),
+        radial-gradient(circle at bottom right, rgba(167, 139, 250, 0.1), transparent 40%),
+        linear-gradient(180deg, #f8fafc 0%, #f1f5f9 100%);
+    background-attachment: fixed;
 }
 
 .iqac-sidebar {
-    background: linear-gradient(180deg, #ffffff 0%, #f8fafc 100%);
-    border-right: 1px solid #e0e7ff;
+    background: rgba(255, 255, 255, 0.7);
+    backdrop-filter: blur(16px);
+    border-right: 1px solid rgba(255, 255, 255, 0.5);
+    box-shadow: 1px 0 20px rgba(0, 0, 0, 0.02);
 }
 
 .iqac-sidebar-brand {
@@ -78,10 +83,10 @@ textarea {
 }
 
 .iqac-header {
-    background: rgba(255, 255, 255, 0.92);
-    backdrop-filter: blur(12px);
-    border-bottom: 1px solid #e0e7ff;
-    box-shadow: 0 1px 3px rgba(79, 70, 229, 0.06);
+    background: rgba(255, 255, 255, 0.65) !important;
+    backdrop-filter: blur(20px) saturate(150%) !important;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.6) !important;
+    box-shadow: 0 4px 30px rgba(0, 0, 0, 0.03) !important;
 }
 
 .apar-page-bg {
@@ -284,7 +289,8 @@ textarea {
 
 /* Data tables */
 .data-table-wrapper {
-    @apply overflow-hidden rounded-2xl border border-indigo-100/80 bg-white shadow-sm;
+    @apply overflow-hidden rounded-2xl border border-white/60 bg-white/80 backdrop-blur-xl shadow-lg;
+    box-shadow: 0 10px 40px -10px rgba(99, 102, 241, 0.1);
 }
 
 .data-table-scroll {
@@ -296,7 +302,7 @@ textarea {
 }
 
 .data-table thead {
-    @apply border-b border-indigo-100 bg-gradient-to-r from-indigo-50 to-violet-50/50;
+    @apply border-b border-indigo-100 bg-white/90 backdrop-blur-md;
 }
 
 .data-table thead th {
@@ -308,7 +314,13 @@ textarea {
 }
 
 .data-table tbody tr {
-    @apply transition-colors hover:bg-indigo-50/40;
+    @apply transition-all duration-300 hover:bg-white;
+}
+.data-table tbody tr:hover {
+    transform: translateY(-1px) scale(1.002);
+    box-shadow: 0 4px 12px -4px rgba(99, 102, 241, 0.15);
+    z-index: 10;
+    position: relative;
 }
 
 .data-table tbody td {
@@ -341,7 +353,20 @@ textarea {
 }
 
 .form-card {
-    @apply overflow-hidden rounded-2xl border border-indigo-100/80 bg-white shadow-sm;
+    @apply relative overflow-hidden rounded-2xl border border-white bg-white/90 backdrop-blur-xl shadow-2xl;
+    box-shadow: 0 20px 40px -15px rgba(99, 102, 241, 0.15);
+}
+.form-card::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    padding: 1px;
+    background: linear-gradient(135deg, rgba(255,255,255,0.8), rgba(255,255,255,0.2));
+    -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+    pointer-events: none;
 }
 
 .form-card-body {
@@ -353,7 +378,7 @@ textarea {
 }
 
 .form-field-input-iqac {
-    @apply w-full rounded-xl border border-gray-200 bg-gray-50/80 px-4 py-3 text-sm text-gray-900 shadow-sm transition placeholder:text-gray-400 hover:border-indigo-200 focus:border-indigo-500 focus:bg-white focus:outline-none focus:ring-2 focus:ring-indigo-200 disabled:cursor-not-allowed disabled:opacity-60;
+    @apply w-full rounded-xl border border-gray-200/80 bg-gray-50/50 px-4 py-3 text-sm text-gray-900 shadow-sm transition-all duration-300 placeholder:text-gray-400 hover:border-indigo-300 focus:border-indigo-500 focus:bg-white focus:outline-none focus:ring-4 focus:ring-indigo-500/20 disabled:cursor-not-allowed disabled:opacity-60;
 }
 
 .form-field-label-iqac {
@@ -361,7 +386,18 @@ textarea {
 }
 
 .form-btn-primary {
-    @apply inline-flex items-center gap-2 rounded-xl bg-gradient-to-r from-indigo-600 to-violet-600 px-5 py-2.5 text-sm font-bold text-white shadow-md transition hover:from-indigo-500 hover:to-violet-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-60;
+    @apply inline-flex items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-indigo-600 via-purple-600 to-violet-600 px-6 py-3 text-sm font-bold text-white shadow-lg transition-all duration-300 focus:outline-none focus:ring-4 focus:ring-indigo-500/30 disabled:cursor-not-allowed disabled:opacity-60;
+    background-size: 200% auto;
+    animation: gradientFlow 4s linear infinite;
+}
+.form-btn-primary:hover:not(:disabled) {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px -6px rgba(99, 102, 241, 0.6);
+}
+@keyframes gradientFlow {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
 }
 
 .form-btn-secondary {
@@ -604,3 +640,51 @@ body {
         background: none !important;
     }
 }
+
+/* Global Premium Animations */
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+.animate-fade-in-up {
+    animation: fadeInUp 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+.animate-fade-in-up-delay-1 {
+    animation: fadeInUp 0.8s cubic-bezier(0.16, 1, 0.3, 1) 0.1s forwards;
+    opacity: 0;
+}
+.animate-fade-in-up-delay-2 {
+    animation: fadeInUp 0.8s cubic-bezier(0.16, 1, 0.3, 1) 0.2s forwards;
+    opacity: 0;
+}
+.animate-fade-in-up-delay-3 {
+    animation: fadeInUp 0.8s cubic-bezier(0.16, 1, 0.3, 1) 0.3s forwards;
+    opacity: 0;
+}
+
+@keyframes float {
+    0% { transform: translateY(0px) rotate(0deg); }
+    50% { transform: translateY(-20px) rotate(5deg); }
+    100% { transform: translateY(0px) rotate(0deg); }
+}
+.animate-float {
+    animation: float 8s ease-in-out infinite;
+}
+.animate-float-delayed {
+    animation: float 9s ease-in-out 2s infinite;
+}
+
+@keyframes pulse-soft {
+    0%, 100% { opacity: 0.5; transform: scale(1); }
+    50% { opacity: 0.8; transform: scale(1.05); }
+}
+.animate-pulse-soft {
+    animation: pulse-soft 4s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+

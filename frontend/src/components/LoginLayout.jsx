@@ -10,8 +10,8 @@ const VARIANTS = {
     ring: 'ring-indigo-100',
     glow: 'shadow-indigo-200/50',
     overlay: 'bg-gradient-to-br from-indigo-50/90 via-white/85 to-violet-50/80',
-    button: 'bg-gradient-to-r from-indigo-600 to-violet-600 hover:from-indigo-500 hover:to-violet-500 focus:ring-indigo-500',
-    inputFocus: 'focus:border-indigo-500 focus:ring-indigo-200',
+    button: 'bg-[length:200%_auto] bg-gradient-to-r from-indigo-600 via-purple-600 to-violet-600 hover:from-indigo-500 hover:to-violet-500 focus:ring-indigo-500 animate-gradient shadow-lg shadow-indigo-200/50 hover:-translate-y-[2px] transition-all duration-300',
+    inputFocus: 'focus:bg-white focus:outline-none focus:ring-4 focus:ring-indigo-500/20 hover:border-indigo-300 transition-all duration-300',
     loadingBg: 'from-indigo-100 via-white to-violet-100',
   },
   apar: {
@@ -21,8 +21,8 @@ const VARIANTS = {
     ring: 'ring-emerald-100',
     glow: 'shadow-emerald-200/50',
     overlay: 'bg-gradient-to-br from-emerald-50/90 via-white/85 to-teal-50/80',
-    button: 'bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 focus:ring-emerald-500',
-    inputFocus: 'focus:border-emerald-500 focus:ring-emerald-200',
+    button: 'bg-[length:200%_auto] bg-gradient-to-r from-emerald-600 via-teal-500 to-emerald-500 hover:from-emerald-500 hover:to-teal-500 focus:ring-emerald-500 animate-gradient shadow-lg shadow-emerald-200/50 hover:-translate-y-[2px] transition-all duration-300',
+    inputFocus: 'focus:bg-white focus:outline-none focus:ring-4 focus:ring-emerald-500/20 hover:border-emerald-300 transition-all duration-300',
     loadingBg: 'from-emerald-100 via-white to-teal-100',
   },
 };
@@ -36,10 +36,10 @@ export function LoginField({ label, htmlFor, children, variant = 'iqac' }) {
       </label>
       {React.Children.map(children, (child) =>
         React.isValidElement(child)
-          ? React.cloneElement(child, {
-              className: `form-field-input ${v.inputFocus} ${child.props.className || ''}`.trim(),
-            })
-          : child
+            ? React.cloneElement(child, {
+                className: `form-field-input bg-white/50 border border-gray-200/80 shadow-sm ${v.inputFocus} ${child.props.className || ''}`.trim(),
+              })
+            : child
       )}
     </div>
   );
@@ -86,16 +86,20 @@ export function LoginLayout({
           backgroundPosition: 'center',
         }}
       />
-      <div className={`absolute inset-0 z-0 ${v.overlay}`} />
+      <div className={`absolute inset-0 z-0 ${v.overlay} backdrop-blur-sm`} />
+
+      {/* Animated Orbs for Login */}
+      <div className={`absolute top-1/4 -left-32 w-96 h-96 rounded-full mix-blend-multiply filter blur-[100px] opacity-40 animate-float ${variant === 'apar' ? 'bg-emerald-300' : 'bg-indigo-300'}`} />
+      <div className={`absolute bottom-1/4 -right-32 w-96 h-96 rounded-full mix-blend-multiply filter blur-[100px] opacity-40 animate-float-delayed ${variant === 'apar' ? 'bg-teal-300' : 'bg-violet-300'}`} />
 
       <div
-        className={`relative z-10 w-full max-w-md overflow-hidden rounded-2xl bg-white/95 shadow-2xl ring-1 ${v.ring} ${v.glow} backdrop-blur-sm`}
+        className={`relative z-10 w-full max-w-md overflow-hidden rounded-2xl bg-white/70 shadow-2xl border border-white/60 ${v.glow} backdrop-blur-2xl animate-fade-in-up`}
       >
         <div className={`h-1.5 w-full bg-gradient-to-r ${v.accentBar}`} />
 
         <div className="space-y-6 p-8 sm:p-10">
           <div className="text-center">
-            <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-2xl bg-white shadow-md ring-1 ring-gray-100">
+            <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-2xl bg-white shadow-lg ring-1 ring-white/50">
               <img src="/dtu_logo.jpeg" alt="DTU" className="h-12 w-auto object-contain" />
             </div>
             <p className={`text-xs font-bold uppercase tracking-[0.25em] ${v.badgeClass}`}>{v.badge}</p>
