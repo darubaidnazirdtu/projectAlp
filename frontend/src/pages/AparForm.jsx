@@ -793,7 +793,12 @@ export default function AparForm() {
                 return sanitizeAlphaNum(v);
             }
         }
-        if (lower.includes('assessment.')) return sanitizeNumeric(v);
+        if (lower.includes('assessment.')) {
+            if (lower.includes('assessment.general.') && !lower.includes('q6')) {
+                return String(v || '').replace(/[^A-Za-z0-9 .,/()\n-]+/g, '');
+            }
+            return sanitizeNumeric(v);
+        }
         if (
             lower.includes('time_table') ||
             lower.includes('workload_week') ||
