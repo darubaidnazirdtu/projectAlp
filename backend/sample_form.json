@@ -1,0 +1,552 @@
+{
+  "_id": "6a5de87435c4e5b63aa96c1b",
+  "faculty_id": "darubaidnazir",
+  "ay": "2026-27",
+  "status": "Accepted by Reviewing officer",
+  "current_step": 1,
+  "reporting_officer_id": "pawansingh",
+  "reviewing_officer_id": "lokesh",
+  "personal": {
+    "name": "Dar Ubaid Nazir",
+    "designation": "Assistant Professor",
+    "date_of_birth": "2001-04-01T00:00:00.000Z",
+    "email": "darubaidnazir@dtu.ac.in",
+    "phone": "9622922604",
+    "department_id": "CSE",
+    "joining_date": "2026-07-01T00:00:00.000Z",
+    "sc_st_status": "General",
+    "absence_taken": "Yes",
+    "absence_period": "2026-07-03 to 2026-07-08 (Sabbatical Leave)\n2026-07-14 to 2026-07-31 (Maternity)",
+    "grade": "12"
+  },
+  "teaching": {
+    "time_table": {
+      "provided": {
+        "odd_semester": "65",
+        "even_semester": "65"
+      },
+      "actual": {
+        "odd_semester": "45",
+        "even_semester": "44"
+      }
+    },
+    "workload_week": {
+      "odd_semester": {
+        "lectures": "45",
+        "tutorials": "45",
+        "practicals": "45",
+        "seminars": "45"
+      },
+      "even_semester": {
+        "lectures": "64",
+        "tutorials": "45",
+        "practicals": "45",
+        "seminars": "454"
+      }
+    },
+    "health_checkup_file": "optionaldocuments/2026-27/darubaidnazir/1-report-1784539504505.pdf",
+    "description_of_duties_department": [
+      {
+        "description": "Conducted theory and practical classes as per the assigned teaching workload for the academic session",
+        "proof": "part3/darubaidnazir/1-report-1784539325456.pdf",
+        "_id": "6a5de97035c4e5b63aa96c5e"
+      },
+      {
+        "description": "Prepared lesson plans course materials assignments and question papers for assigned courses",
+        "proof": "part3/darubaidnazir/1-report-1784539342998.pdf",
+        "_id": "6a5de97035c4e5b63aa96c5f"
+      },
+      {
+        "description": "Evaluated answer scripts assignments quizzes and maintained student assessment records",
+        "proof": "part3/darubaidnazir/1-report-1784539357566.pdf",
+        "_id": "6a5de97035c4e5b63aa96c60"
+      }
+    ],
+    "description_of_duties_admin": [
+      {
+        "description": "Served as an active member of various departmental committees contributing to both academic and administrative functions to ensure the smooth and efficient operation of the department",
+        "proof": "part3/darubaidnazir/1-report-1784539452025.pdf",
+        "_id": "6a5de97035c4e5b63aa96c5d"
+      }
+    ],
+    "courses_taught": [
+      {
+        "name_of_course": "DSA",
+        "course_code": "DSA101",
+        "total_lectures_scheduled": "30",
+        "total_lectures_engaged": "30",
+        "extra_lectures_engaged": "2",
+        "tutorials_scheduled": "45",
+        "tutorials_engaged": "45",
+        "extra_tutorials_engaged": "6",
+        "degree_type": "UG",
+        "semester": "Odd",
+        "course_type": "Theory",
+        "_id": "6a5dea5835c4e5b63aa96d99"
+      },
+      {
+        "name_of_course": "BlockChain",
+        "course_code": "BL202",
+        "tutorials_scheduled": "65",
+        "tutorials_engaged": "65",
+        "extra_tutorials_engaged": "0",
+        "labs_scheduled": "56",
+        "labs_engaged": "56",
+        "degree_type": "UG",
+        "semester": "Even",
+        "course_type": "Practical",
+        "_id": "6a5dea5835c4e5b63aa96d9a"
+      }
+    ],
+    "teaching_methods": [
+      {
+        "description": "DescriptionSuggested Proof Document Served as a member of departmental committees for academic and administrative activitiesCommittee order Assisted in admission orientation and student counseling activitiesOfficial order  Notice Performed examination duties such as invigilation paper setting evaluation and result processingExamination duty order Coordinated departmental events workshops seminars or guest lectures",
+        "_id": "6a5dea5835c4e5b63aa96d97"
+      },
+      {
+        "description": "DescriptionSuggested Proof Document Conducted theory and practical classes as per the assigned teaching workload for the academic sessionTeaching workload allocation order  Timetable Prepared lesson plans course materials assignments and question papers for assigned coursesLesson plan  Course file Evaluated answer scripts assignments quizzes and maintained student assessment records",
+        "_id": "6a5dea5835c4e5b63aa96d98"
+      }
+    ],
+    "ict_tools": [
+      {
+        "description": "quality assurance initiatives student welfare activities and other institutional responsibilities assigned by the department Coordinated with faculty members and administrative staff to facilitate effective decisionmaking maintain compliance with institutional policies and promote a collaborative academic environment",
+        "room_no": "505",
+        "_id": "6a5dea5835c4e5b63aa96d96"
+      }
+    ],
+    "student_centric_methods": [
+      {
+        "description": "Served as an active member of various departmental committees contributing significantly to the planning coordination and execution of academic and administrative activities Participated in committee meetings assisted in policy implementation coordinated departmental events and supported examinationrelated activities including scheduling invigilation evaluation and result processing Worked collaboratively with faculty members and administrative staff to ensure the effective execution of departmental responsibilities maintain compliance with institutional guidelines and enhance the overall academic environment",
+        "_id": "6a5dea5835c4e5b63aa96d95"
+      }
+    ],
+    "tutorials_tests": [
+      {
+        "course_name": "DSA",
+        "semester": "Odd",
+        "degree_type": "UG",
+        "number_of_tests": "45",
+        "assignment_checked": "545",
+        "_id": "6a5dea5835c4e5b63aa96d93"
+      },
+      {
+        "course_name": "BlockChain",
+        "semester": "Odd",
+        "degree_type": "UG",
+        "number_of_tests": "65",
+        "assignment_checked": "65",
+        "_id": "6a5dea5835c4e5b63aa96d94"
+      }
+    ],
+    "academic_planning": [
+      {
+        "description": "quality assurance initiatives student welfare activities and other institutional responsibilities assigned by the department Coordinated with faculty members and administrative staff to facilitate effective decisionmaking maintain compliance with institutional policies and promote a collaborative academic environment",
+        "_id": "6a5dea5835c4e5b63aa96d92"
+      }
+    ],
+    "faculty_visits_other_institutions": [
+      {
+        "institution": "National Institute of Technology",
+        "nature_of_visit": "Faculty Development Programme FDP",
+        "title_of_activity": "Advances in Deep Learning and Computer Vision",
+        "role_of_faculty": "Participant",
+        "date_of_visit": "05Jul2025",
+        "mode": "Physical",
+        "level": "International",
+        "_id": "6a5dea5835c4e5b63aa96d91"
+      }
+    ]
+  },
+  "research": {
+    "journals": [
+      {
+        "paper_id": "PUB-1784540496707-0f333531-8281-4249-8412-5329168b68de",
+        "title": "Deep LearningBased Framework for Automated Fetal Abdominal Circumference Measurement from BlindSweep Ultrasound Images",
+        "name_of_journal": "International Journal of Medical Imaging and Health Informatics",
+        "author_names": "Dar Ubaid Nazir John Doe Jane Smith",
+        "issn": "21567018",
+        "volume": "15",
+        "issue": "3",
+        "page_numbers": "1",
+        "year_of_publication": "11-2026",
+        "doi": "10.1234/ijmihi.2026.123456",
+        "indexing": "SCIE",
+        "impact_factor": "32",
+        "publisher": "Elsevier",
+        "link_to_paper": "part3/darubaidnazir/1-report-1784539914987.pdf",
+        "faculty_members": [],
+        "students": [],
+        "_id": "6a5deb1a35c4e5b63aa96ece"
+      }
+    ],
+    "conferences": [
+      {
+        "paper_id": "PUB-1784540496708-6b7cdd74-26d8-46a4-a7a0-fd22e65d1471",
+        "title": "Deep LearningBased Framework for Automated Fetal Abdominal Circumference Measurement from BlindSweep Ultrasound Images",
+        "name_of_conference": "International Conference on Artificial Intelligence and Data Analytics ICAIDA 2026",
+        "conference_level": "National",
+        "organizer": "Department of Computer Science ABC University",
+        "venue": "New Delhi India",
+        "publisher": "Elsevier",
+        "isbn": "97816654XXXXX",
+        "issn": "NA",
+        "volume": "3",
+        "year_of_publication": "08-2026",
+        "doi": "10.1109/ICAIDA.2026.123456",
+        "indexing": "PubMed",
+        "link_to_paper": "part3/darubaidnazir/1-report-1784540132087.pdf",
+        "faculty_members": [],
+        "students": [],
+        "external_contributors": [],
+        "_id": "6a5ded4b35c4e5b63aa97704"
+      }
+    ],
+    "projects": [
+      {
+        "project_id": "RES-1784540496710-a2f3e3ef-2e04-407d-8208-6749b04a19ea",
+        "funding_id": "RES-1784540496710-a2f3e3ef-2e04-407d-8208-6749b04a19ea",
+        "title_research": "AIBased Cybersecurity Audit Analytics for Automated Risk Assessment",
+        "role": "Principal Investigator",
+        "type_of_project": "Sponsored Research",
+        "funding_agency_name": "Ministry of Electronics and Information Technology MeitY",
+        "funding_type": "Government",
+        "sanction_number": "MeitYAI202500123",
+        "year_of_sanction": "08-2026",
+        "total_amount_sanctioned": "2500000",
+        "total_amount_used_this_year": "850000",
+        "start_date": "2026-07-01T00:00:00.000Z",
+        "end_date": "2026-07-23T00:00:00.000Z",
+        "link": "part3/darubaidnazir/1-report-1784539843871.pdf",
+        "academic_year": "2026-27",
+        "faculty_involved": [
+          {
+            "faculty_name": "Pawan ",
+            "faculty_emp_code": "pawan",
+            "faculty_designation": "AP",
+            "role": "Principal Investigator"
+          }
+        ],
+        "students_involved": [],
+        "manpower_details": [],
+        "external_collaborators": [],
+        "_id": "6a5deb1a35c4e5b63aa96ecd"
+      }
+    ],
+    "phd_guidance": [],
+    "phd_supervision": [
+      {
+        "student_name": "Aisha Khan",
+        "enrollment_no": "PHDCSE2024018",
+        "thesis_title": "Intelligent Deep Learning Framework for Automated Cybersecurity Risk Assessment in Enterprise Networks",
+        "thesis_type": "Full-time",
+        "supervisor_name": "Dar Ubaid Nazir",
+        "supervision_location": "Internal (Within University)",
+        "date_of_registration": "2026-07-01T00:00:00.000Z",
+        "date_of_defence": "2026-07-31T00:00:00.000Z",
+        "date_of_result_notification": "2026-07-23T00:00:00.000Z",
+        "academic_year": "2026-27",
+        "link": "part3/darubaidnazir/1-report-1784540203437.pdf",
+        "co_supervisors": [],
+        "committee_members": [],
+        "_id": "6a5ded4b35c4e5b63aa97702"
+      }
+    ],
+    "books": [
+      {
+        "publication_id": "PUB-1784540496710-b117c918-4272-453d-a291-65d5f5cb4fbe",
+        "title_of_book": "Advances in Artificial Intelligence and Machine Learning",
+        "title_of_chapter": "Deep Learning Techniques for Automated Medical Image Analysis",
+        "publication_type": "Book",
+        "role": "Author",
+        "year": "08-2026",
+        "isbn_number": "9781234567890",
+        "name_of_publisher": "Springer Nature",
+        "publisher_type": "National",
+        "link_to_publication": "part3/darubaidnazir/1-report-1784540061579.pdf",
+        "doi": "10.1007/978-1-23456-789-0_5",
+        "indexing": "SCI",
+        "faculty_ids": [],
+        "student_ids": [],
+        "faculty_members": [],
+        "students": [],
+        "external_contributors": [],
+        "_id": "6a5ded4b35c4e5b63aa97701"
+      }
+    ],
+    "fdps": [],
+    "consultancy": [
+      {
+        "consultancy_id": "RES-1784540496711-832b098d-191e-405d-82d3-62957a2abdb5",
+        "name_of_project": "Cybersecurity Risk Assessment and Audit Consultancy for Enterprise Information Systems",
+        "agency_name": "ABC Technologies Pvt Ltd",
+        "type_of_agency": "Government",
+        "grant_amount": "300000",
+        "revenue_generated": "5000",
+        "start_date": "2026-07-02T00:00:00.000Z",
+        "link": "part3/darubaidnazir/1-report-1784540423940.pdf",
+        "faculty_involved": [],
+        "students_involved": [],
+        "external_collaborators": [],
+        "_id": "6a5ded4b35c4e5b63aa976ff"
+      },
+      {
+        "consultancy_id": "RES-1784540496711-a14405a2-bcfa-461a-b0b0-435aeefe075e",
+        "name_of_project": "AIBased Predictive Analytics Solution for Healthcare Data",
+        "agency_name": "XYZ Healthcare Solutions Pvt Ltd",
+        "type_of_agency": "Government",
+        "grant_amount": "988888",
+        "revenue_generated": "255555",
+        "start_date": "2026-07-20T00:00:00.000Z",
+        "link": "part3/darubaidnazir/1-report-1784540451121.pdf",
+        "faculty_involved": [],
+        "students_involved": [],
+        "external_collaborators": [],
+        "_id": "6a5ded4b35c4e5b63aa97700"
+      }
+    ],
+    "patents": [],
+    "awards": [
+      {
+        "award_id": "AWD-1784540496712-26b7d0ce-70a9-413d-a7f9-dccbf2353646",
+        "name_of_award": "Best Research Paper Award",
+        "type_of_award": "National",
+        "category_of_award": "Research Excellence",
+        "name_of_organisation": "Department of Computer Science ABC University",
+        "awarding_agency": "International Conference on Artificial Intelligence and Data Science",
+        "agency_type": "DTU",
+        "date_of_award": "2026-07-23T00:00:00.000Z",
+        "monetary_value": "500000",
+        "year": "12-2026",
+        "evidence_link": "part3/darubaidnazir/1-report-1784540250048.pdf",
+        "faculty_recipients": [],
+        "student_recipients": [],
+        "external_recipients": [],
+        "_id": "6a5ded4b35c4e5b63aa976fe"
+      }
+    ],
+    "e_content": [
+      {
+        "econtent_id": "ECO-1784540496713-48ec308c-66ad-4b53-adc4-d7c085e68f61",
+        "name_of_module": "ntroduction to Supervised Learning and Classification Algorithms",
+        "type_of_content": "Module",
+        "platform": "Moodle LMS",
+        "platform_type": "LMS",
+        "date_of_launching": "2026-07-20T00:00:00.000Z",
+        "target_audience": "UG",
+        "duration_hours": "3",
+        "course_name": "Machine Learning",
+        "course_code": "CSE401",
+        "academic_year": "2026-27",
+        "faculty_id": "darubaidnazir",
+        "_id": "6a5ded4b35c4e5b63aa976fd"
+      }
+    ],
+    "collaborations": [
+      {
+        "activity_id": "COL-1784540496715-64f9d951-4aa7-4d34-8ea7-1c79d2d3710a",
+        "title_of_activity": "Collaborative Research on AIBased Cybersecurity Risk Assessment",
+        "name_of_collaborative_agency": "Research Collaboration",
+        "type_of_activity": "Workshop",
+        "nature_of_collaboration": "National Institute of Technology Warangal",
+        "number_of_participants": "56",
+        "source_of_financial_support": "Internal Research Grant",
+        "funding_amount": "500000",
+        "year": "08-2026",
+        "duration": "3",
+        "level": "Institutional",
+        "start_date": "2026-07-21T00:00:00.000Z",
+        "end_date": "2026-07-30T00:00:00.000Z",
+        "link": "part3/darubaidnazir/1-report-1784540357245.pdf",
+        "academic_year": "2026-27",
+        "faculty_associations": [],
+        "student_associations": [],
+        "external_contributors": [],
+        "_id": "6a5ded4b35c4e5b63aa976fc"
+      }
+    ],
+    "faculty_visits": [],
+    "memberships": [],
+    "summer_institutes_attended": [
+      {
+        "description": "FieldSample Data Course NameArtificial Intelligence Course CodeCSE502 Module NameNeural Networks and Deep Learning TypeEContent  Lecture Notes PlatformGoogle Classroom Platform TypeOnline Target AudiencePostgraduate Students Academic Year202627 SemesterEven Date10022027 Duration Hours5 RemarksCreated comprehensive digital learning material including presentations assignments and recorded lectures Another Example FieldSample Data Course NameData Structures and Algorithms Course CodeCSE203 Module NameTrees and Graph Algorithms TypeInteractive Learning Module PlatformSWAYAM Platform TypeNational Target AudienceUndergraduate Students Academic Year202627",
+        "_id": "6a5ded4b35c4e5b63aa976fb"
+      }
+    ],
+    "summer_institutes_organized": [
+      {
+        "description": "FieldSample Data Activity TitleCollaborative Research on AIBased Cybersecurity Risk Assessment TypeResearch Collaboration AgencyNational Institute of Technology Warangal LevelNational NatureCollaborative research involving the development of machine learning models for cybersecurity risk analysis joint publications and student research activities Participants12 Funding Amount250000 Funding SourceInternal Research Grant Duration12 Months",
+        "_id": "6a5ded4b35c4e5b63aa976fa"
+      }
+    ],
+    "ug_pg_guidance": [
+      {
+        "description": "Use these only as examples For an official appraisal enter only collaborations that actually took place and are supported by documents such as an MoU collaboration agreement sanction letter or official communication",
+        "_id": "6a5ded4b35c4e5b63aa976f9"
+      }
+    ],
+    "phd_guidance_text": [],
+    "research_guidance": [
+      {
+        "description": "These are illustrative examples only For an official selfappraisal enter only consultancy projects that actually occurred and are supported by valid documentation such as consultancy agreements work orders invoices or approval letters",
+        "_id": "6a5ded4b35c4e5b63aa976f8"
+      }
+    ],
+    "industry_interaction": [],
+    "memberships_text": [
+      {
+        "description": "Performed departmental administrative responsibilities as a committee member by actively supporting planning monitoring and execution of academic activities throughout the academic year Responsibilities included coordinating faculty and student activities assisting in departmental documentation maintaining academic records facilitating communication among stakeholders and contributing to various initiatives aimed at improving teaching quality and departmental efficiency Worked proactively to ensure smooth daytoday operations and successful completion of departmental objectives",
+        "_id": "6a5ded4b35c4e5b63aa976f7"
+      }
+    ],
+    "other_activities": [
+      {
+        "description": "Served on departmental committees with responsibilities spanning academic planning examination management student support accreditationrelated activities and institutional administration Contributed to the preparation of reports maintenance of departmental records organization of faculty meetings and coordination of departmental events Collaborated with colleagues to implement institutional policies effectively resolve operational challenges and promote a productive and studentcentric academic environment",
+        "_id": "6a5ded4b35c4e5b63aa976f6"
+      }
+    ],
+    "mous": [],
+    "workshops": []
+  },
+  "corporate": {
+    "curriculum_development": [
+      {
+        "description": "Actively contributed to the administrative and academic functioning of the department by serving on departmental committees responsible for curriculum implementation student affairs quality assurance and institutional development Assisted in organizing seminars workshops orientation programs and departmental meetings while ensuring proper documentation and timely execution of assigned tasks Demonstrated commitment to institutional excellence through effective coordination teamwork and adherence to established academic and administrative procedures",
+        "_id": "6a5deb5f35c4e5b63aa97146"
+      }
+    ],
+    "course_development_details": [
+      {
+        "description": "Performed departmental administrative responsibilities as a committee member by actively supporting planning monitoring and execution of academic activities throughout the academic year Responsibilities included coordinating faculty and student activities assisting in departmental documentation maintaining academic records facilitating communication among stakeholders and contributing to various initiatives aimed at improving teaching quality and departmental efficiency Worked proactively to ensure smooth daytoday operations and successful completion of departmental objectives",
+        "_id": "6a5deb5f35c4e5b63aa97145"
+      }
+    ],
+    "lab_development": [
+      {
+        "description": "Served on departmental committees with responsibilities spanning academic planning examination management student support accreditationrelated activities and institutional administration Contributed to the preparation of reports maintenance of departmental records organization of faculty meetings and coordination of departmental events Collaborated with colleagues to implement institutional policies effectively resolve operational challenges and promote a productive and studentcentric academic environment",
+        "_id": "6a5deb5f35c4e5b63aa97144"
+      }
+    ],
+    "cultural_activities": [
+      {
+        "description": "Actively participated in departmental governance by serving on various academic and administrative committees entrusted with the responsibility of ensuring the effective functioning of the department Contributed to curriculum implementation academic planning timetable preparation examination coordination student mentoring activities quality assurance processes and departmental documentation Assisted in organizing academic events workshops seminars guest lectures and faculty development activities while maintaining effective coordination among faculty students and administrative staff Supported accreditation and compliancerelated initiatives through timely preparation of reports record maintenance and execution of institutional directives Demonstrated dedication professionalism and teamwork in carrying out assigned responsibilities thereby contributing to the continuous improvement of departmental performance and the achievement of institutional goals",
+        "_id": "6a5deb5f35c4e5b63aa97143"
+      }
+    ],
+    "sports_community": [
+      {
+        "description": "Served on departmental committees with responsibilities spanning academic planning examination management student support accreditationrelated activities and institutional administration Contributed to the preparation of reports maintenance of departmental records organization of faculty meetings and coordination of departmental events Collaborated with colleagues to implement institutional policies effectively resolve operational challenges and promote a productive and studentcentric academic environment",
+        "_id": "6a5deb5f35c4e5b63aa97142"
+      }
+    ],
+    "admin_assignment_university": [
+      {
+        "description": "Performed departmental administrative responsibilities as a committee member by actively supporting planning monitoring and execution of academic activities throughout the academic year Responsibilities included coordinating faculty and student activities assisting in departmental documentation maintaining academic records facilitating communication among stakeholders and contributing to various initiatives aimed at improving teaching quality and departmental efficiency Worked proactively to ensure smooth daytoday operations and successful completion of departmental objectives  Option 4",
+        "_id": "6a5deb5f35c4e5b63aa97141"
+      }
+    ],
+    "admin_assignment_department": [
+      {
+        "description": "Served on departmental committees with responsibilities spanning academic planning examination management student support accreditationrelated activities and institutional administration Contributed to the preparation of reports maintenance of departmental records organization of faculty meetings and coordination of departmental events Collaborated with colleagues to implement institutional policies effectively resolve operational challenges and promote a productive and studentcentric academic environment",
+        "_id": "6a5deb5f35c4e5b63aa97140"
+      }
+    ],
+    "admin_assignment_external": [
+      {
+        "description": "Actively participated in departmental governance by serving on various academic and administrative committees entrusted with the responsibility of ensuring the effective functioning of the department Contributed to curriculum implementation academic planning timetable preparation examination coordination student mentoring activities quality assurance processes and departmental documentation Assisted in organizing academic events workshops seminars guest lectures and faculty development activities while maintaining effective coordination among faculty students and administrative staff Supported accreditation and compliancerelated initiatives through timely preparation of reports record maintenance and execution of institutional directives Demonstrated dedication professionalism and teamwork in carrying out assigned responsibilities thereby contributing to the continuous improvement of departmental performance and the achievement of institutional goals",
+        "_id": "6a5deb5f35c4e5b63aa9713f"
+      }
+    ],
+    "any_other": [
+      {
+        "description": "Served on departmental committees with responsibilities spanning academic planning examination management student support accreditationrelated activities and institutional administration Contributed to the preparation of reports maintenance of departmental records organization of faculty meetings and coordination of departmental events Collaborated with colleagues to implement institutional policies effectively resolve operational challenges and promote a productive and studentcentric academic environment",
+        "_id": "6a5deb5f35c4e5b63aa9713e"
+      }
+    ],
+    "certify": "true",
+    "extension": []
+  },
+  "history": [
+    {
+      "action": "Submitted",
+      "by": "Faculty",
+      "date": "2026-07-20T09:41:49.042Z",
+      "comment": "Form submitted by faculty",
+      "_id": "6a5ded5d35c4e5b63aa978f6"
+    },
+    {
+      "action": "Forwarded by Reporting officer",
+      "by": "Reporting Officer",
+      "date": "2026-07-20T09:43:58.602Z",
+      "comment": "Forwarded by Reporting officer",
+      "_id": "6a5dedde35c4e5b63aa9797d"
+    },
+    {
+      "action": "Accepted by Reviewing officer",
+      "by": "Reviewing Officer",
+      "date": "2026-07-20T09:45:05.807Z",
+      "comment": "Accepted by Reviewing Officer",
+      "_id": "6a5dee2135c4e5b63aa979df"
+    }
+  ],
+  "createdAt": "2026-07-20T09:20:52.632Z",
+  "updatedAt": "2026-07-20T09:45:05.807Z",
+  "__v": 0,
+  "monthly_saved_at": "2026-07-20T09:41:49.007Z",
+  "timeline": {
+    "submitted_at": "2026-07-20T09:41:49.040Z",
+    "reporting_reviewed_at": "2026-07-20T09:43:58.602Z",
+    "reviewing_reviewed_at": "2026-07-20T09:45:05.807Z"
+  },
+  "assessment": {
+    "section_a": {
+      "q1": "7",
+      "q2": "7",
+      "q3": "8",
+      "q4": "6",
+      "overall_grading": "7"
+    },
+    "section_b": {
+      "q1": "8",
+      "q2": "7",
+      "q3": "6",
+      "q4": "7",
+      "q5": "7",
+      "q6": "9",
+      "q7a": "8",
+      "q7b": "9",
+      "q8": "8",
+      "q9": "7",
+      "q10": "7",
+      "q11": "Very Good",
+      "overall_grading": "8"
+    },
+    "section_c": {
+      "q1": "7",
+      "q2": "6",
+      "q3": "8",
+      "q4": "6",
+      "q5": "8",
+      "q6": "7",
+      "overall_grading": "7"
+    },
+    "general": {
+      "q1": "0",
+      "q2": "0",
+      "q3": "0",
+      "q4": "0",
+      "q5": "0",
+      "q6": "7.3"
+    }
+  },
+  "remarks": {
+    "length_of_service": "YES",
+    "satisfied_with_reporting": "YES",
+    "agree_with_assessment": "Yes",
+    "disagreement_reason": "",
+    "general_remarks": "YES",
+    "specific_characteristics": "Yes",
+    "signature_place": "Dar",
+    "signature_date": "2026-07-20T00:00:00.000Z"
+  }
+}
