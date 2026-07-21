@@ -341,11 +341,11 @@ export default function PartIII({ formData, academicYear, addItem, removeItem, u
                     { label: 'Supervisor Role', key: 'supervisor_role', required: true, placeholder: 'Enter role' },
                     { label: 'Status', key: 'status', type: 'select', options: ['Ongoing', 'Submitted', 'Awarded'], required: true, placeholder: 'Select status' },
                     { label: 'Student Date of Registration', key: 'date_of_registration', type: 'date', required: true },
-                    academicYearField,
-                    { label: 'Student Defence Date', key: 'date_of_defence', type: 'date', required: true },
-                    { label: 'Result Notification Date', key: 'date_of_result_notification', type: 'date', required: true },
+                    { ...academicYearField, hidden: true },
+                    { label: 'Student Defence Date', key: 'date_of_defence', type: 'date', requiredIf: (item) => item?.status !== 'Ongoing', disabled: (item) => item?.status === 'Ongoing' },
+                    { label: 'Result Notification Date', key: 'date_of_result_notification', type: 'date', requiredIf: (item) => item?.status !== 'Ongoing', disabled: (item) => item?.status === 'Ongoing' },
                     { label: 'Remarks', key: 'remarks', placeholder: 'Remarks' },
-                    { label: 'Upload Result Notified for Defence', key: 'link', type: 'file', required: true },
+                    { label: 'Upload Result Notified for Defence', key: 'link', type: 'file', requiredIf: (item) => item?.status !== 'Ongoing' },
                     {
                         label: 'Co-Supervisors', key: 'co_supervisors', type: 'objectList', subFields: [
                             { label: 'Faculty Name', key: 'name', required: true, placeholder: 'Enter name' },

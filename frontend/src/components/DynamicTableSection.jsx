@@ -743,7 +743,9 @@ export default function DynamicTableSection({
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         {fields.map(f => {
                             const isVisible = typeof f.showIf === 'function' ? f.showIf(tempItem) : true;
-                            if (!isVisible || f.hidden) return null;
+                            const isHidden = typeof f.hidden === 'function' ? f.hidden(tempItem) : f.hidden;
+                            if (!isVisible || isHidden) return null;
+                            const isDisabled = typeof f.disabled === 'function' ? f.disabled(tempItem) : f.disabled;
                             return (
                             <div key={f.key} className={f.fullWidth ? "md:col-span-2" : ""}>
                                 <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -755,7 +757,7 @@ export default function DynamicTableSection({
                                         value={tempItem[f.key] || ''}
                                         onChange={(e) => handleChange(f.key, sanitizeForResearchKey(f.key, e.target.value, 'text'))}
                                         required={f.required || (typeof f.requiredIf === 'function' && f.requiredIf(tempItem))}
-                                        disabled={f.disabled || f.readOnly || readOnly}
+                                        disabled={isDisabled || f.readOnly || readOnly}
                                         className="w-full bg-gray-50 border border-gray-200 text-gray-900 rounded-xl shadow-sm focus:ring-2 focus:ring-indigo-500/30 focus:border-indigo-500 hover:border-indigo-300 transition-all duration-200 p-3"
                                     />
                                 ) : f.type === 'select' ? (
@@ -763,7 +765,7 @@ export default function DynamicTableSection({
     value={tempItem[f.key] || ''}
     onChange={(e) => handleChange(f.key, e.target.value)}
     required={f.required || (typeof f.requiredIf === 'function' && f.requiredIf(tempItem))}
-    disabled={f.disabled || f.readOnly || readOnly}
+    disabled={isDisabled || f.readOnly || readOnly}
     className={`w-full border-gray-300 rounded-lg shadow-sm focus:ring-indigo-500 focus:border-indigo-500 p-2.5 ${
         f.key === 'academic_year' ? 'appearance-none bg-gray-100 cursor-not-allowed' : ''
     }`}
@@ -779,7 +781,7 @@ export default function DynamicTableSection({
                                         value={tempItem[f.key] || ''}
                                         onChange={(val, selectedData) => handleEntityChange(f, val, selectedData)}
                                         required={f.required || (typeof f.requiredIf === 'function' && f.requiredIf(tempItem))}
-                                        disabled={f.disabled || f.readOnly || readOnly}
+                                        disabled={isDisabled || f.readOnly || readOnly}
                                         optionsOverride={f.optionsOverride || []}
                                         className="w-full"
                                     />
@@ -788,7 +790,7 @@ export default function DynamicTableSection({
                                             <FileUpload
                                                 value={tempItem[f.key] || ''}
                                                 onChange={(url) => handleChange(f.key, typeof url === 'object' ? url : sanitizeForResearchKey(f.key, url, 'url'))}
-                                                disabled={f.disabled || f.readOnly || readOnly}
+                                                disabled={isDisabled || f.readOnly || readOnly}
                                                 required={f.required || (typeof f.requiredIf === 'function' && f.requiredIf(tempItem))}
                                                 directMinio={true}
                                                 deferUpload={true}
@@ -961,7 +963,7 @@ export default function DynamicTableSection({
                                             maxLength={f.maxLength}
                                             placeholder={f.placeholder}
                                             readOnly={f.readOnly || readOnly}
-                                            disabled={f.disabled || readOnly}
+                                            disabled={isDisabled || f.readOnly || readOnly}
                                             required={f.required || (typeof f.requiredIf === 'function' && f.requiredIf(tempItem))}
                                             className="w-full bg-gray-50 border border-gray-200 text-gray-900 rounded-xl shadow-sm focus:ring-2 focus:ring-indigo-500/30 focus:border-indigo-500 hover:border-indigo-300 transition-all duration-200 p-3"
                                             onBlur={() => {
