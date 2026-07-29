@@ -214,6 +214,7 @@ const AparFormSchema = new mongoose.Schema({
             title: String, // Generic title
             agency_name: String,
             type_of_agency: String,
+            status: String,
             consultancy_type: String,
             grant_amount: String, // IQAC: Number
             revenue_generated: String, // IQAC: Number
@@ -239,6 +240,7 @@ const AparFormSchema = new mongoose.Schema({
             country: String,
             centres: String,
             date_of_filing: Date,
+            date_of_published: Date,
             date_of_award: Date,
             patent_awarding_agency: String,
             link_to_patent: String,

@@ -788,23 +788,23 @@ export default function PartIII({ formData, academicYear, addItem, removeItem, u
                             country: '',
                             patent_awarding_agency: '',
                             date_of_filing: '',
+                            date_of_published: '',
                             date_of_award: '',
                             link_to_patent: '',
                             link: ''
                         }}
                         fields={[
-
                             { label: 'Department / Centre ID', key: 'department_id', type: 'entitySelect', entityType: 'department', required: true },
-                            { label: 'Centres', key: 'centres', required: true, placeholder: 'Enter Centre(s)' },
                             { label: 'Title', key: 'patent_title', required: true, placeholder: 'Enter patent title' },
                             { label: 'Authors', key: 'author_names', required: true, placeholder: 'Enter authors' },
-                            { label: 'App No.', key: 'application_number', required: true, placeholder: 'App No' },
-                            { label: 'Patent No.', key: 'patent_number', placeholder: 'Patent No' },
                             { label: 'Status', key: 'status', type: 'select', options: ['Filed', 'Published', 'Granted'], required: true, placeholder: 'Select status' },
+                            { label: 'Application No.', key: 'application_number', required: true, placeholder: 'Application No' },
+                            { label: 'Patent No.', key: 'patent_number', disabled: (item) => item?.status !== 'Granted', requiredIf: (item) => item?.status === 'Granted', placeholder: 'Patent No' },
                             { label: 'Country', key: 'country', required: true, placeholder: 'Country' },
                             { label: 'Awarding Agency', key: 'patent_awarding_agency', required: true, placeholder: 'Agency' },
                             { label: 'Filing Date', key: 'date_of_filing', type: 'date', required: true },
-                            { label: 'Award Date', key: 'date_of_award', type: 'date' },
+                            { label: 'Published Date', key: 'date_of_published', type: 'date', requiredIf: (item) => item?.status === 'Published' },
+                            { label: 'Award Date', key: 'date_of_award', type: 'date', requiredIf: (item) => item?.status === 'Granted' },
                             { label: 'Upload PDF Proof', key: 'link_to_patent', type: 'file', required: true },
                             {
                                 label: 'Faculty Members', key: 'faculty_members', type: 'objectList', subFields: [
@@ -837,14 +837,16 @@ export default function PartIII({ formData, academicYear, addItem, removeItem, u
                         uniqueKey="name_of_project"
                         {...createHandlers('consultancy')}
                         readOnly={readOnly}
-                        initialItem={{ name_of_project: '', agency_name: '', grant_amount: '', start_date: '', end_date: '', type_of_agency: '', consultancy_type: '', year_of_consultancy: '', revenue_generated: '', link: '', faculty_involved: [], students_involved: [], external_collaborators: [], external_consultants: [] }}
+                        initialItem={{ name_of_project: '', agency_name: '', grant_amount: '', status: '', start_date: '', end_date: '', type_of_agency: '', consultancy_type: '', year_of_consultancy: '', revenue_generated: '', link: '', faculty_involved: [], students_involved: [], external_collaborators: [], external_consultants: [] }}
                         fields={[
                             { label: 'Project Name', key: 'name_of_project', required: true, placeholder: 'Enter project name' },
                             { label: 'Agency', key: 'agency_name', required: true, placeholder: 'Enter agency' },
                             { label: 'Type', key: 'type_of_agency', type: 'select', options: ['Government', 'Private'], required: true, placeholder: 'Select type' },
                             { label: 'Grant', key: 'grant_amount', type: 'number', min: 0, required: true, placeholder: 'Amount' },
                             { label: 'Revenue', key: 'revenue_generated', type: 'number', min: 0, required: true, placeholder: 'Revenue' },
+                            { label: 'Status', key: 'status', type: 'select', options: ['Ongoing', 'Completed'], required: true, placeholder: 'Select status' },
                             { label: 'Start Date', key: 'start_date', type: 'date', required: true },
+                            { label: 'End Date', key: 'end_date', type: 'date', requiredIf: (item) => item?.status !== 'Ongoing' },
                             { label: 'upload proof', key: 'link', type: 'file', required: true },
                             {
                                 label: 'Faculty Involved', key: 'faculty_involved', type: 'objectList', subFields: [
