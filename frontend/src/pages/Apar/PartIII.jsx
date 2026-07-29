@@ -330,7 +330,7 @@ export default function PartIII({ formData, academicYear, addItem, removeItem, u
 
                     {formData.research?.is_eligible_supervisor !== 'No' && (
                         <DynamicTableSection
-                            title="3. DETAILS OF PHD SUPERVISION / DEFENCE"
+                            title="3. DETAILS OF PHD SUPERVISION"
                 data={formData.research.phd_supervision || []}
                 uniqueKey="thesis_title"
                 {...createHandlers('phd_supervision')}
@@ -360,23 +360,23 @@ export default function PartIII({ formData, academicYear, addItem, removeItem, u
                     { label: 'Supervisor Name', key: 'supervisor_name', required: true, disabled: true, defaultValue: user?.name || '', placeholder: 'Enter supervisor name' },
                     { label: 'Student Name', key: 'student_name', required: true, placeholder: 'Enter student name' },
                     { label: 'Student Roll/Enrollment No', key: 'enrollment_no', required: true, placeholder: 'Enter enrollment no' },
-                    { label: 'Student Thesis Title', key: 'thesis_title', required: true, placeholder: 'Enter thesis title' },
-                    { label: 'Student Thesis Type', key: 'thesis_type', type: 'select', options: ['Full-time', 'Part-time', 'Sponsored', 'Industry-linked', 'Other'], required: true, placeholder: 'Select type' },
-                    { label: 'Supervision Location', key: 'supervision_location', type: 'select', options: ['Internal (Within University)', 'External (Outside University)'], required: true, placeholder: 'Select location' },
-                    { label: 'Supervisor Role', key: 'supervisor_role', required: true, placeholder: 'Enter role' },
-                    { label: 'Status', key: 'status', type: 'select', options: ['Ongoing', 'Submitted', 'Awarded'], required: true, placeholder: 'Select status' },
+                    { label: 'PhD Status', key: 'status', type: 'select', options: ['Ongoing', 'Submitted', 'Awarded'], required: true, placeholder: 'Select status' },
+                    { label: 'Student Thesis Title', key: 'thesis_title', requiredIf: (item) => item?.status !== 'Ongoing', placeholder: 'Enter thesis title' },
+                    { label: 'Student Thesis Type', key: 'thesis_type', type: 'select', options: ['Full-time', 'Part-time', 'Sponsored', 'Industry-linked', 'Full time with fellowship', 'Without', 'NetJRF', 'Industry Work Professional (IWP)', 'Other'], required: true, placeholder: 'Select type' },
+                    { label: 'Type of Supervision', key: 'supervision_location', type: 'select', options: ['Internal (Within University)', 'External (Outside University)'], required: true, placeholder: 'Select type' },
+                    { label: 'Supervisor Role', key: 'supervisor_role', type: 'select', options: ['Main', 'Joint'], required: true, placeholder: 'Select role' },
                     { label: 'Student Date of Registration', key: 'date_of_registration', type: 'date', required: true },
                     { ...academicYearField, hidden: true },
-                    { label: 'Student Defence Date', key: 'date_of_defence', type: 'date', requiredIf: (item) => item?.status !== 'Ongoing', disabled: (item) => item?.status === 'Ongoing' },
+                    { label: 'Student Viva Voce Date', key: 'date_of_defence', type: 'date', requiredIf: (item) => item?.status !== 'Ongoing', disabled: (item) => item?.status === 'Ongoing' },
                     { label: 'Result Notification Date', key: 'date_of_result_notification', type: 'date', requiredIf: (item) => item?.status !== 'Ongoing', disabled: (item) => item?.status === 'Ongoing' },
                     { label: 'Remarks', key: 'remarks', placeholder: 'Remarks' },
-                    { label: 'Upload Result Notified for Defence', key: 'link', type: 'file', requiredIf: (item) => item?.status !== 'Ongoing' },
+                    { label: 'Upload Result Notified for Viva Voce', key: 'link', type: 'file', requiredIf: (item) => item?.status !== 'Ongoing' },
                     {
                         label: 'Co-Supervisors', key: 'co_supervisors', type: 'objectList', subFields: [
+                            { label: 'Supervisor Type', key: 'supervisor_type', type: 'select', options: ['Internal', 'External'], required: true, placeholder: 'Select type' },
                             { label: 'Faculty Name', key: 'name', required: true, placeholder: 'Enter name' },
-                            { label: 'Emp Code', key: 'emp_code', required: true, placeholder: 'Enter emp code' },
-                            { label: 'Supervision Location', key: 'supervision_location', type: 'select', options: ['Internal (Within University)', 'External (Outside University)'], required: true, placeholder: 'Select location' },
-                            { label: 'Role', key: 'role', type: 'select', options: ['Co-Supervisor 1', 'Co-Supervisor 2', 'Other'], required: true }
+                            { label: 'Emp Code', key: 'emp_code', showIf: (item) => item.supervisor_type === 'Internal', requiredIf: (item) => item.supervisor_type === 'Internal', placeholder: 'Enter emp code' },
+                            { label: 'Role', key: 'role', type: 'select', options: ['Co-Supervisor 1', 'Co-Supervisor 2', 'Main', 'Other'], required: true }
                         ]
                     }
                 ]}

@@ -913,6 +913,8 @@ const researchSchema = z.object({
     enrollment_no: optionalString,
     thesis_title: optionalString,
     thesis_type: optionalString,
+    supervisor_role: optionalString,
+    status: optionalString,
     supervisor_name: optionalString,
     supervisor_id: optionalString,
     supervision_location: optionalString,
@@ -922,7 +924,8 @@ const researchSchema = z.object({
     academic_year: optionalString,
     remarks: optionalString,
     link: optionalString,
-    department_id: optionalString
+    department_id: optionalString,
+    co_supervisors: z.array(z.any()).optional()
   })).optional(),
   mous: z.array(z.object({
     mou_id: optionalString,
