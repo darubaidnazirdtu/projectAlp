@@ -372,6 +372,7 @@ const AparFormSchema = new mongoose.Schema({
             year_of_signing: String, // IQAC: Number
             purpose: String,
             activities_under_mou: String,
+            status: String,
             start_date: Date,
             end_date: Date,
             level: String,

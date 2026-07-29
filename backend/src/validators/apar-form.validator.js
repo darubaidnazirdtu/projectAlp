@@ -935,6 +935,7 @@ const researchSchema = z.object({
     year_of_signing: optionalString,
     purpose: optionalString,
     activities_under_mou: optionalMouActivities,
+    status: optionalString,
     start_date: optionalString,
     end_date: optionalString,
     level: optionalString,

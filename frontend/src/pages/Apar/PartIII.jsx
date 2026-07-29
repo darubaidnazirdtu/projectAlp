@@ -62,6 +62,11 @@ export default function PartIII({ formData, academicYear, addItem, removeItem, u
                     }
                 }
             }
+            if (field === 'mous') {
+                if (newItem.type_of_mou === 'Other' && newItem.type_of_mou_other) {
+                    newItem.type_of_mou = newItem.type_of_mou_other;
+                }
+            }
             return addItem('research', field, newItem);
         },
         onUpdate: (index, newItem) => {
@@ -88,6 +93,11 @@ export default function PartIII({ formData, academicYear, addItem, removeItem, u
                         const diffDays = Math.ceil((end - start) / (1000 * 60 * 60 * 24)) + 1;
                         updatedItem.duration = `${diffDays} days`;
                     }
+                }
+            }
+            if (field === 'mous') {
+                if (updatedItem.type_of_mou === 'Other' && updatedItem.type_of_mou_other) {
+                    updatedItem.type_of_mou = updatedItem.type_of_mou_other;
                 }
             }
             return updateArrayItem('research', field, index, updatedItem);
@@ -566,6 +576,7 @@ export default function PartIII({ formData, academicYear, addItem, removeItem, u
                     year_of_signing: '',
                     purpose: '',
                     activities_under_mou: '',
+                    status: '',
                     start_date: '',
                     end_date: '',
                     level: '',
@@ -576,14 +587,16 @@ export default function PartIII({ formData, academicYear, addItem, removeItem, u
                     { label: 'Organization Name', key: 'organisation_name', required: true, placeholder: 'Enter organization' },
                     { label: 'Title', key: 'title', required: true, placeholder: 'Enter title' },
                     { label: 'Type of MoU', key: 'type_of_mou', type: 'select', options: ['Academic', 'Research', 'Industrial', 'Other'], required: true, placeholder: 'Select type' },
-                    { label: 'Year of Signing', key: 'year_of_signing', type: 'monthYear', ...academicCycleMonthYearBounds, required: true, placeholder: 'MM-YYYY' },
+                    { label: 'Specify Type of MoU', key: 'type_of_mou_other', showIf: (item) => item?.type_of_mou === 'Other', requiredIf: (item) => item?.type_of_mou === 'Other', placeholder: 'Enter custom type' },
+                    { label: 'Month-Year of Signing', key: 'year_of_signing', type: 'monthYear', ...academicCycleMonthYearBounds, required: true, placeholder: 'MM-YYYY' },
                     { label: 'Purpose', key: 'purpose', required: true, placeholder: 'Enter purpose' },
                     { label: 'Activities under MoU', key: 'activities_under_mou', required: true, placeholder: 'Enter activities' },
                     { label: 'Level', key: 'level', type: 'select', options: ['Institutional', 'National', 'International'], required: true, placeholder: 'Select level' },
+                    { label: 'Status', key: 'status', type: 'select', options: ['Ongoing', 'Completed'], required: true, placeholder: 'Select status' },
                     { ...academicYearField, hidden: true, hideInTable: true },
                     { label: 'Start Date', key: 'start_date', type: 'date', required: true },
-                    { label: 'End Date', key: 'end_date', type: 'date', required: true },
-                    { label: 'Document Upload', key: 'link', type: 'file', required: true },
+                    { label: 'End Date', key: 'end_date', type: 'date', requiredIf: (item) => item?.status !== 'Ongoing' },
+                    { label: 'MOU copy pdf', key: 'link', type: 'file', required: true },
                     {
                         label: 'Faculty Involved', key: 'faculty_associations', type: 'objectList', subFields: [
                             { label: 'Author Type', key: 'author_type', type: 'select', options: ['Internal Author', 'External Author'], required: true, placeholder: 'Select type' },
@@ -620,8 +633,7 @@ export default function PartIII({ formData, academicYear, addItem, removeItem, u
                     { label: 'Location', key: 'location', required: true, placeholder: 'Location' },
                     { label: 'Start Date', key: 'start_date', type: 'date', required: true },
                     { label: 'End Date', key: 'end_date', type: 'date', required: true },
-                    { label: 'Institutional Affiliation', key: 'same_institute_affiliation', type: 'select', options: ['Yes', 'No'], placeholder: 'Select' },
-                    { label: 'Document proof upload', key: 'link', type: 'file', required: true },
+                    { label: 'Document proof upload', key: 'link', type: 'file' },
                     {
                         label: 'Faculty Involved', key: 'faculty_ids', type: 'objectList', subFields: [
                             { label: 'Author Type', key: 'author_type', type: 'select', options: ['Internal Author', 'External Author'], required: true, placeholder: 'Select type' },
@@ -678,13 +690,13 @@ export default function PartIII({ formData, academicYear, addItem, removeItem, u
                     { label: 'Specify Other Type', key: 'type_of_program_other', showIf: (item) => item.type_of_program === 'Other', requiredIf: (item) => item.type_of_program === 'Other', placeholder: 'Enter type', hideInTable: true },
                     { label: 'Level', key: 'level', type: 'select', options: ['Institutional', 'National', 'International'], required: true, placeholder: 'Select level' },
                     { label: 'Participation Level', key: 'participation_level', type: 'select', options: ['Attended', 'Organized'], placeholder: 'Select Attended/Organized' },
-                    { label: 'Amount for Funding (INR)', key: 'amount_for_funding', type: 'number', min: 0, required: true, placeholder: 'Enter amount' },
+                    { label: 'Amount for Funding (INR)', key: 'amount_for_funding', type: 'number', min: 0, requiredIf: (item) => item?.participation_level !== 'Attended', disabled: (item) => item?.participation_level === 'Attended', placeholder: 'Enter amount' },
                     { label: 'Mode', key: 'mode', type: 'select', options: ['Online', 'Offline', 'Hybrid'], required: true, placeholder: 'Select mode' },
                     { label: 'Organizer', key: 'organising_body', required: true, placeholder: 'Enter organizer' },
                     { label: 'Venue', key: 'venue', required: true, placeholder: 'Venue' },
                     { label: 'Duration (Days)', key: 'duration_days', type: 'number', min: 0, required: true, placeholder: 'No. of days' },
                     { ...academicYearField, hidden: true, hideInTable: true },
-                    { label: 'Funding Agency', key: 'funding_agency', placeholder: 'Agency' },
+                    { label: 'Funding Agency', key: 'funding_agency', disabled: (item) => item?.participation_level === 'Attended', placeholder: 'Agency' },
                     { label: 'Start Date', key: 'start_date', type: 'date', required: true }, 
                     { label: 'End Date', key: 'end_date', type: 'date', required: true },
                     { label: 'Remarks', key: 'remarks', placeholder: 'Remarks' },
