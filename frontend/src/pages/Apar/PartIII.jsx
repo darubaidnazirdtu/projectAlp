@@ -392,19 +392,18 @@ export default function PartIII({ formData, academicYear, addItem, removeItem, u
                 uniqueKey="name_of_award"
                 {...createHandlers('awards')}
                 readOnly={readOnly}
-                initialItem={{ name_of_award: '', awarding_agency: '', agency_type: '', category_of_award: '', date_of_award: '', evidence_link: '' }}
+                initialItem={{ name_of_award: '', agency_type: '', category_of_award: '', date_of_award: '', evidence_link: '' }}
                 fields={[
 
                     { label: 'Award Name', key: 'name_of_award', required: true, placeholder: 'Enter award name' },
-                    { label: 'Agency', key: 'awarding_agency', required: true, placeholder: 'Enter agency' },
-                    { label: 'Agency Type', key: 'agency_type', type: 'select', options: ['DTU', 'Other'], required: true, placeholder: 'Select agency type' },
-                    { label: 'Organization', key: 'name_of_organisation', required: true, placeholder: 'Enter organization' },
+                    { label: 'Sponsoring agency Type', key: 'agency_type', type: 'select', options: ['DTU', 'Other'], required: true, placeholder: 'Select agency type' },
+                    { label: 'Organization', key: 'name_of_organisation', requiredIf: (item) => item?.agency_type === 'Other', placeholder: 'Enter organization' },
                     { label: 'Category', key: 'category_of_award', placeholder: 'Enter category' },
                     { label: 'Type', key: 'type_of_award', type: 'select', options: ['International', 'National', 'State', 'University'], required: true, placeholder: 'Select type' },
                     { label: 'Month-Year', key: 'year', type: 'monthYear', ...academicCycleMonthYearBounds, required: true, placeholder: 'MM-YYYY' },
                     { label: 'Reward amount', key: 'monetary_value',  type: 'number', min: 0, placeholder: 'Enter amount' },
                     { label: 'Date', key: 'date_of_award', type: 'date', required: true },
-                    { label: 'Evidence PDF', key: 'evidence_link', type: 'file', required: true }
+                    { label: 'Award Letter', key: 'evidence_link', type: 'file', required: true }
                 ]}
             />
 
