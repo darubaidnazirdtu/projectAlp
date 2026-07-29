@@ -774,6 +774,9 @@ export default function DynamicTableSection({
                                         {f.options.map(opt => (
                                             <option key={opt} value={opt}>{opt}</option>
                                         ))}
+                                        {tempItem[f.key] && !f.options.includes(tempItem[f.key]) && (
+                                            <option value={tempItem[f.key]}>{tempItem[f.key]}</option>
+                                        )}
                                     </select>
                                 ) : f.type === 'entitySelect' ? (
                                     <SearchableSelect

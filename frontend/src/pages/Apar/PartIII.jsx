@@ -36,8 +36,20 @@ export default function PartIII({ formData, academicYear, addItem, removeItem, u
 
     // Helper handlers generator
     const createHandlers = (field) => ({
-        onAdd: (item) => addItem('research', field, item),
-        onUpdate: (index, newItem) => updateArrayItem('research', field, index, newItem),
+        onAdd: (item) => {
+            const newItem = { ...item };
+            if (field === 'projects' && newItem.type_of_project === 'Other' && newItem.type_of_project_other) {
+                newItem.type_of_project = newItem.type_of_project_other;
+            }
+            return addItem('research', field, newItem);
+        },
+        onUpdate: (index, newItem) => {
+            const updatedItem = { ...newItem };
+            if (field === 'projects' && updatedItem.type_of_project === 'Other' && updatedItem.type_of_project_other) {
+                updatedItem.type_of_project = updatedItem.type_of_project_other;
+            }
+            return updateArrayItem('research', field, index, updatedItem);
+        },
         onRemove: removeItem ? (index) => removeItem('research', field, index) : undefined
     });
 
@@ -67,6 +79,7 @@ export default function PartIII({ formData, academicYear, addItem, removeItem, u
                 initialItem={{
                     department_id: '',
                     title_research: '',
+                    status: '',
                     role: '',
                     type_of_project: '',
                     funding_agency_name: '',
@@ -86,8 +99,10 @@ export default function PartIII({ formData, academicYear, addItem, removeItem, u
                 }}
                 fields={[
                     { label: 'Research Title', key: 'title_research', fullWidth: true, required: true, placeholder: 'Enter research title' },
+                    { label: 'Status', key: 'status', type: 'select', options: ['Ongoing', 'Completed'], required: true, placeholder: 'Select status' },
                     { label: 'Role', key: 'role', type: 'select', options: ['Principal Investigator', 'Co-Principal Investigator', 'Research Collaborator'] ,required: true, placeholder: 'Select Role'},
                     { label: 'Project Type', key: 'type_of_project', type: 'select', options: ['Sponsored Research', 'Innovation', 'Startup', 'Other'], required: true, placeholder: 'Select type' },
+                    { label: 'Specify Project Type', key: 'type_of_project_other', showIf: (item) => item.type_of_project === 'Other', requiredIf: (item) => item.type_of_project === 'Other', placeholder: 'Enter custom project type' },
                     { label: 'Funding Agency', key: 'funding_agency_name', required: true, placeholder: 'Enter funding agency' },
                     { label: 'Funding Type', key: 'funding_type', type: 'select', options: ['Government', 'Non-Government', 'Industry'], required: true, placeholder: 'Select funding type' },
                     { label: 'Sanction Number', key: 'sanction_number', required: true, placeholder: 'Enter sanction number' },
@@ -111,7 +126,7 @@ export default function PartIII({ formData, academicYear, addItem, removeItem, u
     label: 'End Date',
     key: 'end_date',
     type: 'date',
-    required: true,
+    requiredIf: (item) => item?.status !== 'Ongoing',
     minDateField: 'start_date',
     validate: (value, formData) => {
         if (!value || !formData.start_date) return true;
@@ -121,13 +136,13 @@ export default function PartIII({ formData, academicYear, addItem, removeItem, u
 },
                     
                     { label: 'Total Amount Sanctioned', key: 'total_amount_sanctioned', type: 'number', min: 0, placeholder: 'Enter total amount sanctioned', required: true },
-                    { label: 'Total Amount Used in this academic year', key: 'total_amount_used_this_year', type: 'number', min: 0, placeholder: 'Enter total amount used', required: true },
+                    { label: 'Total Amount Used in this Financial Year', key: 'total_amount_used_this_year', type: 'number', min: 0, placeholder: 'Enter total amount used', required: true },
                     { label: 'Remarks', key: 'remarks', placeholder: 'Enter remarks' },
                     { label: 'Proof of Sanction Letter', key: 'link', type: 'file', required: true },
                     {
                         label: 'Faculty Involved', key: 'faculty_involved', type: 'objectList', subFields: [
                             { label: 'Faculty Name', key: 'faculty_name', required: true, placeholder: 'Enter name' },
-                            { label: 'Faculty Employ Code', key: 'faculty_emp_code', required: true, placeholder: 'Enter employ code' },
+                            { label: 'Faculty Employee Code', key: 'faculty_emp_code', required: true, placeholder: 'Enter employ code' },
                             { label: 'Designation', key: 'faculty_designation', placeholder: 'Enter designation' },
                             { label: 'Role', key: 'role', type: 'select', options: ['Principal Investigator', 'Co-Principal Investigator', 'Research Collaborator'], required: true }
                         ]
@@ -135,7 +150,8 @@ export default function PartIII({ formData, academicYear, addItem, removeItem, u
                     {
                         label: 'Students Involved', key: 'students_involved', type: 'objectList', subFields: [
                             { label: 'Student Name', key: 'name', required: true, placeholder: 'Enter student name' }, { label: 'Student Roll No', key: 'roll_no', required: true, placeholder: 'Enter roll no' },
-                            { label: 'Role', key: 'role', type: 'select', options: ['Research Assistant', 'Intern', 'Contributor'], required: true }
+                            { label: 'Role', key: 'role', type: 'select', options: ['Research Assistant', 'Intern', 'Contributor', 'Other'], required: true },
+                            { label: 'Other Role', key: 'other_role', showIf: (item) => item.role === 'Other', requiredIf: (item) => item.role === 'Other', placeholder: 'Specify role' }
                         ]
                     },
                     {

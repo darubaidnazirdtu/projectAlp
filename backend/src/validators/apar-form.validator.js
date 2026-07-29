@@ -798,7 +798,14 @@ const researchSchema = z.object({
     end_date: optionalString,
     remarks: optionalString,
     academic_year: optionalString,
-    department_id: optionalString
+    department_id: optionalString,
+    status: optionalString,
+    role: optionalString,
+    link: optionalString,
+    faculty_involved: z.array(z.any()).optional(),
+    students_involved: z.array(z.any()).optional(),
+    manpower_details: z.array(z.any()).optional(),
+    external_collaborators: z.array(z.any()).optional()
   })).optional(),
   consultancy: z.array(z.object({
     consultancy_id: optionalString,

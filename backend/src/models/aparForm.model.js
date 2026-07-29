@@ -186,6 +186,7 @@ const AparFormSchema = new mongoose.Schema({
             funding_id: String,
             title_research: String,
             title: String, // Generic title
+            status: String,
             role: String,
             type_of_project: String,
             funding_agency_name: String,
