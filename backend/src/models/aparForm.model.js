@@ -350,6 +350,7 @@ const AparFormSchema = new mongoose.Schema({
             supervisor_role: String,
             status: String,
             supervisor_name: String, // Often auto-filled but good to have
+            supervisor_id: String,
             supervision_location: String,
             date_of_registration: Date,
             date_of_defence: Date,

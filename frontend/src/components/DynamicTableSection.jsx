@@ -249,7 +249,13 @@ export default function DynamicTableSection({
     };
 
     const handleStartEdit = (index, item) => {
-        setTempItem(normalizeMonthYearFields(item));
+        const itemWithDefaults = { ...item };
+        fields.forEach(field => {
+            if (field.defaultValue !== undefined && (itemWithDefaults[field.key] === undefined || itemWithDefaults[field.key] === '')) {
+                itemWithDefaults[field.key] = field.defaultValue;
+            }
+        });
+        setTempItem(normalizeMonthYearFields(itemWithDefaults));
         setTempSubItems({});
         setActiveSubForms({});
         setFieldErrors({});
