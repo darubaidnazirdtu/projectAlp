@@ -41,12 +41,18 @@ export default function PartIII({ formData, academicYear, addItem, removeItem, u
             if (field === 'projects' && newItem.type_of_project === 'Other' && newItem.type_of_project_other) {
                 newItem.type_of_project = newItem.type_of_project_other;
             }
+            if ((field === 'journals' || field === 'books' || field === 'conferences') && newItem.indexing === 'Other' && newItem.indexing_other) {
+                newItem.indexing = newItem.indexing_other;
+            }
             return addItem('research', field, newItem);
         },
         onUpdate: (index, newItem) => {
             const updatedItem = { ...newItem };
             if (field === 'projects' && updatedItem.type_of_project === 'Other' && updatedItem.type_of_project_other) {
                 updatedItem.type_of_project = updatedItem.type_of_project_other;
+            }
+            if ((field === 'journals' || field === 'books' || field === 'conferences') && updatedItem.indexing === 'Other' && updatedItem.indexing_other) {
+                updatedItem.indexing = updatedItem.indexing_other;
             }
             return updateArrayItem('research', field, index, updatedItem);
         },
@@ -183,6 +189,7 @@ export default function PartIII({ formData, academicYear, addItem, removeItem, u
                     { label: 'Pages', key: 'page_numbers',type: 'number', min: 0, required: true, placeholder: 'Page numbers' },
                     { label: 'Month-Year', key: 'year_of_publication',type: 'monthYear', ...academicCycleMonthYearBounds, required: true, placeholder: 'e.g., 02-2026' },
                     { label: 'Indexing', key: 'indexing', type: 'select', options: ['SCI', 'SCIE', 'Scopus', 'Web of Science', 'PubMed', 'UGC Care', 'Google Scholar', 'Other'], required: true, placeholder: 'Select Indexing' },
+                    { label: 'Specify Indexing', key: 'indexing_other', showIf: (item) => item.indexing === 'Other', requiredIf: (item) => item.indexing === 'Other', placeholder: 'Enter custom indexing' },
                     { label: 'Impact Factor', key: 'impact_factor', type: 'number', min: 0, required: true, placeholder: 'IF' },
                     { label: 'DOI', key: 'doi', required: true, placeholder: 'DOI' },
                     { label: 'First Page of Published Paper', key: 'link_to_paper', type: 'file', required: true },
@@ -192,8 +199,9 @@ export default function PartIII({ formData, academicYear, addItem, removeItem, u
                         { label: 'Employee Code', key: 'emp_code', showIf: (item) => item.author_type === 'Internal Author', requiredIf: (item) => item.author_type === 'Internal Author', placeholder: 'Enter employee code' }
                     ] },
                     { label: 'Students', key: 'students', type: 'objectList', subFields: [
+                        { label: 'Student Type', key: 'student_type', type: 'select', options: ['Internal', 'External'], required: true, placeholder: 'Select type' },
                         { label: 'Student Name', key: 'name', required: true, placeholder: 'Enter student name' },
-                        { label: 'Student Roll No', key: 'roll_no', required: true, placeholder: 'Enter roll no' }
+                        { label: 'Student Roll No', key: 'roll_no', showIf: (item) => item.student_type === 'Internal', requiredIf: (item) => item.student_type === 'Internal', placeholder: 'Enter roll no' }
                     ] }
                 ]}
             />
@@ -231,6 +239,7 @@ export default function PartIII({ formData, academicYear, addItem, removeItem, u
                     { label: 'Publisher Type', key: 'publisher_type', type: 'select', options: ['National', 'International'], required: true, placeholder: 'Select type' },
                     { label: 'DOI', key: 'doi', required: true, placeholder: 'DOI' },
                     { label: 'Indexing', key: 'indexing', type: 'select', options: ['SCI', 'SCIE', 'Scopus', 'Web of Science', 'PubMed', 'UGC Care', 'Google Scholar', 'Other'], required: true, placeholder: 'Select Indexing' },
+                    { label: 'Specify Indexing', key: 'indexing_other', showIf: (item) => item.indexing === 'Other', requiredIf: (item) => item.indexing === 'Other', placeholder: 'Enter custom indexing' },
                     { label: 'upload proof file', key: 'link_to_publication', type: 'file', required: true },
                     { label: 'Co-Author', key: 'faculty_members', type: 'objectList', subFields: [
                         { label: 'Author Type', key: 'author_type', type: 'select', options: ['Internal Author', 'External Author'], required: true, placeholder: 'Select type' },
@@ -286,7 +295,7 @@ export default function PartIII({ formData, academicYear, addItem, removeItem, u
                     { label: 'Volume', key: 'volume', required: true, placeholder: 'Volume' },
                     { label: 'Month-Year', key: 'year_of_publication', type: 'monthYear', ...academicCycleMonthYearBounds, required: true, placeholder: 'e.g., 02-2026' },
                     { label: 'DOI', key: 'doi', required: true, placeholder: 'DOI' },
-                    { label: 'Indexing', key: 'indexing', type: 'select', options: ['SCI', 'SCIE', 'Scopus', 'Web of Science', 'PubMed', 'UGC Care', 'Google Scholar', 'Other'], required: true, placeholder: 'Select Indexing' },
+                    { label: 'Indexing', key: 'indexing', type: 'select', options: ['Core A star', 'Core A', 'Core B', 'Core C', 'Peer Review', 'Scopus'], required: true, placeholder: 'Select Indexing' },
                     { label: 'Award Received', key: 'award_received', placeholder: 'Award details' },
                     { label: 'Upload the proof file', key: 'link_to_paper', type: 'file', required: true },
                     { label: 'Faculty Members', key: 'faculty_members', type: 'objectList', subFields: [

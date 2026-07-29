@@ -764,7 +764,10 @@ const researchSchema = z.object({
     paper_status: optionalString,
     link: optionalString,
     link_to_paper: optionalString,
-    department_id: optionalString
+    department_id: optionalString,
+    faculty_members: z.array(z.any()).optional(),
+    students: z.array(z.any()).optional(),
+    external_contributors: z.array(z.any()).optional()
   })).optional(),
   books: z.array(z.object({
     publication_id: optionalString,
