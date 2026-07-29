@@ -52,6 +52,16 @@ export default function PartIII({ formData, academicYear, addItem, removeItem, u
                     newItem.platform_type = newItem.platform_type_other;
                 }
             }
+            if (field === 'collaborations') {
+                if (newItem.start_date && newItem.end_date) {
+                    const start = new Date(newItem.start_date);
+                    const end = new Date(newItem.end_date);
+                    if (!isNaN(start) && !isNaN(end) && end >= start) {
+                        const diffDays = Math.ceil((end - start) / (1000 * 60 * 60 * 24)) + 1;
+                        newItem.duration = `${diffDays} days`;
+                    }
+                }
+            }
             return addItem('research', field, newItem);
         },
         onUpdate: (index, newItem) => {
@@ -68,6 +78,16 @@ export default function PartIII({ formData, academicYear, addItem, removeItem, u
                 }
                 if (updatedItem.platform_type === 'Other' && updatedItem.platform_type_other) {
                     updatedItem.platform_type = updatedItem.platform_type_other;
+                }
+            }
+            if (field === 'collaborations') {
+                if (updatedItem.start_date && updatedItem.end_date) {
+                    const start = new Date(updatedItem.start_date);
+                    const end = new Date(updatedItem.end_date);
+                    if (!isNaN(start) && !isNaN(end) && end >= start) {
+                        const diffDays = Math.ceil((end - start) / (1000 * 60 * 60 * 24)) + 1;
+                        updatedItem.duration = `${diffDays} days`;
+                    }
                 }
             }
             return updateArrayItem('research', field, index, updatedItem);
@@ -501,15 +521,15 @@ export default function PartIII({ formData, academicYear, addItem, removeItem, u
                     { label: 'Level', key: 'level', type: 'select', options: ['Institutional', 'National', 'International'], required: true, placeholder: 'Select level' },
                     { label: 'Nature', key: 'nature_of_collaboration', required: true, placeholder: 'Describe nature' },
                     { label: 'Participants', key: 'number_of_participants', type: 'number', min: 0, placeholder: 'Count' },
-                    { label: 'Funding amount', key: 'funding_amount', type: 'number', min: 0, required: true, placeholder: 'Amount' },
-                    { label: 'Funding Source', key: 'source_of_financial_support', required: true, placeholder: 'Source' },
-                    { label: 'Duration', key: 'duration', required: true, placeholder: 'e.g., 2 days' },
-                    { label: 'Month-Year', key: 'year', type: 'monthYear', ...academicCycleMonthYearBounds, required: true, placeholder: 'MM-YYYY' },
+                    { label: 'Funding amount', key: 'funding_amount', type: 'number', min: 0, placeholder: 'Amount' },
+                    { label: 'Funding Source', key: 'source_of_financial_support', placeholder: 'Source' },
+                    { label: 'End Month-Year', key: 'year', type: 'monthYear', ...academicCycleMonthYearBounds, required: true, placeholder: 'MM-YYYY' },
                     { ...academicYearField, hidden: true, hideInTable: true },
                     { label: 'Start Date', key: 'start_date', type: 'date', required: true },
                     { label: 'End Date', key: 'end_date', type: 'date', required: true },
+                    { label: 'Duration', key: 'duration', disabled: true, placeholder: 'Auto-calculated on save' },
                     { label: 'Remarks', key: 'remarks', placeholder: 'Remarks' },
-                    { label: 'Document proof upload', key: 'link', type: 'file', required: true },
+                    { label: 'MoU/Letter Proof', key: 'link', type: 'file' },
                     {
                         label: 'Faculty Involved', key: 'faculty_associations', type: 'objectList', subFields: [
                             { label: 'Author Type', key: 'author_type', type: 'select', options: ['Internal Author', 'External Author'], required: true, placeholder: 'Select type' },
