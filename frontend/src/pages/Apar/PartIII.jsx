@@ -44,6 +44,14 @@ export default function PartIII({ formData, academicYear, addItem, removeItem, u
             if ((field === 'journals' || field === 'books' || field === 'conferences') && newItem.indexing === 'Other' && newItem.indexing_other) {
                 newItem.indexing = newItem.indexing_other;
             }
+            if (field === 'e_content') {
+                if (newItem.type_of_content === 'Other' && newItem.type_of_content_other) {
+                    newItem.type_of_content = newItem.type_of_content_other;
+                }
+                if (newItem.platform_type === 'Other' && newItem.platform_type_other) {
+                    newItem.platform_type = newItem.platform_type_other;
+                }
+            }
             return addItem('research', field, newItem);
         },
         onUpdate: (index, newItem) => {
@@ -53,6 +61,14 @@ export default function PartIII({ formData, academicYear, addItem, removeItem, u
             }
             if ((field === 'journals' || field === 'books' || field === 'conferences') && updatedItem.indexing === 'Other' && updatedItem.indexing_other) {
                 updatedItem.indexing = updatedItem.indexing_other;
+            }
+            if (field === 'e_content') {
+                if (updatedItem.type_of_content === 'Other' && updatedItem.type_of_content_other) {
+                    updatedItem.type_of_content = updatedItem.type_of_content_other;
+                }
+                if (updatedItem.platform_type === 'Other' && updatedItem.platform_type_other) {
+                    updatedItem.platform_type = updatedItem.platform_type_other;
+                }
             }
             return updateArrayItem('research', field, index, updatedItem);
         },
@@ -425,7 +441,6 @@ export default function PartIII({ formData, academicYear, addItem, removeItem, u
                     platform_type: '',
                     target_audience: '',
                     academic_year: resolvedAcademicYear,
-                    semester: '',
                     date_of_launching: '',
                     duration_hours: '',
                     remarks: '',
@@ -437,15 +452,16 @@ export default function PartIII({ formData, academicYear, addItem, removeItem, u
                     { label: 'Course Code', key: 'course_code', required: true, placeholder: 'Enter course code' },
                     { label: 'Module Name', key: 'name_of_module', required: true, placeholder: 'Enter module name' },
                     { label: 'Type', key: 'type_of_content', type: 'select', options: ['Video', 'Module', 'Quiz', 'PPT', 'Simulation', 'eBook', 'Other'], required: true, placeholder: 'Select type' },
+                    { label: 'Specify Type', key: 'type_of_content_other', showIf: (item) => item?.type_of_content === 'Other', requiredIf: (item) => item?.type_of_content === 'Other', placeholder: 'Enter custom type' },
                     { label: 'Platform', key: 'platform', required: true, placeholder: 'Enter platform' },
                     { label: 'Platform Type', key: 'platform_type', type: 'select', options: ['LMS', 'MOOC', 'YouTube', 'SWAYAM', 'Internal', 'Other'], required: true, placeholder: 'Select platform type' },
+                    { label: 'Specify Platform Type', key: 'platform_type_other', showIf: (item) => item?.platform_type === 'Other', requiredIf: (item) => item?.platform_type === 'Other', placeholder: 'Enter custom platform type' },
                     { label: 'Target Audience', key: 'target_audience', type: 'select', options: ['UG', 'PG', 'PhD', 'Faculty', 'Students', 'Mixed'], required: true, placeholder: 'Select audience' },
-                    academicYearField,
-                    { label: 'Semester', key: 'semester', required: true, placeholder: 'e.g., Odd' },
-                    { label: 'Date', key: 'date_of_launching', type: 'date', required: true },
+                    { ...academicYearField, hidden: true },
+                    { label: 'Launch Date', key: 'date_of_launching', type: 'date', required: true },
                     { label: 'Duration (Hours)', key: 'duration_hours', type: 'number', min: 0, required: true, placeholder: 'Hours' },
                     { label: 'Remarks', key: 'remarks', placeholder: 'Remarks' },
-                    { label: 'Upload pdf proof', key: 'link', type: 'file' }
+                    { label: 'Upload invitation letter/certificate proof', key: 'link', type: 'file' }
                 ]}
             />
 
