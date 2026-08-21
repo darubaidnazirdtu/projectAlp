@@ -17,6 +17,10 @@ This guide provides the necessary steps to get the `projectAlp` application runn
    ```bash
    docker-compose up -d --build
    ```
+4. Run the following command to seed the database:
+   ```bash
+   docker compose exec backend node src/scripts/seedUser.js
+   ```
 
 ## Application Links
 
@@ -64,3 +68,6 @@ mongosh "mongodb://localhost:27017"
   ```bash
   docker-compose restart
   ```
+Login  
+IQAC - iqachead@dtu.ac.in 12345
+APAR - pawansingh@dtu.ac.in 12345
