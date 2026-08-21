@@ -94,7 +94,7 @@ const AparFormSchema = new mongoose.Schema({
             description: String // legacy
         }],
         ict_tools: [{ description: String, room_no: String }],
-        student_centric_methods: [{ description: String }],
+        student_centric_methods: [{ method_id: String, description: String }],
         tutorials_tests: [{
             course_name: String,
 

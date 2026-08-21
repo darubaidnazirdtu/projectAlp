@@ -17,6 +17,7 @@ import { Department } from "../models/department.model.js";
 import { User } from "../models/user.model.js";
 import { Faculty } from "../models/faculty.model.js";
 import { FacultyProfile } from "../models/facultyProfile.model.js";
+import { Teaching } from "../models/teaching.model.js";
 import { createNotification, notifyHeads } from "./notification.controller.js";
 import { v4 as uuidv4 } from 'uuid'; // Assuming uuid is available or use generic ID generator
 import { normalizeQualifications } from '../utils/qualification.util.js';
@@ -273,9 +274,9 @@ const syncIqacToAparForm = async (form, faculty_id, ay) => {
     // ... redefine merge to include logging if helpful, or just log query results below.
 
     // Generic Merger with Enhanced Matching
-    const merge = (sectionKey, iqacList, idField, type) => {
-        if (!typeof research[sectionKey] === 'object') research[sectionKey] = [];
-        const oldSection = Array.isArray(research[sectionKey]) ? research[sectionKey] : [];
+    const merge = (sectionKey, iqacList, idField, type, parentObj = research) => {
+        if (typeof parentObj[sectionKey] !== 'object' || parentObj[sectionKey] === null) parentObj[sectionKey] = [];
+        const oldSection = Array.isArray(parentObj[sectionKey]) ? parentObj[sectionKey] : [];
 
         // Map valid IQAC items to clean POJOs
         const newSection = iqacList.map(iqacItem => {
@@ -305,7 +306,8 @@ const syncIqacToAparForm = async (form, faculty_id, ay) => {
             fdps: ['program_title', 'title'],
             e_content: ['name_of_module', 'title'],
             collaborations: ['title_of_activity', 'title'],
-            faculty_visits: ['title']
+            faculty_visits: ['title'],
+            student_centric_methods: ['description']
         };
 
         const idKeyFor = (item) => {
@@ -325,7 +327,7 @@ const syncIqacToAparForm = async (form, faculty_id, ay) => {
 
         if (wasEmpty) {
             if (newSection.length > 0) modified = true;
-            research[sectionKey] = newSection;
+            parentObj[sectionKey] = newSection;
             return;
         }
 
@@ -378,7 +380,7 @@ const syncIqacToAparForm = async (form, faculty_id, ay) => {
         if (combined.length !== oldSection.length) {
             modified = true;
         }
-        research[sectionKey] = combined;
+        parentObj[sectionKey] = combined;
     };
 
     // Create case-insensitive ID query
@@ -527,6 +529,16 @@ const syncIqacToAparForm = async (form, faculty_id, ay) => {
         const mous = await Collaboration.find({ type: 'mou', 'faculty_associations.faculty_id': idQuery, academic_year: { $in: ayVariants } }).lean();
         const mousMapped = mous.map(m => ({ ...m, mou_id: m.collaboration_id }));
         merge('mous', mousMapped, 'mou_id', 'default');
+
+        // 14. Student Centric Methods (Teaching)
+        const teachingMethods = await Teaching.find({ faculty_id: idQuery, academic_year: { $in: ayVariants } }).lean();
+        const teachingMapped = teachingMethods.map(t => ({
+            ...t,
+            description: t.details_of_methods,
+            method_id: t.method_id
+        }));
+        if (!form.teaching) form.teaching = {};
+        merge('student_centric_methods', teachingMapped, 'method_id', 'default', form.teaching);
 
     } catch (e) {
         console.error("Error syncing IQAC to APAR:", e);

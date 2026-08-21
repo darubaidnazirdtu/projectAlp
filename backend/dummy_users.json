@@ -14,7 +14,7 @@
         "updated_at": "2024-01-01T00:00:00.000Z"
     },
     {
-        "user_id": "HOD_CSE",
+        "user_id": "HODCSE",
         "email": "hod.cse@dtu.ac.in",
         "password_hash": "$2b$12$IL1Url5C.RAG8tgyNGWwR.aM2wI/ZvOd46NCs8P99eqLFz9bdYXZ2",
         "role": "Department HOD",
@@ -28,7 +28,7 @@
         "updated_at": "2024-01-01T00:00:00.000Z"
     },
     {
-        "user_id": "REV_OFFICER",
+        "user_id": "REVOFFICER",
         "email": "prateek.sharma@dtu.ac.in",
         "password_hash": "$2b$12$IL1Url5C.RAG8tgyNGWwR.aM2wI/ZvOd46NCs8P99eqLFz9bdYXZ2",
         "role": "",
@@ -42,13 +42,13 @@
         "updated_at": "2024-01-01T00:00:00.000Z"
     },
     {
-        "user_id": "FAC_PAWAN",
+        "user_id": "FACPAWAN",
         "email": "pawansingh@dtu.ac.in",
         "password_hash": "$2b$12$IL1Url5C.RAG8tgyNGWwR.aM2wI/ZvOd46NCs8P99eqLFz9bdYXZ2",
         "role": "Faculty Member",
         "apar_role": "Officer (Graded)",
-        "reporting_officer_id": "HOD_CSE",
-        "reviewing_officer_id": "REV_OFFICER",
+        "reporting_officer_id": "HODCSE",
+        "reviewing_officer_id": "REVOFFICER",
         "department_id": "CSE",
         "session_token": null,
         "session_expires_at": null,
@@ -56,13 +56,13 @@
         "updated_at": "2024-01-01T00:00:00.000Z"
     },
     {
-        "user_id": "FAC_ANURAG",
+        "user_id": "FACANURAG",
         "email": "anurag@dtu.ac.in",
         "password_hash": "$2b$12$IL1Url5C.RAG8tgyNGWwR.aM2wI/ZvOd46NCs8P99eqLFz9bdYXZ2",
         "role": "Faculty Member",
         "apar_role": "Officer (Graded)",
-        "reporting_officer_id": "HOD_CSE",
-        "reviewing_officer_id": "REV_OFFICER",
+        "reporting_officer_id": "HODCSE",
+        "reviewing_officer_id": "REVOFFICER",
         "department_id": "CSE",
         "session_token": null,
         "session_expires_at": null,
@@ -70,13 +70,13 @@
         "updated_at": "2024-01-01T00:00:00.000Z"
     },
     {
-        "user_id": "FAC_GUNJAN",
+        "user_id": "FACGUNJAN",
         "email": "gunjanchugh@dtu.ac.in",
         "password_hash": "$2b$12$IL1Url5C.RAG8tgyNGWwR.aM2wI/ZvOd46NCs8P99eqLFz9bdYXZ2",
         "role": "Faculty Member",
         "apar_role": "Officer (Graded)",
-        "reporting_officer_id": "HOD_CSE",
-        "reviewing_officer_id": "REV_OFFICER",
+        "reporting_officer_id": "HODCSE",
+        "reviewing_officer_id": "REVOFFICER",
         "department_id": "CSE",
         "session_token": null,
         "session_expires_at": null,

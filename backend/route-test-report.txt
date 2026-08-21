@@ -1,26 +1,3 @@
 Route Test Report
 Base URL: http://localhost:8000
-Discovered: 21 endpoints
-Success: 0  Client-Error: 7  Server-Error: 14
-
-4XX  POST   /api/v1/upload -> 401 (8ms)
-FAIL POST   /api/v1/auth/login -> 500 (4ms)
-FAIL POST   /api/v1/auth/allowed-roles -> 500 (3ms)
-FAIL POST   /api/v1/auth/register -> 500 (2ms)
-FAIL POST   /api/v1/auth/logout -> 500 (2ms)
-4XX  GET    /api/v1/auth/profile -> 401 (2ms)
-FAIL POST   /api/v1/auth/verify-role -> 500 (2ms)
-FAIL POST   /api/v1/auth/change-password -> 500 (3ms)
-4XX  GET    /api/v1/auth/user-ids -> 401 (4ms)
-FAIL POST   /api/v1/apar/auth/login -> 500 (2ms)
-FAIL POST   /api/v1/apar/auth/allowed-roles -> 500 (1ms)
-FAIL POST   /api/v1/apar/auth/logout -> 500 (1ms)
-4XX  GET    /api/v1/apar/auth/profile -> 401 (2ms)
-FAIL POST   /api/v1/apar/auth/profile/avatar -> 500 (1ms)
-FAIL POST   /api/v1/apar/auth/verify-role -> 500 (2ms)
-FAIL POST   /api/v1/apar/auth/change-password -> 500 (2ms)
-4XX  GET    /api/v1/notifications -> 401 (3ms)
-FAIL PATCH  /api/v1/notifications/000000000000000000000000/read -> 500 (2ms)
-FAIL PATCH  /api/v1/notifications/read-all -> 500 (2ms)
-4XX  GET    /api/v1/dashboard/stats -> 401 (3ms)
-4XX  GET    /api/v1/departments -> 404 (2ms)
+ERROR: Base URL not reachable. AggregateError

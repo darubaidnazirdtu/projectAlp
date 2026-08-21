@@ -396,11 +396,11 @@ async function fillReactSelect(page, container, fieldName) {
         await control.click();
         await delay(300); // Wait for dropdown to open
 
-        // If it's a faculty field, try to type "FAC_PAWAN" to filter
+        // If it's a faculty field, try to type "FACPAWAN" to filter
         if (isFacultyField) {
             const input = await container.$('input');
             if (input) {
-                await input.type('FAC_PAWAN', { delay: 50 });
+                await input.type('FACPAWAN', { delay: 50 });
                 await delay(1000); // Wait for search results
             }
         }
@@ -431,14 +431,14 @@ async function fillReactSelect(page, container, fieldName) {
         }
 
         if (options.length > 0) {
-            // If it's a faculty field, try to find "FAC_PAWAN" in the options
+            // If it's a faculty field, try to find "FACPAWAN" in the options
             if (isFacultyField) {
                 for (const option of options) {
                     const text = await option.evaluate(el => el.textContent || '');
-                    if (text.includes('FAC_PAWAN')) {
+                    if (text.includes('FACPAWAN')) {
                         await option.click();
                         await delay(300);
-                        return 'FAC_PAWAN';
+                        return 'FACPAWAN';
                     }
                 }
             }

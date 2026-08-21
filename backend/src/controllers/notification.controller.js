@@ -125,7 +125,7 @@ const buildNotificationRecipientConditions = (user = {}) => {
     // and simplified exact matching for roles
     return recipients.map(r => {
         // If it looks like a role (no digits, just letters/underscores), exact match might be safer
-        // but IDs like "FAC_PAWAN" need case insensitivity.
+        // but IDs like "FACPAWAN" need case insensitivity.
         return { recipient: { $regex: new RegExp(`^${escapeRegex(r)}$`, 'i') } };
     });
 };

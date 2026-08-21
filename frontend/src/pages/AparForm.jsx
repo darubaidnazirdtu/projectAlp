@@ -661,7 +661,7 @@ export default function AparForm() {
     React.useEffect(() => {
         if (!aparUser) return;
         const role = aparRole || loginData.role;
-        if (!(role === 'Reporting Officer' || role === 'Reviewing Officer')) return;
+        if (!(role === 'Reporting Officer' || role === 'Reviewing Officer' || role === 'Dean' || role === 'IQAC Head')) return;
         if (viewMode !== 'list') return;
         (async () => {
             try {
@@ -1373,7 +1373,7 @@ export default function AparForm() {
 
     const isReadOnlyMode = () => {
         const role = aparRole || loginData.role;
-        if (role === 'Reporting Officer' || role === 'Reviewing Officer') return true;
+        if (role === 'Reporting Officer' || role === 'Reviewing Officer' || role === 'Dean' || role === 'IQAC Head') return true;
 
         if (formStatus === 'Submitted') return true;
         const isEditable = !formStatus || ['Draft', 'Query Raised', 'not_filled', 'Query Raised by Reporting officer', 'Query Raised by Reviewing officer'].includes(formStatus);
