@@ -571,6 +571,7 @@ import { iqacApprovalService } from '../services/iqacApproval.service.js';
 import { useIqacFilter } from '../context/IqacFilterContext.jsx';
 import { getSessionFilterOptions } from '../utils/academicYears.js';
 import TablePage from './TablePage';
+import QuickActionsSection from './QuickActionsSection.jsx';
 
 const StatCard = ({ icon, label, value, subtext, trend, trendUp, color, onClick, isActive, hideArrow }) => {
   const colorClasses = {
@@ -1455,26 +1456,8 @@ export default function Dashboard() {
         </WidgetBlock>
       )}
 
-      {/* Quick Shortcuts */}
-      <div className="mt-8 mb-4 flex items-center justify-between">
-         <h2 className="text-base font-semibold text-gray-800">Quick Form Actions</h2>
-      </div>
-      {quickActions.length > 0 ? (
-        <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-3">
-          {quickActions.map((resource) => (
-            <QuickLink
-              key={resource.id}
-              to={resource.addPath}
-              icon={<resource.icon />}
-              label={resource.addLabel}
-            />
-          ))}
-        </div>
-      ) : (
-        <div className="rounded border border-dashed border-gray-200 p-6 text-center text-sm text-gray-500">
-          No quick actions available.
-        </div>
-      )}
+      {/* Quick Form Actions */}
+      <QuickActionsSection quickActions={quickActions} />
     </div>
   );
 }
