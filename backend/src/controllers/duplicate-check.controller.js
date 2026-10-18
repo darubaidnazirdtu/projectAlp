@@ -151,13 +151,36 @@ const checkDuplicate = asyncHandler(async (req, res) => {
         );
     }
 
-    // Get year range from academic year
-    const ayYears = ay.split('-').map(y => parseInt(y)).filter(n => !isNaN(n));
+    // Get year range and variants from academic year
+    const parsedYears = ay.split('-').map(y => parseInt(y)).filter(n => !isNaN(n));
+    const ayYears = [ay];
+
+    if (parsedYears.length >= 2) {
+        const start = parsedYears[0];
+        const end = parsedYears[parsedYears.length - 1];
+        const startLong = start < 100 ? 2000 + start : start;
+        const endLong = end < 100 ? 2000 + end : end;
+        ayYears.push(`${startLong}-${endLong}`);
+        ayYears.push(`${startLong}-${endLong % 100}`);
+    }
+
+    parsedYears.forEach(y => {
+        ayYears.push(y);
+        ayYears.push(String(y));
+        const longYear = y < 100 ? 2000 + y : y;
+        ayYears.push(longYear);
+        ayYears.push(String(longYear));
+        const shortYear = y % 100;
+        ayYears.push(shortYear);
+        ayYears.push(String(shortYear));
+    });
+
+    const uniqueAyYears = [...new Set(ayYears)];
 
     // Build query with year filter
     let query = { ...strategy.query };
-    if (ayYears.length > 0 && strategy.yearField !== 'date_of_filing') {
-        query[strategy.yearField] = { $in: ayYears };
+    if (uniqueAyYears.length > 0 && strategy.yearField !== 'date_of_filing') {
+        query[strategy.yearField] = { $in: uniqueAyYears };
     }
 
     // Fetch existing entries

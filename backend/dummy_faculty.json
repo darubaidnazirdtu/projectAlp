@@ -1,6 +1,6 @@
 [
     {
-        "faculty_id": "FAC_PAWAN",
+        "faculty_id": "FACPAWAN",
         "email": "pawansingh@dtu.ac.in",
         "name": "Dr. Pawan Singh Mehra",
         "gender": "Male",
@@ -21,7 +21,7 @@
         }
     },
     {
-        "faculty_id": "FAC_ANURAG",
+        "faculty_id": "FACANURAG",
         "email": "anurag@dtu.ac.in",
         "name": "Dr. Anurag Goel",
         "gender": "Male",
@@ -42,7 +42,7 @@
         }
     },
     {
-        "faculty_id": "FAC_GUNJAN",
+        "faculty_id": "FACGUNJAN",
         "email": "gunjanchugh@dtu.ac.in",
         "name": "Dr. Gunjan Chugh",
         "gender": "Female",

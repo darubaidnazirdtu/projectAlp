@@ -323,7 +323,7 @@ export const emitCrossFacultyUpdate = (faculty_id, academic_year, data) => {
 export const emitNotification = (userId, notification) => {
     if (!io) return;
 
-    // Resolve user ID logic if needed, but assuming userId is the resolved ID (e.g. "FAC_PAWAN")
+    // Resolve user ID logic if needed, but assuming userId is the resolved ID (e.g. "FACPAWAN")
     // If it could be Mongo ID, we might need resolving, but the callers usually have the readable ID.
     // Let's assume readable ID for now as that's what rooms use.
 

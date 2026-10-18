@@ -1,6 +1,7 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { FiArchive, FiCheckCircle, FiClock, FiLoader, FiSearch, FiUsers, FiX } from 'react-icons/fi';
+import { useNavigate } from 'react-router-dom';
+import { FiArchive, FiCheckCircle, FiClock, FiLoader, FiSearch, FiUsers, FiX, FiEye } from 'react-icons/fi';
 import { aparFormReportingService } from '../../services/apar_form_reporting.service.js';
 import { aparLogout } from '../../store/slices/aparAuthSlice.js';
 import { DepartmentService } from '../../services/department.services.js';
@@ -33,6 +34,7 @@ const formatDate = (value) => {
 
 export default function DeanDashboard() {
   const dispatch = useDispatch();
+  const navigate = useNavigate();
   const { user } = useSelector((state) => state.aparAuth);
   const [rows, setRows] = useState([]);
   const [summary, setSummary] = useState({ totalFaculty: 0, submittedCount: 0, notSubmittedCount: 0 });
@@ -136,6 +138,10 @@ export default function DeanDashboard() {
     setStatusModalOpen(true);
     await loadFacultyHistory(row.faculty_id, row.ay);
   }, [loadFacultyHistory]);
+
+  const handleViewForm = useCallback((row) => {
+    navigate('/apar-form', { state: { selectedFaculty: { ...row, raw: row }, action: 'view' } });
+  }, [navigate]);
 
   return (
     <div className="apar-page-bg min-h-screen px-4 py-8 sm:px-6 lg:px-8">
@@ -247,6 +253,7 @@ export default function DeanDashboard() {
                       <th className="!text-left">Submitted</th>
                       <th className="!text-left">APAR Status</th>
                       <th className="!text-left">Last Updated</th>
+                      <th className="!text-left">Actions</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -272,6 +279,16 @@ export default function DeanDashboard() {
                           </button>
                         </td>
                         <td className="!text-left text-sm text-gray-500">{formatDate(row.updatedAt || row.submittedAt)}</td>
+                        <td className="!text-left">
+                          <button
+                            onClick={() => handleViewForm(row)}
+                            className="inline-flex items-center gap-1 rounded-lg border border-emerald-200 bg-white px-2.5 py-1.5 text-xs font-semibold text-emerald-800 shadow-sm transition hover:bg-emerald-50 active:scale-95 cursor-pointer disabled:opacity-60"
+                            disabled={row.status === 'Not Filled' || row.status === 'not_filled'}
+                            title={row.status === 'Not Filled' || row.status === 'not_filled' ? 'Form has not been created yet' : 'View Faculty APAR Form'}
+                          >
+                            <FiEye className="h-3.5 w-3.5" /> View Form
+                          </button>
+                        </td>
                       </tr>
                     ))}
                   </tbody>

@@ -90,7 +90,7 @@ const USERS = [
     },
     // 2. HOD CSE (User table only, APAR Reporting Officer)
     {
-        user_id: 'HOD_CSE',
+        user_id: 'HODCSE',
         email: 'hod.cse@dtu.ac.in',
         name: 'Dr. Manoj Kumar',
         role: 'Department HOD',
@@ -102,7 +102,7 @@ const USERS = [
     },
     // 3. Reviewing Officer (User table only, APAR Reviewing Officer)
     {
-        user_id: 'REV_OFFICER',
+        user_id: 'REVOFFICER',
         email: 'prateek.sharma@dtu.ac.in',
         name: 'Dr. Prateek Sharma',
         role: 'Faculty Member',
@@ -114,15 +114,15 @@ const USERS = [
     },
     // 4. Faculty (Both Tables)
     {
-        user_id: 'FAC_PAWAN',
+        user_id: 'FACPAWAN',
         email: 'pawansingh@dtu.ac.in',
         name: 'Pawan Singh Mehra',
         role: 'Faculty Member',
         department_id: 'CSE',
         designation: 'Assistant Professor',
         apar_role: 'Officer (Graded)',
-        reporting_officer_id: 'HOD_CSE',
-        reviewing_officer_id: 'REV_OFFICER',
+        reporting_officer_id: 'HODCSE',
+        reviewing_officer_id: 'REVOFFICER',
         password_hash: PASSWORD_HASH,
         in_faculty: true,
         // Faculty Details
@@ -135,15 +135,15 @@ const USERS = [
     },
     // 5. Faculty 2
     {
-        user_id: 'FAC_ANURAG',
+        user_id: 'FACANURAG',
         email: 'anurag@dtu.ac.in',
         name: 'Dr. Anurag Goel',
         role: 'Faculty Member',
         department_id: 'CSE',
         designation: 'Assistant Professor',
         apar_role: 'Officer (Graded)',
-        reporting_officer_id: 'HOD_CSE',
-        reviewing_officer_id: 'REV_OFFICER',
+        reporting_officer_id: 'HODCSE',
+        reviewing_officer_id: 'REVOFFICER',
         password_hash: PASSWORD_HASH,
         in_faculty: true,
         // Faculty Details
@@ -156,15 +156,15 @@ const USERS = [
     },
     // 6. Faculty 3
     {
-        user_id: 'FAC_GUNJAN',
+        user_id: 'FACGUNJAN',
         email: 'gunjanchugh@dtu.ac.in',
         name: 'Dr. Gunjan Chugh',
         role: 'Faculty Member',
         department_id: 'CSE',
         designation: 'Assistant Professor',
         apar_role: 'Officer (Graded)',
-        reporting_officer_id: 'HOD_CSE',
-        reviewing_officer_id: 'REV_OFFICER',
+        reporting_officer_id: 'HODCSE',
+        reviewing_officer_id: 'REVOFFICER',
         password_hash: PASSWORD_HASH,
         in_faculty: true,
         // Faculty Details
@@ -177,15 +177,15 @@ const USERS = [
     },
     // 7. Additional Officer (Graded) users requested by user
     {
-        user_id: 'FAC_ADITI_ZEAR',
+        user_id: 'FACADITIZEAR',
         email: 'aditi.zear@dtu.ac.in',
         name: 'Aditi Zear',
         role: 'Faculty Member',
         department_id: 'CSE',
         designation: 'Assistant Professor',
         apar_role: 'Officer (Graded)',
-        reporting_officer_id: 'HOD_CSE',
-        reviewing_officer_id: 'REV_OFFICER',
+        reporting_officer_id: 'HODCSE',
+        reviewing_officer_id: 'REVOFFICER',
         password_hash: PASSWORD_HASH,
         in_faculty: true,
         gender: 'Female',
@@ -196,15 +196,15 @@ const USERS = [
         specialization: 'Computer Science'
     },
     {
-        user_id: 'FAC_PRAMA_BISHNOI',
+        user_id: 'FACPRAMABISHNOI',
         email: 'prama.bishnoi@dtu.ac.in',
         name: 'Prama Bishnoi',
         role: 'Faculty Member',
         department_id: 'CSE',
         designation: 'Assistant Professor',
         apar_role: 'Officer (Graded)',
-        reporting_officer_id: 'HOD_CSE',
-        reviewing_officer_id: 'REV_OFFICER',
+        reporting_officer_id: 'HODCSE',
+        reviewing_officer_id: 'REVOFFICER',
         password_hash: PASSWORD_HASH,
         in_faculty: true,
         gender: 'Female',
@@ -215,15 +215,15 @@ const USERS = [
         specialization: 'Information Technology'
     },
     {
-        user_id: 'FAC_BINDU_VERMA',
+        user_id: 'FACBINDUVERMA',
         email: 'bindu.verma@dtu.ac.in',
         name: 'Bindu Verma',
         role: 'Faculty Member',
         department_id: 'CSE',
         designation: 'Assistant Professor',
         apar_role: 'Officer (Graded)',
-        reporting_officer_id: 'HOD_CSE',
-        reviewing_officer_id: 'REV_OFFICER',
+        reporting_officer_id: 'HODCSE',
+        reviewing_officer_id: 'REVOFFICER',
         password_hash: PASSWORD_HASH,
         in_faculty: true,
         gender: 'Female',
