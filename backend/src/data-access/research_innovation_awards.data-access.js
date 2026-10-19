@@ -2,6 +2,7 @@ import { FacultyActivity } from "../models/facultyActivity.model.js";
 import { v4 as uuidv4 } from 'uuid';
 import mongoose from 'mongoose';
 import { triggerAparAutoSyncMultiple } from '../utils/apar-auto-sync.js';
+import { ApiError } from '../utils/api-error.js';
 
 /**
  * Research Innovation Awards Data Access Layer
@@ -57,7 +58,7 @@ const set = async (data, loggedInUser = null) => {
     });
 
     if (existingAward) {
-      throw new Error(`Duplicate Entry: An award "${name_of_award}" (${year}) already exists.`);
+      throw new ApiError(409, `Duplicate Entry: An award "${name_of_award}" (${year}) already exists.`);
     }
 
     const award_id = uuidv4();

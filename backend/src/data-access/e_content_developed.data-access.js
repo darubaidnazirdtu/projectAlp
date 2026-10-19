@@ -2,6 +2,7 @@ import { FacultyActivity } from "../models/facultyActivity.model.js";
 import { v4 as uuidv4 } from 'uuid';
 import mongoose from 'mongoose';
 import { triggerAparAutoSyncMultiple } from '../utils/apar-auto-sync.js';
+import { ApiError } from '../utils/api-error.js';
 
 /**
  * E-Content Developed Data Access Layer
@@ -39,7 +40,7 @@ const set = async (data, loggedInUser = null) => {
     });
 
     if (existingContent) {
-      throw new Error(`Duplicate Entry: E-Content module "${name_of_module}" for this course already exists.`);
+      throw new ApiError(409, `Duplicate Entry: E-Content module "${name_of_module}" for this course already exists.`);
     }
 
     const econtent_id = uuidv4();

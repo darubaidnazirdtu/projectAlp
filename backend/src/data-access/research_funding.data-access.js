@@ -2,6 +2,7 @@ import { ResearchProject } from "../models/researchProject.model.js";
 import { v4 as uuidv4 } from 'uuid';
 import { triggerAparAutoSyncMultiple } from '../utils/apar-auto-sync.js';
 import mongoose from 'mongoose';
+import { ApiError } from '../utils/api-error.js';
 
 /**
  * Research Funding Data Access Layer
@@ -64,7 +65,7 @@ const set = async (data, loggedInUser = null) => {
     });
 
     if (existingProject) {
-      throw new Error(`Duplicate Entry: A project with title "${title_research}" and agency "${funding_agency_name}" already exists.`);
+      throw new ApiError(409, `Duplicate Entry: A project with title "${title_research}" and agency "${funding_agency_name}" already exists.`);
     }
 
     const funding_id = uuidv4();

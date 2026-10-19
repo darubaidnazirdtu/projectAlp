@@ -3,6 +3,7 @@ import { Faculty } from "../models/faculty.model.js";
 import { v4 as uuidv4 } from 'uuid';
 import mongoose from 'mongoose';
 import { triggerAparAutoSyncMultiple } from '../utils/apar-auto-sync.js';
+import { ApiError } from '../utils/api-error.js';
 
 /**
  * PhD Defence Data Access Layer
@@ -108,7 +109,7 @@ const set = async (data, loggedInUser = null) => {
     const existingDefence = await PhdDefence.findOne(duplicateQuery);
 
     if (existingDefence) {
-      throw new Error(`Duplicate Entry: PhD Defence for student "${student_name}" (${enrollment_no || thesis_title}) already exists.`);
+      throw new ApiError(409, `Duplicate Entry: PhD Defence for student "${student_name}" (${enrollment_no || thesis_title}) already exists.`);
     }
 
     const defence_id = uuidv4();

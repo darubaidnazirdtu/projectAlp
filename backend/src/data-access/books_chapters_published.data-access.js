@@ -2,6 +2,7 @@ import { Publication } from "../models/publication.model.js";
 import { v4 as uuidv4 } from 'uuid';
 import mongoose from 'mongoose';
 import { triggerAparAutoSyncMultiple } from '../utils/apar-auto-sync.js';
+import { ApiError } from '../utils/api-error.js';
 
 /**
  * Books & Chapters Published Data Access Layer
@@ -80,7 +81,7 @@ const set = async (data, loggedInUser = null) => {
     });
 
     if (existingBook) {
-      throw new Error(`Duplicate Entry: A book/chapter "${title_of_book || title_of_chapter}" (${year}) already exists.`);
+      throw new ApiError(409, `Duplicate Entry: A book/chapter "${title_of_book || title_of_chapter}" (${year}) already exists.`);
     }
 
     const publication_id = uuidv4();

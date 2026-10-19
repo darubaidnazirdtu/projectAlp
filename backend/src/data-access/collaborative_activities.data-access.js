@@ -2,6 +2,7 @@ import { Collaboration } from "../models/collaboration.model.js";
 import { v4 as uuidv4 } from 'uuid';
 import mongoose from 'mongoose';
 import { triggerAparAutoSyncMultiple } from '../utils/apar-auto-sync.js';
+import { ApiError } from '../utils/api-error.js';
 
 /**
  * Collaborative Activities Data Access Layer
@@ -59,7 +60,7 @@ const set = async (data, loggedInUser = null) => {
     });
 
     if (existingActivity) {
-      throw new Error(`Duplicate Entry: An activity "${title_of_activity}" (${year}) already exists.`);
+      throw new ApiError(409, `Duplicate Entry: An activity "${title_of_activity}" (${year}) already exists.`);
     }
 
     const activity_id = uuidv4();
