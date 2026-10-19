@@ -2,6 +2,7 @@ import { ResearchProject } from "../models/researchProject.model.js";
 import { v4 as uuidv4 } from 'uuid';
 import mongoose from 'mongoose';
 import { triggerAparAutoSyncMultiple } from '../utils/apar-auto-sync.js';
+import { ApiError } from '../utils/api-error.js';
 
 /**
  * Revenue from Consultancy Data Access Layer
@@ -57,7 +58,7 @@ const set = async (data, loggedInUser = null) => {
     });
 
     if (existingConsultancy) {
-      throw new Error(`Duplicate Entry: A consultancy project "${name_of_project}" with agency "${agency_name}" already exists.`);
+      throw new ApiError(409, `Duplicate Entry: A consultancy project "${name_of_project}" with agency "${agency_name}" already exists.`);
     }
 
     const consultancy_id = uuidv4();

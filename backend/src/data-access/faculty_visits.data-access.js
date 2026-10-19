@@ -2,6 +2,7 @@ import { FacultyActivity } from "../models/facultyActivity.model.js";
 import { v4 as uuidv4 } from 'uuid';
 import mongoose from 'mongoose';
 import { triggerAparAutoSyncMultiple } from '../utils/apar-auto-sync.js';
+import { ApiError } from '../utils/api-error.js';
 
 /**
  * Faculty Visits Data Access Layer
@@ -37,7 +38,7 @@ const set = async (data, loggedInUser = null) => {
     });
 
     if (existingVisit) {
-      throw new Error(`Duplicate Entry: A visit titled "${title}" on ${start_date} already exists.`);
+      throw new ApiError(409, `Duplicate Entry: A visit titled "${title}" on ${start_date} already exists.`);
     }
 
     const visit_id = uuidv4();

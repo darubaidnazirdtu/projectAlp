@@ -2,6 +2,7 @@ import { Publication } from "../models/publication.model.js";
 import { v4 as uuidv4 } from 'uuid';
 import { triggerAparAutoSyncMultiple } from '../utils/apar-auto-sync.js';
 import mongoose from 'mongoose';
+import { ApiError } from '../utils/api-error.js';
 
 /**
  * Conference Research Papers Data Access Layer
@@ -94,7 +95,7 @@ const set = async (data, loggedInUser = null) => {
     });
 
     if (existingPaper) {
-      throw new Error(`Duplicate Entry: A conference paper "${title}" in "${name_of_conference}" (${year_of_publication}) already exists.`);
+      throw new ApiError(409, `Duplicate Entry: A conference paper "${title}" in "${name_of_conference}" (${year_of_publication}) already exists.`);
     }
 
     const newPublication = new Publication({
